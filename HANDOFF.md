@@ -7,23 +7,25 @@
 
 ## 当前位置（下个 session 从这里开始，细节再往下读）
 
-- **状态（2026-10-19 17:45）**：**四个目标全部 `BUILD SUCCEEDED`**，且临时调试代码已全部删除。
-  `git` 仓库已初始化、首个提交已完成（`049e547`，82 个文件，900K），SSH 密钥已生成并加载。
-- **正在做（用户外出，等回复）**：卡在「GitHub 用户名」和「签名方案」两个需要用户输入的点上。
-  其余能自己做的都已做完（见 5.11）。
-- **下一步（用户给信息后）**：
-  1. 把 `~/.ssh/id_ed25519.pub` 贴到 GitHub → `git remote add origin` → `git push -u origin main`
-  2. 替换 README 第 65、123 行的 `<your-name>`
-  3. 出 Release v1.0 的 `.ipa` / `.app`（**被签名卡住**，见 5.9 末尾）
-  4. 真机侧载（同样卡签名；本机 `0 valid identities`，Xcode 里也没有任何团队）
+- **状态（2026-10-19 18:25）**：**仓库已上线** <https://github.com/LycoRiko/tosn-dos>（public，82 文件）；
+  四端（iOS / iPad / macOS / watchOS）`BUILD SUCCEEDED`；临时调试代码已清零。
+  Team `S465RV3CLC`（免费 Personal Team）已写进工程 6 处签名配置。
+- **正在做 / 卡点**：真机构建。`xcodebuild -allowProvisioningUpdates` 报
+  **`No Accounts: Add a new account in Accounts settings.`** —— 需要用户在 Xcode 图形界面里
+  确认 Apple ID 登录成功，并连真机 ⌘R 一次生成证书/描述文件。详见 5.12。
+- **下一步**：
+  1. 用户在 Xcode 里完成账号登录 + 首次真机构建
+  2. 视结果决定是否给真机构建做「裁剪版 entitlements」（免费账号没有 App Group / iCloud）
+  3. 出 Release v1.0 的 `.ipa` / `.app`
 - **需要用户确认**：
-  1. **5.9 末尾的签名方案 A / B / C**（硬阻塞：不定就没法出 Release 包，也没法侧载真机）
-  2. **GitHub 用户名 + 仓库名**
-  3. README 的 Credits 段落写「running DeepSeek-V4.1-Flash」，但 10-19 凌晨换过
-     hy4-preview / kimi-k2.7，这句要不要改、怎么改由用户定（我没动）
+  1. **真机装包要不要剥掉 App Group + iCloud**（免费账号必然撞这条；剥掉后真机上 Widget / 手表
+     不共享数据，App 退本地库）。见 5.12 末尾
+  2. README 的 Credits 仍写「running DeepSeek-V4.1-Flash」，但 10-19 凌晨换过
+     hy4-preview / kimi-k2.7，这句要不要改由用户定（我没动）
 - **顺序（已定，不要改）**：例行清单 ✅ → 清单耗时 ✅ → 分享为文本 ✅ → 等待中 ✅ → watchOS ✅
-  → Release v1.0 → GitHub push。
+  → GitHub 上线 ✅ → Release v1.0。
 - **红线**：界面不出现 SRE / 运维黑话；不加没要求的开关；改完必须四端编译。
+- **文档策略**：本文件宁详细不精简，不要为了省 token 删历史；要加就加，但别删。
 - **仍未答复**：D 组（等待中的折中方案、有 dueDate 时是否进 Today、怎么结束等待），见 7.2。
   做到那一步之前必须问，不要自己猜。
 - **红线**：界面不出现 SRE / 运维黑话；不加没要求的开关；改完必须双端编译。
@@ -596,6 +598,49 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
   `init.defaultBranch = main`。
 - `gh auth status` → **未登录**。要么回来跑 `gh auth login`（设备码），
   要么在网页建好仓库、我们直接用 SSH push。
+
+---
+
+### 5.12 开源仓库上线 + 团队签名配置 — 2026-10-19 18:25
+
+**仓库已上线**：<https://github.com/LycoRiko/tosn-dos>（public，默认分支 `main`）
+- `gh auth login` 用的是账号 **LycoRiko**，协议 SSH
+- `gh repo create tosn-dos --public --source=. --remote=origin --push` 创建并推送
+- 远端 82 个 blob；`origin` = `git@github.com:LycoRiko/tosn-dos.git`
+- README 里两处 `<your-name>` 已替换成 `LycoRiko`（clone 地址、issues 地址）
+- 当前提交：`916b78f chore: set development team for automatic signing`
+
+**用户改了 README**：删掉了「Why another to-do app」和「What it does」两节（-42 行），
+保留 Requirements / Build / 架构 / Status / 中文说明 / Credits / License。
+用户明确偏好「不要啰嗦」，以后写文档按这个尺度来。
+
+**Team 已写进工程**（不用用户在 Xcode 里手点）：
+- Team ID `S465RV3CLC`，名称 `REGer Bili (Personal Team)`，**isFreeProvisioningTeam = 1**
+- 在 `project.pbxproj` 的 6 处 `CODE_SIGN_STYLE = Automatic;` 后统一加了
+  `DEVELOPMENT_TEAM = S465RV3CLC;`（3 个 target × Debug/Release）
+- 校验：`xcodebuild -showBuildSettings` 已能读到 `DEVELOPMENT_TEAM = S465RV3CLC`
+
+**真机构建仍然卡住（2026-10-19 实测）**：
+- 直接编 `generic/platform=iOS` → `No profiles for … were found`
+- 加 `-allowProvisioningUpdates` → **`No Accounts: Add a new account in Accounts settings.`**
+- 也就是说：**Xcode 的图形界面里账号没真正登录成功**（`IDEProvisioningTeamByIdentifier` 有团队信息，
+  但钥匙串里没有可用会话），命令行无法自动生成描述文件。
+- 需要用户做的：Xcode → Settings → Accounts，确认 Apple ID 状态正常（必要时重新输密码/双重认证），
+  然后**连上 iPhone 在 Xcode 里按一次 ⌘R**——这一次会真正生成证书和描述文件，之后命令行就能用。
+
+**免费账号的两个硬限制（还没撞到，但一定会撞）**：
+1. `com.apple.security.application-groups`（App Group）免费个人团队拿不到 → 签名会报
+   "Provisioning profile doesn't include the application-groups entitlement"
+2. `com.apple.developer.icloud-*`（CloudKit）同样拿不到
+- 如果只是「装到手机上看一眼」，可以给真机构建准备一份**裁剪版 entitlements**
+  （用 `CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]` 指向它，模拟器继续用完整版），
+  代价是真机上 Widget 与手表读不到同一份数据，App 本体自动退到本地库。
+  **这是产品行为变化，动手前要先问用户。**
+
+**关于「免费账户能不能改 Team Name」**（用户 18:23 问）：
+- Personal Team 的名字**跟着 Apple ID 的姓名走**，没有单独重命名的入口
+- 改法只有：到 <https://appleid.apple.com> 改 Apple ID 的姓名 → Xcode 退出账号再登入，团队名才会变
+- 付费开发者账号的团队名可以在 App Store Connect 里改，免费个人团队不行
 
 ---
 
