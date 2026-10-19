@@ -677,7 +677,12 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 （把 JSON 改成它自己的缩进风格，并新增一个自动提取的 key `·`）。
 本轮已 `git checkout` 还原，**没有提交**——这种格式化噪音要不要入库，等用户定。
 
-**⚠️ 当前工作树有一处「故意不提交」的改动**：
+**⚠️ 真机裁剪版工程文件的正确用法（2026-10-19 19:05 改法，覆盖下面这段旧描述）**：
+仓库里**永远只放正常版** `TosnDOs.xcodeproj/project.pbxproj`（没有 `sdk=iphoneos` 那 6 行）。
+裁剪版另存为 **`TosnDOs.xcodeproj/project.pbxproj.1`**，并写进 `.git/info/exclude`（不进仓库）。
+`devbuild.sh` 会在构建前把 `.1` 换进去、`trap` 里无条件换回来（失败/中断也还原），
+已验证：脚本 `exit 0` 后 `grep sdk=iphoneos project.pbxproj` 命中 **0**。
+下面这段是当时的旧做法（直接改仓库版、不提交），**已废弃，仅留作记录**：
 `TosnDOs.xcodeproj/project.pbxproj` —— 在 6 处 `CODE_SIGN_ENTITLEMENTS` 后各加了一行
 ```
 "CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = build/TosnDOsDevice.entitlements;
