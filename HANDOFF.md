@@ -644,6 +644,41 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 ---
 
+### 5.13 真机测试包（裁剪 entitlements）+ 账号会话卡点 — 2026-10-19 18:35
+
+**需求**：用户暂时只能用免费账号，要一份**裁掉 App Group / iCloud** 的真机测试包；
+这份东西**不进仓库**。
+
+**做法：不动工程文件，用命令行覆盖 entitlements。**
+- 新增本机脚本 `devbuild.sh`（仓库根目录），已写进 `.git/info/exclude`，**不会被提交**
+- 脚本会在 `build/`（已被 .gitignore 忽略）生成一份空 entitlements，并用于 archive：
+  ```bash
+  CODE_SIGN_ENTITLEMENTS=build/TosnDOsDevice.entitlements
+  ```
+  三个 target 共用这份空文件，所以 App Group 与 CloudKit 都不再出现在签名里
+- 产出路径：`build/ipa/*.ipa`，ExportOptions 用 `method=development` + `teamID=S465RV3CLC`
+- 同一套命令里的 `-disable-sandbox` 也在
+
+**已验证的部分**：
+- 裁掉 entitlements 后，**真机 arm64 能编译通过**（加 `CODE_SIGNING_ALLOWED=NO` 时
+  `BUILD SUCCEEDED`，`lipo -info` 确认 `arm64`）
+- 报错里**不再出现** App Group / iCloud 相关的 provisioning 抱怨 → 裁剪确实生效
+
+**仍然卡住的部分（关键）**：
+- 证书已经生成了：`security find-identity` 能列出
+  `Apple Development: zregerpilipili@yeah.net (6WCX929U4X)`
+- 但 `xcodebuild -allowProvisioningUpdates` 依然报
+  **`No Accounts: Add a new account in Accounts settings.`**
+- 含义：**Xcode 图形界面的账号会话没有传给命令行**。证书在钥匙串里，但生成描述文件需要账号令牌。
+- 一次性解法（用户操作）：连上 iPhone → Xcode 打开工程 → 选 `TosnDOs` scheme → **⌘R**。
+  这一次会注册设备、生成描述文件，并把 App 直接装到手机上。之后 `./devbuild.sh` 就能重复出包。
+
+**顺带发现**：构建过程里 Xcode 会重写 `Shared/Localizable.xcstrings`
+（把 JSON 改成它自己的缩进风格，并新增一个自动提取的 key `·`）。
+本轮已 `git checkout` 还原，**没有提交**——这种格式化噪音要不要入库，等用户定。
+
+---
+
 ## 6. 未完成清单（按建议顺序）
 1. ~~跑一遍模拟器验收~~ → 主要页面已验收（见 5.1）。剩余需点按的部分等用户手动确认。
 2. **代码风格统一 / 精简**（用户点名要求"编风格统一、逻辑简洁易读、缩进统一，方便 inspect"）
