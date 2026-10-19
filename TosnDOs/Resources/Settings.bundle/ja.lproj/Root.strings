@@ -1,0 +1,11 @@
+"Appearance" = "外観";
+"Theme" = "テーマ";
+"System" = "システム";
+"Light" = "ライト";
+"Dark" = "ダーク";
+"Tasks" = "タスク";
+"Show completed tasks" = "完了したタスクを表示";
+"New lists from templates start today" = "テンプレートから作るリストは今日から開始";
+"Language" = "言語";
+"Changing the theme here applies the next time Tos'n DOs comes to the foreground." = "テーマの変更は、次に Tos'n DOs を開いたときに反映されます。";
+"Tos'n DOs follows the language set in the Settings app." = "Tos'n DOs は「設定」アプリの言語に従います。";

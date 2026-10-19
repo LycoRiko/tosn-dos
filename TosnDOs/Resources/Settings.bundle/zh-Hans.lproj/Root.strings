@@ -1,0 +1,11 @@
+"Appearance" = "外观";
+"Theme" = "主题";
+"System" = "跟随系统";
+"Light" = "浅色";
+"Dark" = "深色";
+"Tasks" = "任务";
+"Show completed tasks" = "显示已完成任务";
+"New lists from templates start today" = "从模板新建的清单从今天开始";
+"Language" = "语言";
+"Changing the theme here applies the next time Tos'n DOs comes to the foreground." = "在此更改主题后，下次回到 Tos'n DOs 时生效。";
+"Tos'n DOs follows the language set in the Settings app." = "Tos'n DOs 跟随系统设置中的语言。";
