@@ -14,43 +14,6 @@ Built with Swift, SwiftUI and SwiftData. No account, no ads, no subscription.
 
 ---
 
-## Why another to-do app
-
-Open any app store and the to-do category looks the same: apps so loaded with features you cannot
-find the one you need, apps that want a subscription and show ads, apps that ask you to create an
-account before they will sync a single line of text.
-
-Tos'n DOs started from a narrower question. While learning site reliability practice, every change
-had to be walked through a checklist, step by step. That needed a list you can pull fresh each time —
-same items, same order, nothing to retype. A to-do app with reusable templates turned out to be
-exactly the thing worth building.
-
-The rule for every feature since: it has to be obvious to someone who has never heard of any of this.
-
-## What it does
-
-**One screen for today.** The home screen shows what is due now and how much of it is done.
-Everything else is one tap away.
-
-**Type it the way you say it.** `Buy coffee beans tomorrow 3pm` becomes a task with a due date.
-Dates are understood in Chinese and English — no forms, no pickers.
-
-**Templates.** Write a checklist once, then pull a fresh copy whenever you need to run it again.
-
-**Repeating lists.** A template can repeat daily, weekly or monthly. If the app was closed for three
-weeks, it asks what to do about the ones you missed instead of silently dropping them.
-
-**Waiting on someone else.** A task can be parked as *waiting for…* with a reason. Waiting tasks get
-their own group and stay out of every number, because a thing you cannot act on should not make today
-look heavier than it is.
-
-**Look back.** Finished lists collect in Browse, and each one shows how long it took from first line
-to last tick.
-
-**The rest of it:** subtasks, tags, priority, deadlines with reminders, a home screen widget,
-four languages (English, 简体中文, 繁體中文, 日本語), dark mode, Dynamic Type, and iCloud sync on
-iPhone and iPad (the Mac keeps its data locally).
-
 ## Requirements
 
 | | |
@@ -63,7 +26,7 @@ iPhone and iPad (the Mac keeps its data locally).
 ## Build and run
 
 ```bash
-git clone https://github.com/<your-name>/tosn-dos.git
+git clone https://github.com/LycoRiko/tosn-dos.git
 cd tosn-dos
 open TosnDOs.xcodeproj
 ```
@@ -112,13 +75,10 @@ iOS 18+、macOS 15+、watchOS 10+，Xcode 26。打开 `TosnDOs.xcodeproj` 直接
 
 ## Credits
 
-Course project for **XAUAT ISEI CST2601**, designed and directed by Riko Miyazaki.
-Built in collaboration with the **WorkBuddy** agent (Tencent) running **DeepSeek-V4.1-Flash** —
-the design decisions, the review and every judgement call along the way stayed with the author.
+Designed and directed by Riko Miyazaki, built in collaboration with the **WorkBuddy** agent (Tencent) running **DeepSeek-V4.1-Flash**.
 
 ## License
 
 MIT — see [LICENSE](LICENSE). Use it, change it, ship it; just keep the copyright notice.
 
-Questions or ideas: [open an issue](https://github.com/<your-name>/tosn-dos/issues) or write to
-rikomiyazaki@xauat.edu.cn.
+Questions or ideas: [open an issue](https://github.com/LycoRiko/tosn-dos/issues)
