@@ -693,6 +693,38 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 ---
 
+### 5.14 真机安装成功 + IPA 流水线打通 — 2026-10-19 19:00
+
+**用户已在 iPhone 16 Pro Max（iOS 27.0.1）上装好并打开。** 走的是 Xcode 里 ⌘R。
+那一次操作同时解决了三件事：注册设备、生成 3 份描述文件、把 App 装上去。
+
+**描述文件落地**：`~/Library/Developer/Xcode/UserData/Provisioning Profiles/`
+出现 3 个 `.mobileprovision`（18:55）。**这是关键转折点**——有了本地描述文件之后，
+`xcodebuild` 不再需要向账号库要东西，`No Accounts` 就绕过去了。
+
+**验证到的事实**：
+- `xcodebuild archive`（**不加** `-allowProvisioningUpdates`）→ `ARCHIVE SUCCEEDED`
+- 归档产物的签名：`Identifier=com.rikomiyazaki.TosnDOs`、`TeamIdentifier=S465RV3CLC`，
+  `codesign --entitlements` 里**没有** application-groups / icloud → 裁剪生效
+- 归档里有 `TosnDOs.app/Watch/TosnDOsWatch.app` → 手表仍然内嵌
+- 设备上确认存在 `Tos'n DOs 1.0 (1)`（`devicectl device info apps`）
+
+**Xcode 26 的一个坑**：`-exportArchive` 的 `method` 键怎么填都报
+`expected one {} but found <value>`（`development`、`debugging` 都试过）。
+最终没再用 exportArchive——**archive 里的 .app 本来就签好了**，手动封成 IPA 即可：
+```bash
+mkdir -p Payload && cp -R …/TosnDOs.app Payload/ && zip -qry TosnDOs.ipa Payload
+```
+校验通过：`codesign --verify --deep --strict` 有效、`Payload/TosnDOs.app/embedded.mobileprovision` 存在。
+
+**产物**：`build/ipa/TosnDOs.ipa`（791K），`devbuild.sh` 已端到端跑通（exit 0）。
+`build/` 与 `devbuild.sh` 都在 git 忽略范围内，**没有进仓库**。
+
+**仍然存在的限制（免费账号）**：真机上 App Group 与 iCloud 被剥掉，所以 Widget 读不到数据；
+手表走 WatchConnectivity，不受影响。包的有效期 7 天，过期重跑一次 `devbuild.sh` 或 ⌘R。
+
+---
+
 ## 6. 未完成清单（按建议顺序）
 1. ~~跑一遍模拟器验收~~ → 主要页面已验收（见 5.1）。剩余需点按的部分等用户手动确认。
 2. **代码风格统一 / 精简**（用户点名要求"编风格统一、逻辑简洁易读、缩进统一，方便 inspect"）
