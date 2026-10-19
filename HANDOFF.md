@@ -584,6 +584,19 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 - `ssh -T git@github.com` 现在返回 `Permission denied (publickey)`——**网络通，只差把公钥登记到账号**
 - **push 还差**：GitHub 用户名（README 两处 `<your-name>` + remote 地址）、仓库名（暂定 `tosn-dos`）
 
+**gh CLI（2026-10-19 17:55 装好）**：
+- 本机是 **Intel（x86_64）+ macOS 26.7.1**，Homebrew 判定为 **Tier 3**：`gh` 没有预编译 bottle，
+  `brew install gh` 会退化成从源码编译 Go，且被沙箱挡住（`exited with 71`）——**别再走这条路**。
+- 实际做法：下载官方预编译包 `gh_2.102.0_macOS_amd64.zip`（GitHub 直连会断流，
+  用 `https://ghfast.top/` 前缀加速），解压后把 `bin/gh` 放到 `/usr/local/bin/gh`，
+  `xattr -dr com.apple.quarantine` 去隔离属性。`gh --version` = 2.102.0，已可用。
+- `brew` 本身可用（7.0.4，prefix `/usr/local`），**未配置国内镜像**；
+  实测官方 API 1.1s、TUNA 0.54s，都能通，所以没换源。
+- 全局 git 身份也已写入 `~/.gitconfig`：`Riko Miyazaki` / `rikomiyazaki@xauat.edu.cn`，
+  `init.defaultBranch = main`。
+- `gh auth status` → **未登录**。要么回来跑 `gh auth login`（设备码），
+  要么在网页建好仓库、我们直接用 SSH push。
+
 ---
 
 ## 6. 未完成清单（按建议顺序）
