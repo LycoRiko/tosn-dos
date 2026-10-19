@@ -677,6 +677,20 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 （把 JSON 改成它自己的缩进风格，并新增一个自动提取的 key `·`）。
 本轮已 `git checkout` 还原，**没有提交**——这种格式化噪音要不要入库，等用户定。
 
+**⚠️ 当前工作树有一处「故意不提交」的改动**：
+`TosnDOs.xcodeproj/project.pbxproj` —— 在 6 处 `CODE_SIGN_ENTITLEMENTS` 后各加了一行
+```
+"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = build/TosnDOsDevice.entitlements;
+```
+作用：**真机构建**用裁剪版，**模拟器继续用完整版**（已验证 `-showBuildSettings`：
+`-sdk iphoneos` 指向 `build/TosnDOsDevice.entitlements`，`-sdk iphonesimulator` 仍是
+`TosnDOs/TosnDOs.entitlements`）。这样用户在 Xcode 里按 ⌘R 时不会再撞 App Group 签名错误。
+**这是本地临时改动，没有 commit、没有 push**（用户明确要求这份裁剪构建不进仓库）。
+→ 真机装好之后，要么 `git checkout -- TosnDOs.xcodeproj/project.pbxproj` 还原，
+要么征得用户同意后再决定是否入库。
+
+**模拟器构建回归**：加完这行后 iOS Simulator 仍然 `BUILD SUCCEEDED`，不受影响。
+
 ---
 
 ## 6. 未完成清单（按建议顺序）
