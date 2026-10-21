@@ -157,6 +157,9 @@ struct TaskListView: View {
             }
         }
         .searchable(text: $search, prompt: Text("Search tasks"))
+        #if os(iOS)
+        .modifier(KeyboardDismissScroll())
+        #endif
         .safeAreaInset(edge: .bottom, spacing: 0) {
             QuickAddBar(targetList: targetList, defaultDue: defaultDue)
         }

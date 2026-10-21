@@ -104,6 +104,7 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 | 真机装完 Widget 没数据 | 免费账号没有 App Group，属预期。要完整功能得上付费账号 |
 | `Localizable.xcstrings` 突然几千行 diff | Xcode GUI 重排格式（`xcodebuild` 不会）。提交一次即可，别反复还原 |
 | 例行清单不弹窗 / 只算 1 期 | 模板缺 `repeatStart`，锚点退回 `createdAt`。真实路径由设置重复规则时写入 |
+| 模拟器里查不到键盘相关状态 | 模拟器默认接了硬件键盘，软键盘不弹出。改成强制分支或用 `-forceBounce` 这类临时开关验证 |
 
 ---
 
@@ -117,11 +118,17 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 ### 5.2 其余
 
-1. **URL scheme**：`CFBundleURLTypes` 缺失，所以 `onOpenURL` 和 Widget 的 `widgetURL` 是死代码。
+1. **带设备边框的截图**（用户要做 App Store 详情页海报 + Keynote）：iPhone / iPad / Watch / macOS
+   各一张。`simctl io … screenshot` 只有圆角遮罩（`--mask`），**没有物理边框**，边框要自己合成。
+   需要先有内容——临时加一个 `-shotSeed` 的 DEBUG 种子，截完删掉。
+2. **真机包 + 无线安装**：`./devbuild.sh` 出不含 App Group 的包；用户当天没带线，
+   装机阶段先确认 `devicectl list devices` 里 transport 是不是 `localNetwork`，能走无线就走无线。
+3. **URL scheme**：`CFBundleURLTypes` 缺失，所以 `onOpenURL` 和 Widget 的 `widgetURL` 是死代码。
    要新建 `TosnDOs/Info.plist` 并关掉 `GENERATE_INFOPLIST_FILE`。
-2. **iPad 横屏**：`NavigationSplitView` 需要 `.balanced` + 侧栏默认收起。
-3. **两条告警**：`TemplateDetailView.swift:33`、`TemplateLibraryView.swift:84`。
-4. **手表真机安装**：Xcode 里设备切到 `REG's Apple Watch` 按 ⌘R。
+4. **iPad 横屏**：`NavigationSplitView` 需要 `.balanced` + 侧栏默认收起。
+5. **两条告警**：`TemplateDetailView.swift:33`、`TemplateLibraryView.swift:84`。
+6. **手表真机安装**：Xcode 里设备切到 `REG's Apple Watch` 按 ⌘R。
+7. **回车键文案**：`QuickAddBar` 标的是 `Done`，实际动作是「添加任务」，要不要改成 `Add` 待定。
 
 ---
 
@@ -140,6 +147,7 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 | watchOS | 手机推「今天剩余」快照（`updateApplicationContext`），手表镜像到本地库，勾选回传；口径同样走 `TodayScope` |
 | 本地化 | 四语言 205 条，占位符已校验一致 |
 | 无障碍 | Dynamic Type（`ScaledFont.swift`）、VoiceOver 标签、深色模式 |
+| 键盘收起 | `TaskListView` 挂 `KeyboardDismissScroll`（`TosnDOs/Support/`）：`scrollDismissesKeyboard(.interactively)` + 软键盘在屏时才 `scrollBounceBehavior(.always)`，所以任务不满一屏也能拖一下收键盘，键盘没弹时列表不会乱弹 |
 
 **已知取舍**（都经用户追认，改动前先问）：
 - 等待中的任务不进 Today，即使到期日是今天
