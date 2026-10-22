@@ -6,10 +6,10 @@ A quiet, fast to-do app for iPhone, iPad and Mac, with a watch app that shows wh
 Built with Swift, SwiftUI and SwiftData. No account, no ads, no subscription.
 
 <p align="center">
-  <img src="docs/screenshots/today.png" width="220" alt="Today">
-  <img src="docs/screenshots/list-waiting.png" width="220" alt="A list with a waiting group">
-  <img src="docs/screenshots/browse.png" width="220" alt="Browse">
-  <img src="docs/screenshots/watch.png" width="160" alt="Apple Watch">
+  <img src="docs/appstore/iphone-today.png" width="240" alt="Today">
+  <img src="docs/appstore/ipad-list-waiting.png" width="300" alt="A list with a waiting group">
+  <img src="docs/appstore/iphone-browse.png" width="240" alt="Browse">
+  <img src="docs/appstore/watch-today.png" width="180" alt="Apple Watch">
 </p>
 
 ---
