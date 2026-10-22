@@ -132,3 +132,35 @@ struct QRSheet: View {
         }
     }
 }
+
+#if os(macOS)
+import AppKit
+
+extension QRCode {
+    /// Reads a QR out of an image the user dropped or pasted. Core Image does
+    /// the decoding on-device; no camera, no extra permission, no new framework.
+    static func message(in data: Data) -> String? {
+        guard
+            let image = NSImage(data: data),
+            let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+        else { return nil }
+
+        let detector = CIDetector(
+            ofType: CIDetectorTypeQRCode,
+            context: nil,
+            options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]
+        )
+        let features = detector?.features(in: CIImage(cgImage: cgImage)) as? [CIQRCodeFeature]
+        return features?.first?.messageString
+    }
+
+    /// Accepts either the deep link or the bare code that older images carry.
+    static func code(from message: String) -> String? {
+        if let components = URLComponents(string: message),
+           let value = components.queryItems?.first(where: { $0.name == "c" })?.value {
+            return value
+        }
+        return message.hasPrefix(ListCodec.prefix) ? message : nil
+    }
+}
+#endif

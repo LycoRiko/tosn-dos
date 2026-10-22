@@ -1,5 +1,8 @@
 import SwiftUI
 import SwiftData
+#if os(macOS)
+import UniformTypeIdentifiers
+#endif
 
 /// The single task list renderer, used by the iPhone tabs and the Mac
 /// content column. Both platforms share the rows, the grouping and the
@@ -21,6 +24,9 @@ struct TaskListView: View {
     @State private var showsNewList = false
     @State private var showsTemplates = false
     @State private var showsQR = false
+    #if os(macOS)
+    @State private var isDropTargeted = false
+    #endif
 
     // MARK: - Derived state
 
@@ -154,9 +160,8 @@ struct TaskListView: View {
                         ShareLink(item: ListShareText.make(for: list)) {
                             Label("Share as text", systemImage: "square.and.arrow.up")
                         }
-                        ShareLink(item: ListCodec.encode(list)) {
-                            Label("Share as code", systemImage: "number")
-                        }
+                        // QR only: the bare base64 string was too long to paste
+                        // anywhere, and the camera path needs no paste at all.
                         Button {
                             showsQR = true
                         } label: {
@@ -170,6 +175,27 @@ struct TaskListView: View {
             }
         }
         .searchable(text: $search, prompt: Text("Search tasks"))
+        #if os(macOS)
+        // Dragging a QR image in is the Mac's answer to scanning: no camera,
+        // no permission, and Core Image does the decoding.
+        .onDrop(of: [.image, .fileURL], isTargeted: $isDropTargeted) { providers in
+            handleDrop(providers)
+        }
+        .overlay {
+            if isDropTargeted {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(Theme.accent, lineWidth: 3)
+                        .background(Theme.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    Label("Drop a QR image or a backup", systemImage: "qrcode.viewfinder")
+                        .font(.headline)
+                        .foregroundStyle(Theme.accent)
+                }
+                .padding(12)
+                .allowsHitTesting(false)
+            }
+        }
+        #endif
         .sheet(isPresented: $showsQR) {
             if let list = currentList {
                 QRSheet(title: list.title, code: ListCodec.encode(list))
@@ -200,7 +226,55 @@ struct TaskListView: View {
 
     // MARK: - Rows
 
-    @ViewBuilder
+    #if os(macOS)
+    private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+
+        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                guard
+                    let data = item as? Data,
+                    let url = URL(dataRepresentation: data, relativeTo: nil),
+                    let contents = try? Data(contentsOf: url)
+                else { return }
+                let name = url.lastPathComponent
+                Task { @MainActor in importPayload(contents, fileName: name) }
+            }
+            return true
+        }
+
+        if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
+                guard let data else { return }
+                Task { @MainActor in importPayload(data, fileName: "") }
+            }
+            return true
+        }
+        return false
+    }
+
+    /// One drop target, two formats: a backup JSON restores the whole workspace,
+    /// an image is read as a QR. The JSON check comes first — a backup is never
+    /// a valid QR, while a QR screenshot is never valid JSON.
+    @MainActor
+    private func importPayload(_ data: Data, fileName: String) {
+        if fileName.lowercased().hasSuffix(".json"), let backup = try? BackupFile.decode(data) {
+            backup.restore(into: context, mode: .merge)
+            return
+        }
+
+        guard
+            let message = QRCode.message(in: data),
+            let code = QRCode.code(from: message),
+            let snapshot = ListCodec.decode(code)
+        else { return }
+
+        let existing = (try? context.fetch(FetchDescriptor<TodoList>())) ?? []
+        let next = (existing.map(\.sortIndex).max() ?? 0) + 1
+        ListCodec.importList(snapshot, into: context, sortIndex: next)
+    }
+    #endif
+
     private func row(_ task: TodoItem) -> some View {
         TaskRow(task: task, showsListName: showsListName)
             .listRowInsets(EdgeInsets(top: 0, leading: Theme.pagePadding, bottom: 0, trailing: Theme.pagePadding))

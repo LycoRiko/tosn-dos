@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA11BB22CC33DD44EE55FF50 /* TodoList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF40 /* TodoList.swift */; };
+		AA11BB22CC33DD44EE55FF51 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF41 /* TodoItem.swift */; };
+		AA11BB22CC33DD44EE55FF52 /* ListTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF42 /* ListTemplate.swift */; };
+		AA11BB22CC33DD44EE55FF53 /* ListCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF43 /* ListCodec.swift */; };
+		AA11BB22CC33DD44EE55FF54 /* BackupFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF44 /* BackupFile.swift */; };
+		AA11BB22CC33DD44EE55FF55 /* NaturalDateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF45 /* NaturalDateParser.swift */; };
 		0FD6726CBBB69427440940FB /* TosnDOsWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 55D5919CD0B3AD51F6E7B3A0 /* TosnDOsWatch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		200166EAC3CD46B6D7A51C5C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05F014129D6577BC4C44C1C8 /* Foundation.framework */; };
 		AA11BB22CC33DD44EE55FF1C /* TosnDOsWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF1D /* TosnDOsWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -26,6 +32,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 350AF3124ED5715CF202EF63;
 			remoteInfo = TosnDOsWatch;
+		};
+		AA11BB22CC33DD44EE55FF3A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA11BB22CC33DD44EE55FF01 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA11BB22CC33DD44EE55FF04;
+			remoteInfo = TosnDOs;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -55,6 +68,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA11BB22CC33DD44EE55FF40 /* TodoList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/TodoList.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF41 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/TodoItem.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF42 /* ListTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/ListTemplate.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF43 /* ListCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Transfer/ListCodec.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF44 /* BackupFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/BackupFile.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF45 /* NaturalDateParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/NaturalDateParser.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF31 /* TosnDOsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TosnDOsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		05F014129D6577BC4C44C1C8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		55D5919CD0B3AD51F6E7B3A0 /* TosnDOsWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TosnDOsWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA11BB22CC33DD44EE55FF05 /* TosnDOs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TosnDOs.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,6 +131,11 @@
 			path = TosnDOsWatch;
 			sourceTree = "<group>";
 		};
+		AA11BB22CC33DD44EE55FF32 /* TosnDOsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TosnDOsTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +161,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA11BB22CC33DD44EE55FF34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -154,6 +186,7 @@
 				AA11BB22CC33DD44EE55FF10 /* Shared */,
 				AA11BB22CC33DD44EE55FF11 /* TosnDOsWidget */,
 				AA11BB22CC33DD44EE55FF03 /* Products */,
+				AA11BB22CC33DD44EE55FF32 /* TosnDOsTests */,
 				B0270F04537B75F4410D53DB /* TosnDOsWatch */,
 				E7FF84F92B3B8374FA1A9422 /* Frameworks */,
 			);
@@ -163,6 +196,7 @@
 			isa = PBXGroup;
 			children = (
 				AA11BB22CC33DD44EE55FF05 /* TosnDOs.app */,
+				AA11BB22CC33DD44EE55FF31 /* TosnDOsTests.xctest */,
 				AA11BB22CC33DD44EE55FF1D /* TosnDOsWidget.appex */,
 				55D5919CD0B3AD51F6E7B3A0 /* TosnDOsWatch.app */,
 			);
@@ -247,6 +281,26 @@
 			productReference = AA11BB22CC33DD44EE55FF1D /* TosnDOsWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		AA11BB22CC33DD44EE55FF30 /* TosnDOsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA11BB22CC33DD44EE55FF36 /* Build configuration list for PBXNativeTarget "TosnDOsTests" */;
+			buildPhases = (
+				AA11BB22CC33DD44EE55FF33 /* Sources */,
+				AA11BB22CC33DD44EE55FF34 /* Frameworks */,
+				AA11BB22CC33DD44EE55FF35 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA11BB22CC33DD44EE55FF32 /* TosnDOsTests */,
+			);
+			name = TosnDOsTests;
+			productName = TosnDOsTests;
+			productReference = AA11BB22CC33DD44EE55FF31 /* TosnDOsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -262,6 +316,10 @@
 					};
 					AA11BB22CC33DD44EE55FF12 = {
 						CreatedOnToolsVersion = 26.1;
+					};
+					AA11BB22CC33DD44EE55FF30 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = AA11BB22CC33DD44EE55FF04;
 					};
 				};
 			};
@@ -284,6 +342,7 @@
 			targets = (
 				AA11BB22CC33DD44EE55FF04 /* TosnDOs */,
 				AA11BB22CC33DD44EE55FF12 /* TosnDOsWidget */,
+				AA11BB22CC33DD44EE55FF30 /* TosnDOsTests */,
 				350AF3124ED5715CF202EF63 /* TosnDOsWatch */,
 			);
 		};
@@ -305,6 +364,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AA11BB22CC33DD44EE55FF15 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA11BB22CC33DD44EE55FF35 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -335,6 +401,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA11BB22CC33DD44EE55FF33 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA11BB22CC33DD44EE55FF50 /* TodoList.swift in Sources */,
+				AA11BB22CC33DD44EE55FF51 /* TodoItem.swift in Sources */,
+				AA11BB22CC33DD44EE55FF52 /* ListTemplate.swift in Sources */,
+				AA11BB22CC33DD44EE55FF53 /* ListCodec.swift in Sources */,
+				AA11BB22CC33DD44EE55FF54 /* BackupFile.swift in Sources */,
+				AA11BB22CC33DD44EE55FF55 /* NaturalDateParser.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -349,6 +428,11 @@
 			isa = PBXTargetDependency;
 			target = AA11BB22CC33DD44EE55FF12 /* TosnDOsWidget */;
 			targetProxy = AA11BB22CC33DD44EE55FF1A /* PBXContainerItemProxy */;
+		};
+		AA11BB22CC33DD44EE55FF39 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA11BB22CC33DD44EE55FF04 /* TosnDOs */;
+			targetProxy = AA11BB22CC33DD44EE55FF3A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -657,6 +741,38 @@
 			};
 			name = Debug;
 		};
+		AA11BB22CC33DD44EE55FF37 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rikomiyazaki.TosnDOsTests;
+				ENABLE_TESTING_SEARCH_PATHS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AA11BB22CC33DD44EE55FF38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rikomiyazaki.TosnDOsTests;
+				ENABLE_TESTING_SEARCH_PATHS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -692,6 +808,15 @@
 			buildConfigurations = (
 				AA11BB22CC33DD44EE55FF17 /* Debug */,
 				AA11BB22CC33DD44EE55FF18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA11BB22CC33DD44EE55FF36 /* Build configuration list for PBXNativeTarget "TosnDOsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA11BB22CC33DD44EE55FF37 /* Debug */,
+				AA11BB22CC33DD44EE55FF38 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

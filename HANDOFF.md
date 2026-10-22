@@ -416,3 +416,19 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 - `MacRootView` 侧栏的「Previous ToDos」从「列出每个已完结清单」改成**一行入口**（带数量），
   点开进 `PreviousListsView` —— 和 iOS 同一个页面。
 - 好处：侧栏不再被几十个历史清单撑长；分组和「当日新增」在两端终于一致。
+
+### 5.14 21:00 单元测试 + macOS 拖拽导入
+
+**测试**
+- 工程里**没有测试 target**，手写 pbxproj 加了一个 `TosnDOsTests`：
+  同步组 + 目标 + 三阶段 + 配置 + scheme 的 `Testables`。
+- **不要用 TEST_HOST**：宿主模式会报 `test runner hung before establishing connection`
+  （App 被拉起来却连不上 runner）。改成把 6 个纯逻辑文件直接编进测试包：
+  `TodoList/TodoItem/ListTemplate` 三个模型 + `ListCodec` + `BackupFile` + `NaturalDateParser`。
+- 6 个测试全过（`xcodebuild test -scheme TosnDOs -only-testing:TosnDOsTests`）：
+  自然日期解析、纯文本不动、完成时间写入/清除/幂等、分享码往返、垃圾码拒绝、备份往返。
+
+**macOS 拖拽导入（不碰摄像头）**
+- `TaskListView` 挂 `.onDrop`：拖**二维码图片**或**备份 JSON**进窗口即可导入。
+  JSON 先判（备份永远不是合法二维码）；二维码用 `CIDetector` 本机解码。
+- 拖入时整页高亮边框 + 「Drop a QR image or a backup」提示。
