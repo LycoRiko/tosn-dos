@@ -34,6 +34,7 @@ struct TaskRow: View {
                         Image(systemName: "exclamationmark.2")
                             .font(.system(size: 9.5, weight: .bold))
                             .foregroundStyle(TaskPriority.high.color)
+                            .accessibilityHidden(true)
                     }
                     Text(task.title.isEmpty ? String(localized: "Untitled") : task.title)
                         .scaledFont(15.5, weight: .medium)
@@ -90,6 +91,7 @@ struct TaskRow: View {
                     Circle()
                         .fill(ListPalette.color(list.colorHex))
                         .frame(width: 5, height: 5)
+                        .accessibilityHidden(true)
                     Text(list.title)
                         .scaledFont(11.5, weight: .medium)
                         .foregroundStyle(.secondary)

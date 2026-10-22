@@ -153,6 +153,9 @@ struct TaskListView: View {
                         ShareLink(item: ListShareText.make(for: list)) {
                             Label("Share as text", systemImage: "square.and.arrow.up")
                         }
+                        ShareLink(item: ListCodec.encode(list)) {
+                            Label("Share as code", systemImage: "number")
+                        }
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
@@ -163,6 +166,7 @@ struct TaskListView: View {
         .searchable(text: $search, prompt: Text("Search tasks"))
         #if os(iOS)
         .modifier(KeyboardDismissScroll())
+        .dismissKeyboardOnTap()
         #endif
         .safeAreaInset(edge: .bottom, spacing: 0) {
             QuickAddBar(targetList: targetList, defaultDue: defaultDue)

@@ -10,6 +10,14 @@ struct SettingsView: View {
     @AppStorage(BackgroundKey.blur) private var backgroundBlur = 24.0
     @AppStorage(BackgroundKey.opacity) private var backgroundOpacity = 0.92
 
+    @Environment(\.modelContext) private var context
+    @State private var exportDocument = BackupDocument()
+    @State private var showsExporter = false
+    @State private var showsImporter = false
+    @State private var pendingBackup: BackupFile?
+    @State private var showsModePrompt = false
+    @State private var backupNote: String?
+
     private var syncStatus: AppContainer.SyncStatus { AppContainer.status }
 
     private var background: Binding<BackgroundSetting> {
@@ -33,6 +41,38 @@ struct SettingsView: View {
         let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(short) (\(build))"
+    }
+
+    // MARK: - Backup
+
+    private func exportBackup() {
+        let file = BackupFile.capture(from: context)
+        guard let data = try? file.data() else { return }
+        exportDocument = BackupDocument(data: data)
+        showsExporter = true
+    }
+
+    private func loadBackup(_ result: Result<URL, Error>) {
+        guard case .success(let url) = result else { return }
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        guard
+            let data = try? Data(contentsOf: url),
+            let file = try? BackupFile.decode(data)
+        else {
+            backupNote = String(localized: "That file could not be read.")
+            return
+        }
+        pendingBackup = file
+        showsModePrompt = true
+    }
+
+    private func restore(_ mode: BackupFile.Mode) {
+        guard let backup = pendingBackup else { return }
+        let counts = backup.restore(into: context, mode: mode)
+        backupNote = String(localized: "Restored \(counts.lists) lists and \(counts.templates) templates.")
+        pendingBackup = nil
     }
 
     /// Language only. `Locale.current.identifier` carries the region too, which
@@ -104,6 +144,20 @@ struct SettingsView: View {
             }
 
             Section {
+                Button("Export backup") { exportBackup() }
+                Button("Restore backup") { showsImporter = true }
+                if let backupNote {
+                    Text(backupNote)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Backup")
+            } footer: {
+                Text("One JSON file with every list and template. Restoring asks whether to merge or replace.")
+            }
+
+            Section {
                 LabeledContent("Version") {
                     Text(version)
                         .foregroundStyle(.secondary)
@@ -112,6 +166,26 @@ struct SettingsView: View {
             } header: {
                 Text("About")
             }
+        }
+        .fileExporter(
+            isPresented: $showsExporter,
+            document: exportDocument,
+            contentType: .json,
+            defaultFilename: "tosndos-backup"
+        ) { _ in }
+        .fileImporter(isPresented: $showsImporter, allowedContentTypes: [.json]) { result in
+            loadBackup(result)
+        }
+        .confirmationDialog(
+            "How should this backup be restored?",
+            isPresented: $showsModePrompt,
+            titleVisibility: .visible
+        ) {
+            Button("Merge with what's here") { restore(.merge) }
+            Button("Replace everything", role: .destructive) { restore(.replace) }
+            Button("Cancel", role: .cancel) { pendingBackup = nil }
+        } message: {
+            Text("Merging adds every list as new. Replacing deletes what is here first.")
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)

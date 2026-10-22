@@ -64,10 +64,10 @@ Not built yet: a share code — importing a list from a link or string. Share-as
 
 ## 中文说明
 
-一个安静、快速的待办清单，运行在 iPhone、iPad、Mac、Apple Watch上。
+一个安静、快速的待办清单，运行在 iPhone、iPad、Mac、Apple Watch 上。
 用 Swift + SwiftUI + SwiftData 写成，没有广告、不需要注册账号。
 
-核心功能：像说话一样输入就能识别日期 / 模板可反复拉取和按天周月重复
+核心功能：像说话一样输入就能识别日期 / 模板可反复拉取，并按天、周、月重复。
 
 iOS 18+、macOS 15+、watchOS 10+，Xcode 26。打开 `TosnDOs.xcodeproj` 直接运行即可，模拟器不需要签名。
 

@@ -16,11 +16,14 @@
 | 签名 | Team `S465RV3CLC`（REGer Bili / Personal Team，免费） |
 | 版本 | Bundle `com.rikomiyazaki.TosnDOs`（`.widget` / `.watchkitapp`） |
 
-**下一个该做的**：分享码（见 5.1）。之后依次是 URL scheme、iPad 横屏适配、两条编译器告警。
+**下一个该做的（2026-10-22 晚安排的顺序）**：键盘两件事 → 无障碍/操作逻辑自查 →
+App Intents / 分享码 / 备份恢复 → 单元测试（做不完顺延）。详见 5.2。
 
 **开工前必看**：
 - 构建**必须**带 `-disable-sandbox`，否则宏插件必挂（第 2、4 节）
 - `devbuild.sh`、`project.pbxproj.1`、`build/` 是本机专有文件，已 git 忽略，**别提交、别删**
+- **有一笔未提交的改动**：README 中文说明两处笔误（`Apple Watch` 后补空格、结尾补句号）。
+  2026-10-22 按用户要求**先不推**，下次提交仓库时一并带上。
 
 **需要用户拍板的两件事**：
 1. README 的 Credits 写着「running DeepSeek-V4.1-Flash」，但 10-19 凌晨换过其他模型，改不改由他定
@@ -116,27 +119,36 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 与「分享为文本」共用序列化格式（`TosnDOs/Support/ListShareText.swift`），别写成纯展示文本。
 参考过 WakeUp 课程表的做法；服务端短口令方案已否决。
 
-### 5.2 其余
+### 5.2 待办（2026-10-22 晚更新）
 
-0. **明天两件审查（用户 2026-10-21 点名，都要从代码层从头到尾过）**
-   - **无障碍 / VoiceOver（优先）**：逐屏走一遍，确认每一行、每个按钮、每个自定义控件都有可读的
-     accessibilityLabel、正确的 traits（button / header / selected）、合理的阅读顺序；装饰性图形要
-     标记为 hidden；自定义手势（swipe、长按）要有替代入口，不能只有手势才可达。
-     重点怀疑对象：模板页内联 TextField、TaskRow 的勾选框、ProgressRing（纯绘制，多半没读出数值）、
-     玻璃卡片容器、`KeyboardDismissScroll` 这类包装层是否把可访问性弄丢。
-     验收方式：模拟器开 VoiceOver（Accessibility Inspector）逐屏朗读，不是只看代码。
-   - **操作逻辑**：把每个页面能点的东西列一遍，逐个问「这个动作和旁边那个有什么区别」
-     「我要做的下一件事有没有入口」。样本就是模板详情页两个按钮做同一件事——
-     **入口缺失 + 重复动作**，编译和截图都发现不了，只有真用才踩得到。
-1. **iPad 版式第一版待确认**（2026-10-21）：`TaskListView` 的 List 加 `.frame(maxWidth: 720)` +
-   `.frame(maxWidth: .infinity)`，`QuickAddBar` 同步限宽。iPad 从「贴左满宽」变成居中的一列。
-   用户要看过截图再定要不要再动（比如垂直居中、或 iPad 单独布局）。macOS 中间栏本来就窄于 720，不受影响。
-2. **手表真机安装**：Xcode 里设备切到 `REG's Apple Watch` 按 ⌘R。
-3. **滚动收键盘「不太跟手」**（用户真机实测反馈，优先级低，改天做）：
-   功能是通的——拖着列表键盘会跟着下去并收起，只是手感偏滞。
-   原因大概率是 `.interactively` 要等滚动位移过阈值才动画收起，而短列表的回弹位移本来就小。
-   候补方案：① 换 `.immediately`（一拖就收，但完全不跟随手指）；② 保留 `.interactively` 且把回弹
-   阻力调小；③ 自己用 DragGesture 驱动（和行滑动、下拉刷新容易打架，风险最高）。**没试过，别照抄。**
+**今晚已完成**（详见第 6 节）
+- 键盘：点击空白收起（`dismissKeyboardOnTap`）+ 保留跟手滚动。
+- 无障碍第一轮：装饰图标标 hidden、进度环补可读文案（四语言）
+- App Intents：加任务 / 完成任务 / 打开 Today + 三条 Siri 短语
+- 分享码：`TOSN1:` + deflate + Base64URL，导入永远新建
+- 备份恢复：JSON 全量导出/导入，导入时询问「合并 / 覆盖」
+
+**没做完 / 顺延**
+- **单元测试**：按用户要求放最后，今晚没动。下次第一步。
+- **无障碍第二轮**：代码层改完了，但 **VoiceOver 实听没做**（需要真机开朗读逐屏走）。
+- **操作逻辑审查**：只修了模板那一个样本，其余页面还没逐个过。
+- **分享码长度**：现在仍受标题文本量限制（20 条任务约 400–600 字符）。真要更短只有三条路：
+  ① 只分享标题和日期，砍掉备注/优先级/子项；② 本地生成二维码，聊天里发图；③ 上服务端短链（已否决）。
+  **下次要问用户选哪条，别自己定。**
+
+**等外部条件的**
+- **iPad 版式定稿**：720 居中已上机，等用户看过截图再定要不要垂直居中 / 单独布局。
+- **手表真机安装**：**往后放**——等手表端功能补完 + 付费账号到位再开始，现在不排。
+- **滚动收键盘手感**：并入上面第 1 项，不再单列。
+
+**Backlog（用户说"过几天看"，不急）**
+- 通知里的「稍后提醒」（1 小时 / 今晚 / 明早）
+- 手表复杂功能（表盘看还剩几件）
+- 智能列表扩到「本周 / 无日期」
+- 已在原排期里但排在功能线后面的：无（分享码已提到今晚）
+
+**已删除**
+- ~~iOS 18 兼容性实跑~~：用户硬盘没空间装 runtime，直接去掉，不再提。
 
 **已打通、别再重复排查**：
 - **无线安装**：校园网（10.59.x）下设备不可达；开 iPhone 热点（Mac 在 172.20.10.x）立刻可用，
@@ -165,6 +177,10 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 | 空状态 | 没任务时卡片显示 ✓ `Nothing due today`，且**不画进度环**（`remaining + done == 0` 时不渲染），避免「全清了」配 0% 环的矛盾 |
 | URL scheme | `TosnDOs/Info.plist` 只放 `CFBundleURLTypes`（`tosndos`），靠 `GENERATE_INFOPLIST_FILE = YES` 与自动生成的键合并；该文件已加进同步组例外集，否则会 `Multiple commands produce Info.plist` |
 | 录入键 | 保持 `submitLabel(.done)`。试过改文案：iOS 根本没有「Add」返回键，`.return` 在多行框会变换行（会坏），`.go` 能用但用户觉得 Done 就行——**这类标签判断以后先问用户**，别自己换 |
+| 键盘收起 | 两条路并存：拖动跟手收（`.interactively`）+ **点击列表任意空白收起**（`dismissKeyboardOnTap`，走 `resignFirstResponder`）。**注意只在 TaskListView 挂**——模板页的输入框在 List 里面，挂上会把自己点没 |
+| App Intents | `TosnDOs/Intents/`：加任务（走 `NaturalDateParser`）、按名字完成任务、打开 Today；`TosnShortcuts` 三条短语。共用 `AppContainer.boot.container`，不需要 App Group。**短语里不能插 String 参数**，只能 AppEntity/AppEnum |
+| 分享码 | `Shared/Transfer/ListCodec.swift`：JSON（单字母键、空字段省略）→ deflate → Base64URL，前缀 `TOSN1:`；日期存相对天数，放几天再导入也不会错。导入走 `tosndos://import?c=`，**永远新建清单** |
+| 备份恢复 | `TosnDOs/Support/BackupFile.swift`：全量 JSON（清单/任务/模板/子项，带 schema 号）；设置页导出到文件，导入时弹「合并 / 覆盖」。**嵌套类型别叫 `TemplateItem`**，会和模型撞名 |
 | 商店截图 | `docs/appstore/`：iPhone Today / Browse、iPad、Watch、Mac 各一张，带机身边框。合成脚本 `frame.py`（Pillow），边框由截图 alpha 的圆角半径推算，不是硬编码机型 |
 
 **已知取舍**（都经用户追认，改动前先问）：
@@ -214,14 +230,14 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 **质量保证**
 - **零自动化测试**：没有 unit / UI test，回归全靠"四端编过 + 手点"
-- 只在 iPhone 16 Pro Max（iOS 27）+ 模拟器上跑过；**iOS 18 最低目标、旧机型、iPad 真机都未实测**
+- 只在 iPhone 16 Pro Max（iOS 27）+ 模拟器上跑过；旧机型、iPad 真机都未实测
 - VoiceOver 只做了标签和 Dynamic Type，**没跑过完整朗读流程**
 - 本地化审计是脚本一次性跑的，没有 CI 守着
 
 **产品面**
 - iPad 只有第一版列宽；macOS 侧栏/多列没有专门设计
-- 手表只在模拟器验证过，**真机从未安装**
-- 数据只有「分享为文本」单向导出，**没有备份/恢复**，误删靠 SwiftData 默认行为
-- 分享码未做；「等待中」之外的业务形态（子任务批量、依赖）没有
+- 手表只在模拟器验证过，**真机从未安装**（等付费账号后再排）
+- 数据只有「分享为文本」单向导出，**备份/恢复排进今晚**（见 5.2）
+- 分享码**排进今晚**；「等待中」之外的业务形态（子任务批量、依赖）没有
 - 无明显性能评估：大清单、Widget 刷新频率、CloudKit 首次同步都没压过
-- 键盘收起手感偏滞（见 5.2）
+- 键盘收起手感偏滞，且点击空白处不收（今晚一并修，见 5.2）

@@ -66,11 +66,12 @@ struct ProgressRing: View {
                     .font(.system(size: size * 0.26, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
+                    .accessibilityHidden(true)
             }
         }
         .frame(width: size, height: size)
         .accessibilityElement()
-        .accessibilityLabel(Text("Progress \(Int(clamped * 100))%"))
+        .accessibilityLabel(Text("Progress \(Int((clamped * 100).rounded()))%"))
     }
 }
 
@@ -85,6 +86,7 @@ struct MetaChip: View {
             if let icon {
                 Image(systemName: icon)
                     .font(.system(size: 9.5, weight: .semibold))
+                    .accessibilityHidden(true)
             }
             Text(text)
                 .scaledFont(11.5, weight: .medium)
@@ -197,6 +199,7 @@ struct EmptyHint: View {
             Image(systemName: symbol)
                 .font(.system(size: 34, weight: .light))
                 .foregroundStyle(.tertiary)
+                .accessibilityHidden(true)
             Text(title)
                 .scaledFont(15, weight: .semibold)
             Text(message)
