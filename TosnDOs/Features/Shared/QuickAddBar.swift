@@ -68,6 +68,7 @@ struct QuickAddBar: View {
         .padding(.vertical, 8)
         .glassSurface(radius: 26, interactive: true)
         .padding(.horizontal, Theme.pagePadding)
+        .frame(maxWidth: 720)
         .padding(.bottom, 6)
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: text.isEmpty)
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: previewLabel)

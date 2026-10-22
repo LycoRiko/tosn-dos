@@ -10,6 +10,8 @@ struct TemplateDetailView: View {
     @Environment(\.modelContext) private var context
 
     @State private var showsInstantiate = false
+    @State private var showsEditor = false
+    @FocusState private var focusedItem: UUID?
 
     private var template: ListTemplate? {
         templates.first { $0.uid == templateUID }
@@ -27,17 +29,32 @@ struct TemplateDetailView: View {
                 )
             }
         }
+        // A row the user tapped but never filled in should not survive: it reads
+        // as a stray bullet and would be copied into every new list.
+        .onChange(of: focusedItem) { previous, _ in
+            pruneIfEmpty(previous)
+        }
         .background(AppBackground())
         .navigationTitle(template?.title ?? String(localized: "Template"))
         .toolbar {
-            if let template {
+            if template != nil {
+                // Editing used to live only behind the library's context menu,
+                // which left the detail screen with two identical "add to
+                // workspace" buttons and no way to put tasks in the template.
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        showsInstantiate = true
+                        showsEditor = true
                     } label: {
-                        Image(systemName: "plus.square.on.square")
+                        Image(systemName: "pencil")
                     }
-                    .accessibilityLabel(Text("Add to workspace"))
+                    .accessibilityLabel(Text("Edit"))
+                }
+            }
+        }
+        .sheet(isPresented: $showsEditor) {
+            if let template {
+                NavigationStack {
+                    TemplateEditorView(template: template)
                 }
             }
         }
@@ -49,28 +66,43 @@ struct TemplateDetailView: View {
     }
 
     private func content(_ template: ListTemplate) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header(template)
+        // A List, not a ScrollView: swipe-to-delete is the expected way to
+        // remove a row, and only List gives it for free (with VoiceOver support).
+        List {
+            header(template)
+                .rowChrome()
 
-                if template.orderedItems.isEmpty {
-                    EmptyHint(
-                        symbol: "square.and.pencil",
-                        title: String(localized: "Nothing written yet"),
-                        message: String(localized: "Add tasks and checks to this template.")
-                    )
-                } else {
-                    VStack(alignment: .leading, spacing: 14) {
-                        ForEach(template.orderedItems) { item in
-                            itemBlock(item)
+            if template.orderedItems.isEmpty {
+                EmptyHint(
+                    symbol: "square.and.pencil",
+                    title: String(localized: "Nothing written yet"),
+                    message: String(localized: "Add tasks and checks to this template.")
+                )
+                .rowChrome()
+            } else {
+                ForEach(template.orderedItems) { item in
+                    itemBlock(item, in: template)
+                        .rowChrome()
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                context.delete(item)
+                                touch(template)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
                 }
             }
-            .padding(.horizontal, Theme.pagePadding)
-            .padding(.top, 8)
-            .padding(.bottom, 96)
+
+            addTaskButton(template)
+                .rowChrome()
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .environment(\.defaultMinListRowHeight, 1)
+        #if os(iOS)
+        .modifier(KeyboardDismissScroll())
+        #endif
         .safeAreaInset(edge: .bottom) {
             Button {
                 showsInstantiate = true
@@ -122,14 +154,20 @@ struct TemplateDetailView: View {
         }
     }
 
-    private func itemBlock(_ item: TemplateItem) -> some View {
+    private func itemBlock(_ item: TemplateItem, in template: ListTemplate) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 7) {
                 Image(systemName: "circle")
                     .font(.system(size: 13, weight: .regular))
                     .foregroundStyle(.tertiary)
-                Text(item.title)
+                TextField("Task name", text: Binding(
+                    get: { item.title },
+                    set: { item.title = $0; touch(template) }
+                ))
                     .font(.subheadline.weight(.medium))
+                    .focused($focusedItem, equals: item.uid)
+                    .submitLabel(.next)
+                    .onSubmit { addItem(to: template) }
                 if item.priority != .none {
                     Circle()
                         .fill(item.priority.color)
@@ -161,5 +199,67 @@ struct TemplateDetailView: View {
             }
         }
         .padding(.vertical, 2)
+        .contextMenu {
+            Button(role: .destructive) {
+                context.delete(item)
+                touch(template)
+            } label: {
+                Label("Delete task", systemImage: "trash")
+            }
+        }
+    }
+
+    private func addTaskButton(_ template: ListTemplate) -> some View {
+        Button {
+            addItem(to: template)
+        } label: {
+            Label("Add task", systemImage: "plus.circle.fill")
+                .font(.subheadline.weight(.medium))
+                .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Theme.accent)
+    }
+
+    /// Adding happens on this screen: the pencil is for the template's own
+    /// properties, and making people open it to type a task was a dead end.
+    private func addItem(to template: ListTemplate) {
+        // Returning on an untouched row should not stack a second empty one.
+        if let current = focusedItem,
+           let existing = template.orderedItems.first(where: { $0.uid == current }),
+           existing.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            focusedItem = existing.uid
+            return
+        }
+
+        let item = TemplateItem(title: "", sortIndex: Double(template.taskCount))
+        context.insert(item)
+        item.template = template
+        touch(template)
+        focusedItem = item.uid
+    }
+
+    private func pruneIfEmpty(_ uid: UUID?) {
+        guard let uid, let template,
+              let item = template.orderedItems.first(where: { $0.uid == uid }),
+              item.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return }
+        context.delete(item)
+        touch(template)
+    }
+
+    private func touch(_ template: ListTemplate) {
+        template.updatedAt = .now
+        try? context.save()
+    }
+}
+
+private extension View {
+    /// These rows are layout containers, not table cells: no separator, no
+    /// background, page padding instead of the default inset.
+    func rowChrome() -> some View {
+        listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: 6, leading: Theme.pagePadding, bottom: 6, trailing: Theme.pagePadding))
     }
 }

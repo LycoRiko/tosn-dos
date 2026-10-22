@@ -81,7 +81,7 @@ struct TemplateLibraryView: View {
                     Label("Edit", systemImage: "pencil")
                 }
                 Button {
-                    WorkspaceService.duplicate(template: template, in: context)
+                    _ = WorkspaceService.duplicate(template: template, in: context)
                 } label: {
                     Label("Duplicate", systemImage: "plus.square.on.square")
                 }

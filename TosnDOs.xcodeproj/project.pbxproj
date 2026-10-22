@@ -73,6 +73,7 @@
 		AA11BB22CC33DD44EE55FF1F /* Exceptions for "TosnDOs" folder in "TosnDOs" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Info.plist,
 				TosnDOs.entitlements,
 			);
 			target = AA11BB22CC33DD44EE55FF04 /* TosnDOs */;
@@ -517,6 +518,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TosnDOs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tos'n DOs";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -551,6 +553,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TosnDOs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tos'n DOs";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

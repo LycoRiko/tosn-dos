@@ -139,6 +139,10 @@ struct TaskListView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        // On iPad the rows stretched edge to edge, which left a lot of dead space
+        // and very long lines. Cap the column, then let it centre.
+        .frame(maxWidth: 720)
+        .frame(maxWidth: .infinity)
         .background(AppBackground(setting: currentList?.backgroundSetting))
         .environment(\.photoBackground, photoBackground)
         .navigationTitle(title)

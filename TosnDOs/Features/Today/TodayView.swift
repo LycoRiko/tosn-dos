@@ -36,7 +36,7 @@ struct TodayHero: View {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.title3)
                             .foregroundStyle(Theme.mint)
-                        Text("All clear")
+                        Text("Nothing due today")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else {
@@ -54,8 +54,11 @@ struct TodayHero: View {
 
             Spacer(minLength: 0)
 
-            ProgressRing(progress: progress, size: 58, lineWidth: 6.5)
-                .padding(.top, 2)
+            // Nothing was ever due: a 0% ring reads as failure next to "nothing due".
+            if remaining + done > 0 {
+                ProgressRing(progress: progress, size: 58, lineWidth: 6.5)
+                    .padding(.top, 2)
+            }
         }
         .glassCard(radius: Theme.radius, padding: 20)
         .animation(.spring(response: 0.5, dampingFraction: 0.85), value: remaining)
