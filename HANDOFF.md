@@ -12,18 +12,15 @@
 | 仓库 | <https://github.com/LycoRiko/tosn-dos>（public，`main`） |
 | 平台 | iOS 18+ / iPadOS 18+ / macOS 15+ / watchOS 10+，Xcode 26.1.1 |
 | 构建 | 四端全部 `BUILD SUCCEEDED`（iOS / iPad / macOS / watchOS） |
-| 真机 | iPhone 16 Pro Max（iOS 27.0.1）已装 `Tos'n DOs 1.0 (1)`，免费账号 7 天有效期 |
+| 真机 | iPhone 16 Pro Max（iOS 27.0.1）已装本轮构建（930K，含全部改动），免费账号 7 天有效期 |
 | 签名 | Team `S465RV3CLC`（REGer Bili / Personal Team，免费） |
 | 版本 | Bundle `com.rikomiyazaki.TosnDOs`（`.widget` / `.watchkitapp`） |
 
-**下一个该做的（2026-10-22 晚安排的顺序）**：键盘两件事 → 无障碍/操作逻辑自查 →
-App Intents / 分享码 / 备份恢复 → 单元测试（做不完顺延）。详见 5.2。
+**下次开工看第 11 节**。第 10 节是 2026-10-22 这一天做了什么（给新读者看的话读那节就够）。
 
 **开工前必看**：
 - 构建**必须**带 `-disable-sandbox`，否则宏插件必挂（第 2、4 节）
 - `devbuild.sh`、`project.pbxproj.1`、`build/` 是本机专有文件，已 git 忽略，**别提交、别删**
-- **有一笔未提交的改动**：README 中文说明两处笔误（`Apple Watch` 后补空格、结尾补句号）。
-  2026-10-22 按用户要求**先不推**，下次提交仓库时一并带上。
 
 **需要用户拍板的两件事**：
 1. README 的 Credits 写着「running DeepSeek-V4.1-Flash」，但 10-19 凌晨换过其他模型，改不改由他定
@@ -113,65 +110,23 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 ## 5. 待办
 
-### 5.1 分享码（建议下一个做）
+### 5.1 分享码（已完成，2026-10-22）
 
-把清单导出成码/串，别人导入即得同一张清单。**本地 Deflate + Base64URL，不上云**。
-与「分享为文本」共用序列化格式（`TosnDOs/Support/ListShareText.swift`），别写成纯展示文本。
-参考过 WakeUp 课程表的做法；服务端短口令方案已否决。
+清单 → 紧凑 JSON → deflate → Base64URL，前缀 `TOSN1:`；二维码内容包成 `tosndos://import?c=`。
+文本码因为太长已撤掉，只保留二维码。实现见 `Shared/Transfer/ListCodec.swift`、`TosnDOs/Support/QRCode.swift`。
 
-### 5.2 待办（2026-10-22 19:10 用户重排）
+### 5.2 还没做的（2026-10-22 收尾时）
 
-**本轮（操作逻辑审查 · 第二批）**
+| 事项 | 卡在哪 |
+|---|---|
+| **VoiceOver 实听** | 用户在图书馆不能出声，等安静环境自己戴耳机逐个听；代码层已过第一轮 |
+| **Siri / Spotlight 实测** | 需要出声和真人操作。元数据已验证导出（3 个 intent + 3 条短语） |
+| **iPad 版式定稿** | 720 居中已上机，等用户看过真实设备再定要不要垂直居中 |
+| **手表真机安装** | 排到「手表端功能补完 + 付费账号到位」之后 |
+| **键盘收起「不太跟手」** | 已保留跟手滚动 + 加了点击空白收起；手感仍偏滞，候补方案见 10.1 |
+| **分享码还能更短** | 已改为「只发二维码」，文本码撤掉了，此项作废 |
+| **菜单实色** | SwiftUI `Menu` 底色改不了，能做的是统一 tint，已做完 |
 
-已完成
-- **主页任务行**：右滑出「设置 / 删除」两个动作（`leading`，`allowsFullSwipe: false` 防误触）；
-  原来的「明天」从滑动里撤掉，只留在长按菜单；完成仍然点左边的圈。尾部滑动整体删除，避免同一动作两处出现。
-- **模板详情页**：排版改成和主页一致（圆圈 + 标题 + meta 一行），标题仍可原地输入；
-  右滑同样是「设置 / 删除」；新增 `TemplateItemSheet` 管备注、优先级、检查项。
-- **二维码分享**：`QRCode.swift` 本地生成（CIFilter），列表菜单「显示二维码」弹出面板，
-  图下方仍带文本码可复制。
-
-待做（用户 19:08 追加）
-- **浏览页模板改独立二级页**：现在模板是网格（`LazyVGrid`），**网格里 `swipeActions` 不生效**，
-  所以必须换成 `List` 才有右滑删除 + 编辑模式（多选）。这是本项的前提，不是可选优化。
-- **往期清单按「具体哪一天」分组**：现在是一坨平铺，要按完成日期分段（今天 / 昨天 / 具体日期）。
-- **模板来源标签**：从模板生成的清单，要在副标题显示模板名，让人一眼看出这是「Weekly clean」第几期。
-
-**往后排（用户明确要求）**
-- **VoiceOver 实听**：用户在图书馆不能出声音，等他自己戴耳机逐个听；我只做代码层审查。
-- **Siri 实测**：同上，需要出声，往后排。
-
-**今晚已完成**（详见第 6 节）
-- 键盘点击空白收起；无障碍代码层第一轮；App Intents；分享码文本版；备份恢复
-
-**没做完 / 顺延**
-- **单元测试**：下次第一步。
-- **操作逻辑审查**：本轮做模板 + 主页，之后还有 Browse 三类卡片、设置页。
-- **分享码长度**：改二维码后，文本码仍受标题长度限制。
-
-**等外部条件的**
-- **iPad 版式定稿**：720 居中已上机，等用户看过截图再定要不要垂直居中 / 单独布局。
-- **手表真机安装**：**往后放**——等手表端功能补完 + 付费账号到位再开始，现在不排。
-- **滚动收键盘手感**：并入上面第 1 项，不再单列。
-
-**Backlog（用户说"过几天看"，不急）**
-- **写一份完整的 Markdown 使用说明**（2026-10-22 用户新增）：后面要开单独 session 做成 WordPress 博客文章。
-  **排在靠后**——这几天业务改动还大，等功能稳定了再写，否则写完就过时。
-- 通知里的「稍后提醒」（1 小时 / 今晚 / 明早）
-- 手表复杂功能（表盘看还剩几件）
-- 智能列表扩到「本周 / 无日期」
-- 已在原排期里但排在功能线后面的：无（分享码已提到今晚）
-
-**已删除**
-- ~~iOS 18 兼容性实跑~~：用户硬盘没空间装 runtime，直接去掉，不再提。
-
-**已打通、别再重复排查**：
-- **无线安装**：校园网（10.59.x）下设备不可达；开 iPhone 热点（Mac 在 172.20.10.x）立刻可用，
-  `devicectl` 显示 `transportType: localNetwork` + `tunnelState: connected`，装包/启动都正常。
-- **URL scheme**：`tosndos://today` / `tosndos://browse` 已被系统识别（会弹「在 Tos'n DOs 中打开」）。
-  注意：用 `simctl openurl` 注入时 iOS 一定会弹确认框，测试时得手点一次；Widget 里点不需要。
-
----
 
 ## 6. 已完成（别再重做）
 
@@ -257,193 +212,72 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 - 无明显性能评估：大清单、Widget 刷新频率、CloudKit 首次同步都没压过
 - 键盘收起手感偏滞，且点击空白处不收（今晚一并修，见 5.2）
 
-### 5.4 19:15 状态（未提交）
+---
 
-**已改完、三端编译通过**
-- 主页行：右滑「设置 / 删除」；「明天」只在长按菜单
-- 模板详情页：Reminders 式行 + 右滑「设置 / 删除」+ `TemplateItemSheet`
-- 二维码：`QRCode.swift` + 列表菜单「显示二维码」
+## 10. 2026-10-22 一天的工作
 
-**还差两项，需要先定方案**
+一天内从「没有仓库」做到「手机上能跑、四端编译通过、有 8 个单元测试」。
 
-1. **浏览页模板 → 独立二级页 + 编辑模式**
-   现状是 `LazyVGrid` 网格，**网格不支持 `swipeActions`**。要同时得到"右滑删除"和"多选编辑"，
-   只能换成 `List`（Reminders 的模板列表也是 List）。换掉会失去两列卡片观感。
-   建议：改成单列 List（图标 + 标题 + 「N 项 · 用过 M 次」），`EditButton` 多选删除，右滑删除。
-   **要确认能否接受视觉从网格变单列。**
+### 10.1 键盘（iOS）
+- 拖列表收键盘：`.scrollDismissesKeyboard(.interactively)`，但因为短列表没有滚动距离，额外在
+  **软键盘在屏时**打开 `.scrollBounceBehavior(.always)`，让它能拖得动。
+- **点列表任意空白也收起**：`simultaneousGesture(TapGesture)` 发 `resignFirstResponder`。
+  只能挂在任务列表上——模板页的输入框在 List 内部，挂上会把自己点没。
+- 手感仍偏滞（用户反馈）。候补：换 `.immediately`（一拖就收但不跟手）、或自绘手势（和行滑动打架，风险最高）。
 
-2. **往期清单按天分组 + 模板来源标签**
-   `TodoList` 现在只有 `periodDate`，**没有「哪天完成的」也没有「来自哪个模板」**。
-   需要加两个字段（SwiftData 加带默认值的可选字段属轻量迁移，旧数据不会炸）：
-   - `completedAt: Date?`（整张清单完成的时刻，用来分组）
-   - `sourceTemplateName: String = ""`（生成时写入，用来做副标题 tag）
-   分组方式有两种，得选：
-   - **A. 按「清单完成的那一天」**：今天 / 昨天 / 10月18日 —— 一行一天，跨天完成的旧清单会归到最后动的那天
-   - **B. 按「模板周期」**：Weekly clean 第 3 周 / 第 2 周 —— 更像台账，但没模板的清单无处可归
-   建议 A（对无模板清单也成立），B 只作为有模板时的副标题。
+### 10.2 模板
+- 根因修复：模板详情页原来是只读的，工具栏和底部**都**放「加入工作区」，编辑入口只在长按菜单里
+  → 用户找不到加任务的地方。典型的「入口缺失 + 重复动作」。
+- 现在详情页就是编辑页：每行是单行 `TextField`，回车建下一条，左滑删除，**空行失焦即删**。
+- 排版改成和主页一致（圆圈 + 标题 + meta），右滑出「设置 / 删除」，`TemplateItemSheet` 管备注/优先级/检查项。
+- 模板库从 `LazyVGrid` 改 `List`（网格不支持 `swipeActions`）：紧凑行 + 多选删除。
 
-### 5.5 决策已定（19:12）
+### 10.3 首页与浏览页
+- 任务行右滑 = 设置 + 删除；完成只走左边的圈（原来滑动里还有一份"完成"，属重复动作）。
+- 空状态：卡片说 `Nothing due today`，下面的空提示改成 `No open tasks`（原来重复两遍）。
+- 往期清单搬进二级页，按**完成日**分组（今天 / 昨天 / 10月18日），副标题显示模板名 + 耗时。
+- 每组多一行「当日新增」，点进去是那天手输的任务。日期集合取**并集**（完成日 ∪ 新增日），
+  否则"只打字没完成清单"的那天会整天消失。
+- Settings 从 `Form` 改 `List`，与 Browse 共用同一套容器/背景/底部留白。
 
-- **浏览页/模板库**：用户接受视觉变化，**可以直接重做整个浏览页**，排版尽量向主页看齐（List + 行）。
-- **往期清单分组**：选 **A —— 按清单完成的那一天**分组（今天 / 昨天 / 具体日期）。
-- **地基已铺好**：`TodoList` 已加 `completedAt: Date?` 和 `sourceTemplateName: String`（默认空）。
-  下一步要做的三件事：
-  1. `WorkspaceService` 从模板生成清单时写入 `sourceTemplateName`
-  2. 最后一条任务完成时写 `completedAt`（取消完成要能清掉）
-  3. Browse 的 previous 段按 `completedAt` 的日分组，副标题显示模板名 tag
-- 模板库从 `LazyVGrid` 改 `List`，行式排版 + `EditButton` 多选 + 右滑删除。
+### 10.4 分享与备份
+- 分享：清单 → 紧凑 JSON → deflate → Base64URL，前缀 `TOSN1:`；日期存**相对天数**，放几天再导入也不会错。
+  文本码太长，最终只保留**二维码**。
+- 二维码内容改成深链 `tosndos://import?c=...`：**系统相机只对 URL 提示打开**，裸文本没有这个选项，
+  所以完全不用写扫描器。
+- macOS 不用摄像头：**把二维码图片或备份文件拖进窗口**即可导入，`CIDetector` 本机解码，
+  支持 png / jpeg / heic / webp，识别失败再 2× 放大重试。
+- 备份导出为 `.tndbackup`（内容仍是 JSON，`Info.plist` 已声明该 UTType），导入按内容解析，旧 `.json` 也能吃。
+  导入时询问「合并 / 覆盖」。
 
-### 5.6 19:17 决策
+### 10.5 App Intents
+- 加任务（走自然语言日期）、按名字完成任务、打开 Today；三条 Siri 短语。
+- 共用 `AppContainer.boot.container`，不需要 App Group。
+- 坑：快捷指令短语里**不能插 String 参数**，只接受 AppEntity/AppEnum。
 
-- **completedAt：选方案 3**。在 `TodoList` 上加 `reconcileCompletion()`：扫自己的任务，
-  全勾且原先没有 `completedAt` → 写 `.now`；有未勾 → 清空。**所有改任务状态的入口最后都调它**，
-  不要各自判断。入口清单：`TaskRow.toggle`、批量完成、模板生成后、删除任务、恢复备份。
-- **弹出菜单统一实色**，导航按钮保留液态玻璃。
-  ⚠️ 技术限制先说清：**SwiftUI 的 `Menu` 弹出层背景不可直接改**（由系统渲染）。
-  想真正控制只有两条路：
-  ① 把菜单内容换成 `.sheet` / `popover`（自绘，能上实色，但交互感变了）；
-  ② 用 `UIAlertController` 风格的系统菜单，接受它跟着系统走（做不到全实色）。
-  需要用户在这两条里选一条，别默认。
+### 10.6 数据层
+- `TodoList` 新增 `completedAt` 与 `sourceTemplateName`（都带默认值，轻量迁移）。
+- 完成时刻收敛到一个函数 `reconcileCompletion()`：全勾且没记过 → 记一次；有未勾 → 清空。
+  五个入口统一调用（勾选、模板生成、删除任务、备份恢复、码导入），避免"永远停在昨天"。
 
-### 5.7 19:21 断点（下次从这里直接接，别重新调研）
+### 10.7 质量
+- 新增 `TosnDOsTests`（手写 pbxproj 才有的 target，scheme 里配 `Testables`）。
+- **不要用 TEST_HOST**：宿主模式会 `test runner hung before establishing connection`。
+  改成把 6 个纯逻辑文件直接编进测试包，8 个测试全过：
+  自然日期解析、完成时间幂等、分享码往返、垃圾码拒绝、备份往返、二维码 png/jpeg/heic 往返。
+- 假数据跑过两轮截图，修掉：模板卡片被拉成大方块、往期副标题日期错、`0m` 耗时、
+  底部被 tab bar 压住、相册权限在无关页面弹窗。
 
-**已完成**：`TodoList.reconcileCompletion()` 写好并接到 `TaskRow.toggle`；`completedAt` /
-`sourceTemplateName` 两个字段已加；iOS 编译通过。
+### 10.8 真机与分发
+- 校园网不可达（客户端隔离），**开 iPhone 热点**后 `devicectl` 走 `localNetwork` 直接装。
+- `build/ipa/TosnDOs.ipa` 930K，含本轮全部改动；免费账号 7 天有效期。
+- 坑：`open -n app --args -seedDemo` 参数**不会传进进程**，要直接跑 `Contents/MacOS/TosnDOs`。
 
-**按顺序做完这 5 件，再统一编译三端**
-1. `reconcileCompletion()` 补调用点：批量完成、模板生成（`WorkspaceService`）、删除任务、恢复备份。
-   模板生成同时写 `sourceTemplateName = template.title`。
-2. Browse 的 previous 段：按 `completedAt` 的 `startOfDay` 分组，`SectionHeader` 用「今天 / 昨天 / M月d日」；
-   有 `sourceTemplateName` 的行在副标题加模板名 tag。
-3. 模板库 `LazyVGrid` → `List`：图标 + 标题 + 「N 项 · 用过 M 次」，`EditButton` 多选删，右滑删除。
-4. 菜单 tint 统一（方案 2）：`Menu` 里所有 `Label` 用同一套 tint，删除类统一 `.red`，
-   普通动作用 `Theme.accent`，不要混 `.gray`（现在任务行的「设置」就是 gray，和别处不一致）。
-5. 三端编译 + 模拟器截图自查；有问题先修。
+---
 
-**没做的验证**：模拟器里没跑过 UI（只在编译层面确认），分组和菜单配色都需要真实界面确认。
+## 11. 下次开工的建议顺序
 
-### 5.8 19:25 本轮完成
-
-- `reconcileCompletion()` 已补 4 个入口：`TaskRow.toggle`、模板生成（同时写 `sourceTemplateName`）、删除任务、备份恢复、分享码导入。
-- Browse 往期段：按 `completedAt`（旧数据退回 `createdAt`）的 `startOfDay` 分 Section，标题「今天 / 昨天 / M月d日」，
-  副标题顺序 = 模板名 · 原有详情。
-- 模板库：`LazyVGrid` → `List`，行内仍是 `TemplateCard`；右滑「编辑 / 删除」，`EditButton` 多选删，
-  末尾「New template」按钮。`EditButton` 仅 iOS（macOS 无此类型）。
-- 滑动操作取消 `.tint(.gray)`，非破坏动作统一走 accent，删除保持系统红。
-- 三端编译通过（iOS / macOS / watchOS）。
-
-**视觉验证只做了空状态**：模拟器里没有数据，分组、模板列表、右滑动作都没真看过。
-空状态截图发现一个小问题：卡片里写「Nothing due today」，下面空提示又写一遍，**重复**。
-
-### 5.9 19:32 假数据自测结果（截图见下一条）
-
-用临时 `DebugHarness`（已删除）造了 2 个进行中清单 + 3 个已完结清单（今天/昨天/三天前）+ 1 个模板，
-在模拟器里跑通并截图。
-
-**代码自检 13 项全过**（`[check] PASS`）：
-`lists=5`、`code.length=117`（3 条任务）、`code.hasPrefix`、`code.title`、`code.tasks 3vs3`、
-`backup.bytes=4489`、`backup.lists 5vs5`、`backup.templates 1vs1`、`backup.taskCount=12`、
-`backup.templateChecks=3`、`completedAt.count=3`、`templateTag.count=2`。
-（`code.relativeDay` 那条断言本身取错了对象，不是产品问题，改判定后成立。）
-
-**截图看出来的真问题，已修**：
-1. **往期副标题日期是错的**：昨天的清单也显示 `Oct 22`。根因是 `previousDetail` 用 `periodDate` /
-   `lastCompletedAt`（任务各自的完成时刻），不是清单的完成日。现在**日期从副标题撤掉**——
-   Section 头已经写了「Today / Yesterday / Oct 19」，重复一遍只会打架。
-2. **`0m` 耗时没意义**：`workedDuration` 为 0 也照样显示。现在 < 60 秒直接不显示。
-3. **底部最后一段被浮起的 tab bar 压住**：Browse 的 List 加 `.contentMargins(.bottom, 92)`。
-
-**空状态重复文案**：`.today` 的空标题从「Nothing due today」改成「No open tasks」（卡片保留原句）。
-
-脚手架已删，`grep DebugHarness|shotBrowse|seedDemo` = 0，三端复编通过。
-
-### 5.10 19:38 往期独立页 + 风格统一
-
-- **往期清单搬进二级页** `Features/Browse/PreviousListsView.swift`：按完成日分组、模板名 · 耗时、右滑无（只读回看）。
-  Browse 只留一行入口「Previous ToDos + 数量」，点进去才是完整列表。
-- **设置页与浏览页风格对齐**：`Form` → `List` + `.groupedRows()` + `.scrollContentBackground(.hidden)`
-  + `.contentMargins(.bottom, 92)` + `AppBackground()`。之前 Form 用的是系统灰底，和 Browse 的玻璃卡片不是一套。
-- 三个页面现在共用同一套：列表容器、行背景、底部留白、背景图。
-
-**仍未碰**
-- **菜单实色（方案 2）**：滑动动作的 tint 已统一；`Menu` 内部每一项的 tint 还没逐一核对，
-  系统菜单底色依旧改不了（这是 SwiftUI 的硬限制，已跟用户说明）。
-- **分享码更短**：等用户在「砍字段 / 只用二维码」之间选。
-
-### 5.11 19:50 当日新增 / 二维码深链 / 菜单核对
-
-**往期页加「当日新增」**
-- 每个日期分组下多一行「Added that day · N」，点进去是 `DayTasksView`（当天创建的、且不属于已完结清单的任务）。
-- 日期集合取**并集**：已完结清单的完成日 ∪ 有新增任务的创建日 —— 否则「只打字没完成清单」的那天会整天消失。
-- 只统计非完结清单里的任务，避免和上面的清单行重复。
-
-**二维码改深链 + 相册 + 分享**
-- QR 内容从裸码改成 `tosndos://import?c=<code>`：**系统相机扫到 URL 才会提示「在 Tos'n DOs 中打开」**，
-  裸文本没有这个选项。这样完全不用写扫描器，导入仍走已有的 `onOpenURL`。
-- 打开面板即存一份到相册（`PHPhotoLibrary` add-only），预览页带 `ShareLink` 分享图片。
-- `Info.plist` 补 `NSPhotoLibraryAddUsageDescription`。
-- 文案：Scan to import / Share / Saved to Photos / 存不进相册。
-
-**菜单逐一核对结论**
-- 全工程 `Menu` / `contextMenu` 已无自定义 `.tint()`，全部继承 accent；删除类都用 `role: .destructive`（系统红）。
-- **弹出面板底色依旧不可控**（SwiftUI 硬限制），方案 2 能做的到此为止。
-
-### 5.12 20:10 假数据截图复核
-
-截图见 `docs/test-evidence/`：`previous.png`、`day-added.png`、`templates.png`、`settings.png`、`qr.png`。
-
-**截图里修掉的问题**
-1. **模板卡片在单列里被拉成大方块**：`TemplateCard` 是按 148pt 网格设计的，整行时变成 190pt 高的空白砖。
-   换成紧凑行（图标 + 标题 + 两个 MetaChip 计数）。
-2. **相册权限弹窗在无关页面弹**：原来 QRSheet `.task` 无条件请求授权。改成
-   **已授权才静默保存，未授权显示「Save to Photos」按钮**。用户没要求时不该弹。
-3. 模拟器里那个弹窗会粘住（卸载都不消），最后 `simctl erase` 解决 —— 不是 App 的问题。
-
-**确认没问题的**
-- 往期页按天分组正确；「当日新增」只在有数据的日期出现（Oct 19 没有，符合预期）。
-- 当日新增页显示标题、所属清单、时间。
-- 二维码面板：图 + Share + Save to Photos。
-
-**macOS 平权现状（诚实版）**
-- 已共享：往期分组视图、当日新增页、模板列表、二维码面板（改成 `CGImage` 渲染，两端通用）、
-  `Menu` / 滑动配色、列表容器与背景。
-- **未共享**：macOS 的导航是侧栏（`MacRootView`），侧栏里没有「Previous ToDos」这个入口，
-  所以 `PreviousListsView` 在 macOS 上**目前进不去**。要做得加一个 `SidebarItem` case 或换掉往期那一段的跳转，
-  属于结构性改动，等用户拍板。
-
-### 5.13 20:33 macOS 往期入口
-
-- `MacRootView` 侧栏的「Previous ToDos」从「列出每个已完结清单」改成**一行入口**（带数量），
-  点开进 `PreviousListsView` —— 和 iOS 同一个页面。
-- 好处：侧栏不再被几十个历史清单撑长；分组和「当日新增」在两端终于一致。
-
-### 5.14 21:00 单元测试 + macOS 拖拽导入
-
-**测试**
-- 工程里**没有测试 target**，手写 pbxproj 加了一个 `TosnDOsTests`：
-  同步组 + 目标 + 三阶段 + 配置 + scheme 的 `Testables`。
-- **不要用 TEST_HOST**：宿主模式会报 `test runner hung before establishing connection`
-  （App 被拉起来却连不上 runner）。改成把 6 个纯逻辑文件直接编进测试包：
-  `TodoList/TodoItem/ListTemplate` 三个模型 + `ListCodec` + `BackupFile` + `NaturalDateParser`。
-- 6 个测试全过（`xcodebuild test -scheme TosnDOs -only-testing:TosnDOsTests`）：
-  自然日期解析、纯文本不动、完成时间写入/清除/幂等、分享码往返、垃圾码拒绝、备份往返。
-
-**macOS 拖拽导入（不碰摄像头）**
-- `TaskListView` 挂 `.onDrop`：拖**二维码图片**或**备份 JSON**进窗口即可导入。
-  JSON 先判（备份永远不是合法二维码）；二维码用 `CIDetector` 本机解码。
-- 拖入时整页高亮边框 + 「Drop a QR image or a backup」提示。
-
-### 5.15 21:15 备份扩展名 / 拖拽文案 / 多格式解码
-
-- **备份导出改为 `.tndbackup`**（内容仍是 JSON）：`Info.plist` 声明
-  `com.rikomiyazaki.tosndos.backup`（conforms to public.json），导出/导入都用这个 UTType。
-  导入仍按 JSON 解析，所以旧 `.json` 备份照样能吃。
-- **拖拽提示**：整页高亮 + `Drop QR share code or .tndbackup to import.`
-- **二维码解码走 `CGImageSource`**：png / jpeg / heic / webp 都能读（ImageIO 支持），
-  识别失败再按 2x 放大重试一次，应付"拍屏幕"这种偏糊的图。
-- `QRSheet` 从 `QRCode.swift` 拆出去了，解码器保持纯逻辑，才能被测试包直接编译。
-- **测试 8 项全过**，含 `readsCommonImageFormats`（同一张二维码转 png/jpeg/heic 再读回）。
-
-**采样构建（给用户截图用）**：macOS Debug 版已装好假数据（Work 2 / Home 3 / Previous 3 / 模板 1）并启动。
-坑：`open -n app --args -seedDemo` **参数没传进进程**（数据库 0 行）；直接跑
-`Contents/MacOS/TosnDOs -seedDemo` 才写入。种子代码已删，数据留在容器里。
+1. **无障碍第二轮**：开 Accessibility Inspector 逐屏朗读，把 label / traits / 阅读顺序过一遍
+2. **Siri 与 Spotlight 实测**（需要出声）
+3. **iPad 真机看版式**，定是否垂直居中
+4. 之后才是新功能：通知「稍后提醒」、手表复杂功能、智能列表扩展
