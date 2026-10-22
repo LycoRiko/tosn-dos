@@ -187,7 +187,7 @@ struct TaskListView: View {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(Theme.accent, lineWidth: 3)
                         .background(Theme.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    Label("Drop a QR image or a backup", systemImage: "qrcode.viewfinder")
+                    Label("Drop QR share code or .tndbackup to import.", systemImage: "qrcode.viewfinder")
                         .font(.headline)
                         .foregroundStyle(Theme.accent)
                 }

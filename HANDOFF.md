@@ -432,3 +432,18 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 - `TaskListView` 挂 `.onDrop`：拖**二维码图片**或**备份 JSON**进窗口即可导入。
   JSON 先判（备份永远不是合法二维码）；二维码用 `CIDetector` 本机解码。
 - 拖入时整页高亮边框 + 「Drop a QR image or a backup」提示。
+
+### 5.15 21:15 备份扩展名 / 拖拽文案 / 多格式解码
+
+- **备份导出改为 `.tndbackup`**（内容仍是 JSON）：`Info.plist` 声明
+  `com.rikomiyazaki.tosndos.backup`（conforms to public.json），导出/导入都用这个 UTType。
+  导入仍按 JSON 解析，所以旧 `.json` 备份照样能吃。
+- **拖拽提示**：整页高亮 + `Drop QR share code or .tndbackup to import.`
+- **二维码解码走 `CGImageSource`**：png / jpeg / heic / webp 都能读（ImageIO 支持），
+  识别失败再按 2x 放大重试一次，应付"拍屏幕"这种偏糊的图。
+- `QRSheet` 从 `QRCode.swift` 拆出去了，解码器保持纯逻辑，才能被测试包直接编译。
+- **测试 8 项全过**，含 `readsCommonImageFormats`（同一张二维码转 png/jpeg/heic 再读回）。
+
+**采样构建（给用户截图用）**：macOS Debug 版已装好假数据（Work 2 / Home 3 / Previous 3 / 模板 1）并启动。
+坑：`open -n app --args -seedDemo` **参数没传进进程**（数据库 0 行）；直接跑
+`Contents/MacOS/TosnDOs -seedDemo` 才写入。种子代码已删，数据留在容器里。

@@ -174,10 +174,10 @@ struct SettingsView: View {
         .fileExporter(
             isPresented: $showsExporter,
             document: exportDocument,
-            contentType: .json,
+            contentType: BackupFile.contentType,
             defaultFilename: "tosndos-backup"
         ) { _ in }
-        .fileImporter(isPresented: $showsImporter, allowedContentTypes: [.json]) { result in
+        .fileImporter(isPresented: $showsImporter, allowedContentTypes: [BackupFile.contentType, .json]) { result in
             loadBackup(result)
         }
         .confirmationDialog(

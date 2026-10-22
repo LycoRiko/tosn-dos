@@ -4,6 +4,13 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// Full backup file. Carries every field plus a schema number.
+/// The bytes stay JSON; only the extension is ours, so a double-click opens the
+/// app and nobody has to guess whether it is safe to edit.
+extension BackupFile {
+    /// Declared in Info.plist so the system picker accepts only this and .json.
+    static var contentType: UTType { UTType(filenameExtension: "tndbackup") ?? .json }
+}
+
 struct BackupFile: Codable {
     var schema: Int = 1
     var exportedAt: Date = .now

@@ -139,3 +139,43 @@ struct LogicTests {
         #expect(decoded.templates.first?.items.first?.checks == ["Wipe", "Mop"])
     }
 }
+
+#if os(macOS)
+import AppKit
+
+@MainActor
+struct QRTests {
+    /// Generates a QR, re-encodes it as png / jpeg / heic, and reads it back.
+    /// These are the formats a screenshot or a forwarded photo arrives in.
+    @Test func readsCommonImageFormats() throws {
+        let code = "TOSN1:eJyNjjEOwjAMRe8SqVKHDmSBjSEbdwjBaUyJUmKnjkHcnTQlSGwsb3h-9pfc"
+        let link = QRCode.link(for: code)
+        let qr = try #require(QRCode.image(for: link))
+        let rep = NSBitmapImageRep(cgImage: qr)
+
+        let png = try #require(rep.representation(using: .png, properties: [:]))
+        #expect(QRCode.message(in: png) == link)
+
+        let jpeg = try #require(rep.representation(using: .jpeg, properties: [.compressionFactor: 0.9]))
+        #expect(QRCode.message(in: jpeg) == link)
+
+        if let heic = Self.encode(qr, as: "public.heic") {
+            #expect(QRCode.message(in: heic) == link, "heic must survive the round trip")
+        }
+    }
+
+    @Test func codeIsRecoveredFromLink() {
+        let code = "TOSN1:abc"
+        #expect(QRCode.code(from: QRCode.link(for: code)) == code)
+        #expect(QRCode.code(from: "https://example.com") == nil)
+    }
+
+    private static func encode(_ image: CGImage, as type: String) -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, type as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return data as Data
+    }
+}
+#endif

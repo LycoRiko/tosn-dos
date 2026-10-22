@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA11BB22CC33DD44EE55FF56 /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF46 /* QRCode.swift */; };
 		AA11BB22CC33DD44EE55FF50 /* TodoList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF40 /* TodoList.swift */; };
 		AA11BB22CC33DD44EE55FF51 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF41 /* TodoItem.swift */; };
 		AA11BB22CC33DD44EE55FF52 /* ListTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF42 /* ListTemplate.swift */; };
@@ -68,6 +69,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA11BB22CC33DD44EE55FF46 /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/QRCode.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF40 /* TodoList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/TodoList.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF41 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/TodoItem.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF42 /* ListTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/ListTemplate.swift"; sourceTree = "<group>"; };
@@ -411,6 +413,7 @@
 				AA11BB22CC33DD44EE55FF53 /* ListCodec.swift in Sources */,
 				AA11BB22CC33DD44EE55FF54 /* BackupFile.swift in Sources */,
 				AA11BB22CC33DD44EE55FF55 /* NaturalDateParser.swift in Sources */,
+				AA11BB22CC33DD44EE55FF56 /* QRCode.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,5 +17,29 @@
 	</array>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Saves the share code to your photo library.</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Tos’n DOs Backup</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.rikomiyazaki.tosndos.backup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>tndbackup</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/json</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>
