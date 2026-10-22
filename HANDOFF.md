@@ -118,17 +118,31 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 
 ### 5.2 其余
 
-1. **带设备边框的截图**（用户要做 App Store 详情页海报 + Keynote）：iPhone / iPad / Watch / macOS
-   各一张。`simctl io … screenshot` 只有圆角遮罩（`--mask`），**没有物理边框**，边框要自己合成。
-   需要先有内容——临时加一个 `-shotSeed` 的 DEBUG 种子，截完删掉。
-2. **真机包 + 无线安装**：`./devbuild.sh` 出不含 App Group 的包；用户当天没带线，
-   装机阶段先确认 `devicectl list devices` 里 transport 是不是 `localNetwork`，能走无线就走无线。
-3. **URL scheme**：`CFBundleURLTypes` 缺失，所以 `onOpenURL` 和 Widget 的 `widgetURL` 是死代码。
-   要新建 `TosnDOs/Info.plist` 并关掉 `GENERATE_INFOPLIST_FILE`。
-4. **iPad 横屏**：`NavigationSplitView` 需要 `.balanced` + 侧栏默认收起。
-5. **两条告警**：`TemplateDetailView.swift:33`、`TemplateLibraryView.swift:84`。
-6. **手表真机安装**：Xcode 里设备切到 `REG's Apple Watch` 按 ⌘R。
-7. **回车键文案**：`QuickAddBar` 标的是 `Done`，实际动作是「添加任务」，要不要改成 `Add` 待定。
+0. **明天两件审查（用户 2026-10-21 点名，都要从代码层从头到尾过）**
+   - **无障碍 / VoiceOver（优先）**：逐屏走一遍，确认每一行、每个按钮、每个自定义控件都有可读的
+     accessibilityLabel、正确的 traits（button / header / selected）、合理的阅读顺序；装饰性图形要
+     标记为 hidden；自定义手势（swipe、长按）要有替代入口，不能只有手势才可达。
+     重点怀疑对象：模板页内联 TextField、TaskRow 的勾选框、ProgressRing（纯绘制，多半没读出数值）、
+     玻璃卡片容器、`KeyboardDismissScroll` 这类包装层是否把可访问性弄丢。
+     验收方式：模拟器开 VoiceOver（Accessibility Inspector）逐屏朗读，不是只看代码。
+   - **操作逻辑**：把每个页面能点的东西列一遍，逐个问「这个动作和旁边那个有什么区别」
+     「我要做的下一件事有没有入口」。样本就是模板详情页两个按钮做同一件事——
+     **入口缺失 + 重复动作**，编译和截图都发现不了，只有真用才踩得到。
+1. **iPad 版式第一版待确认**（2026-10-21）：`TaskListView` 的 List 加 `.frame(maxWidth: 720)` +
+   `.frame(maxWidth: .infinity)`，`QuickAddBar` 同步限宽。iPad 从「贴左满宽」变成居中的一列。
+   用户要看过截图再定要不要再动（比如垂直居中、或 iPad 单独布局）。macOS 中间栏本来就窄于 720，不受影响。
+2. **手表真机安装**：Xcode 里设备切到 `REG's Apple Watch` 按 ⌘R。
+3. **滚动收键盘「不太跟手」**（用户真机实测反馈，优先级低，改天做）：
+   功能是通的——拖着列表键盘会跟着下去并收起，只是手感偏滞。
+   原因大概率是 `.interactively` 要等滚动位移过阈值才动画收起，而短列表的回弹位移本来就小。
+   候补方案：① 换 `.immediately`（一拖就收，但完全不跟随手指）；② 保留 `.interactively` 且把回弹
+   阻力调小；③ 自己用 DragGesture 驱动（和行滑动、下拉刷新容易打架，风险最高）。**没试过，别照抄。**
+
+**已打通、别再重复排查**：
+- **无线安装**：校园网（10.59.x）下设备不可达；开 iPhone 热点（Mac 在 172.20.10.x）立刻可用，
+  `devicectl` 显示 `transportType: localNetwork` + `tunnelState: connected`，装包/启动都正常。
+- **URL scheme**：`tosndos://today` / `tosndos://browse` 已被系统识别（会弹「在 Tos'n DOs 中打开」）。
+  注意：用 `simctl openurl` 注入时 iOS 一定会弹确认框，测试时得手点一次；Widget 里点不需要。
 
 ---
 
@@ -139,7 +153,7 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 | OOBE | 4 页，最后一页申请通知权限 |
 | Today | 一屏看完，进度环；口径全在 `TodayScope` |
 | 输入 | 自然语言日期（中/英）：`明天 3pm`、`tomorrow 3pm` |
-| 模板 | 可反复拉取；`ListTemplate → TodoList` 一对一复制 |
+| 模板 | 可反复拉取；`ListTemplate → TodoList` 一对一复制。**详情页本身就能加任务**（2026-10-21）：每条标题是可编辑单行 `TextField`，末尾「Add task」插入并聚焦，**回车直接建下一条**，**左滑删除**（页面已从 ScrollView 改成 `List` + `swipeActions`，不然没有原生滑动删除）；**空行不会留**（失焦即删、重复回车不叠空行）；仍保留长按删除作为替代入口。工具栏铅笔只改模板属性 |
 | 例行清单 | 每天/周/月；错过会弹窗问「补最新一期 / 全补 / 不补」，最多 30 期；31 号遇短月落月末，不漂移 |
 | 清单耗时 | Browse 的 Previous ToDos 显示「创建 → 最后勾完」，取消再勾会变长 |
 | 分享为文本 | 任何清单都能导，`[x] / [ ]` 标注，行首不带时间戳 |
@@ -148,6 +162,10 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 | 本地化 | 四语言 205 条，占位符已校验一致 |
 | 无障碍 | Dynamic Type（`ScaledFont.swift`）、VoiceOver 标签、深色模式 |
 | 键盘收起 | `TaskListView` 挂 `KeyboardDismissScroll`（`TosnDOs/Support/`）：`scrollDismissesKeyboard(.interactively)` + 软键盘在屏时才 `scrollBounceBehavior(.always)`，所以任务不满一屏也能拖一下收键盘，键盘没弹时列表不会乱弹 |
+| 空状态 | 没任务时卡片显示 ✓ `Nothing due today`，且**不画进度环**（`remaining + done == 0` 时不渲染），避免「全清了」配 0% 环的矛盾 |
+| URL scheme | `TosnDOs/Info.plist` 只放 `CFBundleURLTypes`（`tosndos`），靠 `GENERATE_INFOPLIST_FILE = YES` 与自动生成的键合并；该文件已加进同步组例外集，否则会 `Multiple commands produce Info.plist` |
+| 录入键 | 保持 `submitLabel(.done)`。试过改文案：iOS 根本没有「Add」返回键，`.return` 在多行框会变换行（会坏），`.go` 能用但用户觉得 Done 就行——**这类标签判断以后先问用户**，别自己换 |
+| 商店截图 | `docs/appstore/`：iPhone Today / Browse、iPad、Watch、Mac 各一张，带机身边框。合成脚本 `frame.py`（Pillow），边框由截图 alpha 的圆角半径推算，不是硬编码机型 |
 
 **已知取舍**（都经用户追认，改动前先问）：
 - 等待中的任务不进 Today，即使到期日是今天
@@ -165,3 +183,45 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 - **残留物零容忍**：临时钩子、调试参数、死代码，交付前删干净并 grep 确认。
 - 用户会亲自 inspect 代码；注释写"为什么"，不写"做了什么"。
 - 每轮改动都要回写本文档。
+
+---
+
+## 8. 2026-10-21 这次会话做了什么
+
+一天之内从「没有仓库」推到「手机上能跑」。
+
+1. **上线**：`gh` 建库并推送 → <https://github.com/LycoRiko/tosn-dos>；README 占位符换成真实地址
+2. **签名**：免费 Personal Team `S465RV3CLC` 写进 6 处配置；`xcodebuild` 读不到账号会话（`No Accounts`），
+   最终靠 Xcode 里 ⌘R 一次生成描述文件，之后 CLI 才能签
+3. **真机链路**：`project.pbxproj.1`（裁剪 App Group / iCloud）+ `devbuild.sh` 出 IPA；
+   校园网不可达，**iPhone 热点**下 `devicectl` 走 `localNetwork` 装成功
+4. **键盘**：`KeyboardDismissScroll` —— 拖列表收键盘，短列表也能拖（`.scrollBounceBehavior(.always)` 只在软键盘在屏时开）
+5. **商店截图**：`docs/appstore/` 五张带机身边框，`frame.py` 从 alpha 反推圆角
+6. **收尾清理**：URL scheme（`TosnDOs/Info.plist` + 同步组例外集）、两条告警、空状态文案、
+   iPad 720 列宽、本地化审计（205 条全齐）
+
+**这一天的教训**：账号/设备/沙箱这类外部卡点，`xcodebuild` 的报错经常指向错误的地方，
+要查到设备端的 `developerModeStatus`、钥匙串里的 `find-identity`、`devicectl` 的 `tunnelState` 才看得见真相。
+
+---
+
+## 9. 已知局限（诚实清单）
+
+**签名与分发**
+- 免费账号：真机**没有 App Group / iCloud**，Widget 读不到数据；包 **7 天过期**，每周要重装
+- 没有 App Store 资产：图标之外的隐私清单、分级、描述都还没准备
+- `project.pbxproj.1` 与 `devbuild.sh` 只在本机（`.git/info/exclude`），换机器要重建
+
+**质量保证**
+- **零自动化测试**：没有 unit / UI test，回归全靠"四端编过 + 手点"
+- 只在 iPhone 16 Pro Max（iOS 27）+ 模拟器上跑过；**iOS 18 最低目标、旧机型、iPad 真机都未实测**
+- VoiceOver 只做了标签和 Dynamic Type，**没跑过完整朗读流程**
+- 本地化审计是脚本一次性跑的，没有 CI 守着
+
+**产品面**
+- iPad 只有第一版列宽；macOS 侧栏/多列没有专门设计
+- 手表只在模拟器验证过，**真机从未安装**
+- 数据只有「分享为文本」单向导出，**没有备份/恢复**，误删靠 SwiftData 默认行为
+- 分享码未做；「等待中」之外的业务形态（子任务批量、依赖）没有
+- 无明显性能评估：大清单、Widget 刷新频率、CloudKit 首次同步都没压过
+- 键盘收起手感偏滞（见 5.2）

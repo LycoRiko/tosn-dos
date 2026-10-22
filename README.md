@@ -64,12 +64,10 @@ Not built yet: a share code — importing a list from a link or string. Share-as
 
 ## 中文说明
 
-一个安静、快速的待办清单，运行在 iPhone、iPad、Mac 上，手表端只显示「今天还剩什么」。
+一个安静、快速的待办清单，运行在 iPhone、iPad、Mac、Apple Watch上。
 用 Swift + SwiftUI + SwiftData 写成，没有广告、不需要注册账号。
 
-做的事：一屏看完今天 / 像说话一样输入就能识别日期 / 模板可反复拉取 / 模板支持按天周月重复，
-漏掉的期数会问你要不要补 / 任务可以标记「等待中」且不计入任何数字 / 完成的清单会显示耗时 /
-子任务、标签、优先级、截止提醒、小组件、四语言、深色模式。
+核心功能：像说话一样输入就能识别日期 / 模板可反复拉取和按天周月重复
 
 iOS 18+、macOS 15+、watchOS 10+，Xcode 26。打开 `TosnDOs.xcodeproj` 直接运行即可，模拟器不需要签名。
 
