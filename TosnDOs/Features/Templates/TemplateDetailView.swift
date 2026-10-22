@@ -11,6 +11,7 @@ struct TemplateDetailView: View {
 
     @State private var showsInstantiate = false
     @State private var showsEditor = false
+    @State private var editingItem: TemplateItem?
     @FocusState private var focusedItem: UUID?
 
     private var template: ListTemplate? {
@@ -58,6 +59,9 @@ struct TemplateDetailView: View {
                 }
             }
         }
+        .sheet(item: $editingItem) { item in
+            TemplateItemSheet(item: item)
+        }
         .sheet(isPresented: $showsInstantiate) {
             if let template {
                 TemplateInstantiateSheet(template: template)
@@ -83,12 +87,18 @@ struct TemplateDetailView: View {
                 ForEach(template.orderedItems) { item in
                     itemBlock(item, in: template)
                         .rowChrome()
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            Button {
+                                editingItem = item
+                            } label: {
+                                Label("Settings", systemImage: "slider.horizontal.3")
+                            }
+
                             Button(role: .destructive) {
                                 context.delete(item)
                                 touch(template)
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Label("Delete task", systemImage: "trash")
                             }
                         }
                 }
@@ -156,50 +166,57 @@ struct TemplateDetailView: View {
 
     private func itemBlock(_ item: TemplateItem, in template: ListTemplate) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 7) {
+            HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "circle")
-                    .font(.system(size: 13, weight: .regular))
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundStyle(.tertiary)
-                TextField("Task name", text: Binding(
-                    get: { item.title },
-                    set: { item.title = $0; touch(template) }
-                ))
-                    .font(.subheadline.weight(.medium))
-                    .focused($focusedItem, equals: item.uid)
-                    .submitLabel(.next)
-                    .onSubmit { addItem(to: template) }
-                if item.priority != .none {
-                    Circle()
-                        .fill(item.priority.color)
-                        .frame(width: 5, height: 5)
-                }
-            }
+                    .padding(.top, 1)
+                    .accessibilityHidden(true)
 
-            if !item.note.isEmpty {
-                Text(item.note)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.leading, 20)
-            }
-
-            if !item.orderedChecks.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
-                    ForEach(item.orderedChecks) { check in
-                        HStack(spacing: 7) {
-                            Image(systemName: "checkmark.square")
-                                .font(.system(size: 10.5))
-                                .foregroundStyle(.tertiary)
-                            Text(check.title)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                    HStack(spacing: 5) {
+                        if item.priority == .high {
+                            Image(systemName: "exclamationmark.2")
+                                .font(.system(size: 9.5, weight: .bold))
+                                .foregroundStyle(TaskPriority.high.color)
+                                .accessibilityHidden(true)
+                        }
+                        TextField("Task name", text: Binding(
+                            get: { item.title },
+                            set: { item.title = $0; touch(template) }
+                        ))
+                        .font(.subheadline.weight(.medium))
+                        .focused($focusedItem, equals: item.uid)
+                        .submitLabel(.next)
+                        .onSubmit { addItem(to: template) }
+                    }
+
+                    if !item.note.isEmpty || !item.orderedChecks.isEmpty {
+                        HStack(spacing: 6) {
+                            if !item.orderedChecks.isEmpty {
+                                MetaChip(icon: "checklist", text: "\(item.orderedChecks.count)")
+                            }
+                            if !item.note.isEmpty {
+                                Text(item.note)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer(minLength: 0)
                         }
                     }
                 }
-                .padding(.leading, 20)
+
+                Spacer(minLength: 0)
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
         .contextMenu {
+            Button {
+                editingItem = item
+            } label: {
+                Label("Settings", systemImage: "slider.horizontal.3")
+            }
             Button(role: .destructive) {
                 context.delete(item)
                 touch(template)

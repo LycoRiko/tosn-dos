@@ -15,5 +15,7 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Saves the share code to your photo library.</string>
 </dict>
 </plist>

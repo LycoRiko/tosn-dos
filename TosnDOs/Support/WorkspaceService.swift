@@ -56,6 +56,7 @@ enum WorkspaceService {
             sortIndex: nextListIndex(in: context)
         )
         list.periodDate = period
+        list.sourceTemplateName = template.title
         context.insert(list)
 
         let startOfToday = Calendar.current.startOfDay(for: .now)
@@ -79,6 +80,7 @@ enum WorkspaceService {
             }
         }
 
+        list.reconcileCompletion()
         template.usageCount += 1
         template.lastUsedAt = .now
         save(context)
@@ -149,8 +151,11 @@ enum WorkspaceService {
     // MARK: Delete
 
     static func delete(_ task: TodoItem, in context: ModelContext) {
+        let owner = task.list
         NotificationService.cancel(task)
         context.delete(task)
+        // Removing the last open task is a completion in every way the UI cares about.
+        owner?.reconcileCompletion()
         save(context)
     }
 

@@ -20,6 +20,7 @@ struct TaskListView: View {
     @State private var editingTask: TodoItem?
     @State private var showsNewList = false
     @State private var showsTemplates = false
+    @State private var showsQR = false
 
     // MARK: - Derived state
 
@@ -156,6 +157,11 @@ struct TaskListView: View {
                         ShareLink(item: ListCodec.encode(list)) {
                             Label("Share as code", systemImage: "number")
                         }
+                        Button {
+                            showsQR = true
+                        } label: {
+                            Label("Show QR code", systemImage: "qrcode")
+                        }
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
@@ -164,6 +170,12 @@ struct TaskListView: View {
             }
         }
         .searchable(text: $search, prompt: Text("Search tasks"))
+        .sheet(isPresented: $showsQR) {
+            if let list = currentList {
+                QRSheet(title: list.title, code: ListCodec.encode(list))
+                    .compactSheetDetents()
+            }
+        }
         #if os(iOS)
         .modifier(KeyboardDismissScroll())
         .dismissKeyboardOnTap()
@@ -197,29 +209,18 @@ struct TaskListView: View {
             .tag(task)
             .contentShape(Rectangle())
             .onTapGesture { open(task) }
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                Button {
+                    open(task)
+                } label: {
+                    Label("Settings", systemImage: "slider.horizontal.3")
+                }
+
                 Button(role: .destructive) {
                     WorkspaceService.delete(task, in: context)
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("Delete task", systemImage: "trash")
                 }
-                Button {
-                    toggleCompletion(task)
-                } label: {
-                    Label(
-                        task.isCompleted ? "Reopen" : "Complete",
-                        systemImage: task.isCompleted ? "arrow.uturn.backward" : "checkmark"
-                    )
-                }
-                .tint(task.isCompleted ? .gray : Theme.mint)
-            }
-            .swipeActions(edge: .leading) {
-                Button {
-                    moveToTomorrow(task)
-                } label: {
-                    Label("Tomorrow", systemImage: "sunrise")
-                }
-                .tint(Theme.accent)
             }
             .contextMenu {
                 Button {
@@ -294,7 +295,8 @@ struct TaskListView: View {
     private var emptyTitle: String {
         if let smart = scope.smartList {
             switch smart {
-            case .today: return String(localized: "Nothing due today")
+            // The hero card above already says "Nothing due today"; repeating it here reads as a stutter.
+            case .today: return String(localized: "No open tasks")
             case .upcoming: return String(localized: "Nothing scheduled")
             case .all: return String(localized: "No open tasks")
             case .completed: return String(localized: "Nothing completed yet")

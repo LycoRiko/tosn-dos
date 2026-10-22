@@ -96,20 +96,24 @@ struct MacRootView: View {
                 Text("My lists")
             }
 
+            // Same page as iOS: the finished lists live behind one entry instead
+            // of filling the sidebar once there are a few dozen of them.
             if !lists.filter(\.isFinished).isEmpty {
                 Section {
-                    ForEach(lists.filter(\.isFinished)) { list in
+                    NavigationLink {
+                        PreviousListsView()
+                    } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "checkmark")
+                            Image(systemName: "checkmark.circle")
                                 .foregroundStyle(Palette.mint)
                                 .frame(width: 16)
-                            Text(list.title)
+                            Text("Previous ToDos")
                             Spacer(minLength: 4)
+                            Text("\(lists.filter(\.isFinished).count)")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
                         }
-                        .tag(SidebarItem.list(list.uid))
                     }
-                } header: {
-                    Text("Previous ToDos")
                 }
             }
 

@@ -1,12 +1,8 @@
 import Foundation
 import SwiftData
 
-/// A list reduced to the parts worth sharing, encoded so the result survives a
-/// chat app: deflate (the titles dominate and compress well) then Base64URL
-/// (no `+ / =`, so it can sit inside a URL or a message untouched).
-///
-/// Length is set by the task titles themselves, not by the container: keys are
-/// one character, nil fields are omitted, and the JSON is written compactly.
+/// Share code: compact JSON -> deflate -> Base64URL.
+/// Length is dominated by task titles, not by the container.
 enum ListCodec {
     static let prefix = "TOSN1:"
 
@@ -88,6 +84,7 @@ enum ListCodec {
             context.insert(task)
             if item.x == true { task.setCompleted(true) }
         }
+        list.reconcileCompletion()
         try? context.save()
         return list
     }

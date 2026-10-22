@@ -15,9 +15,9 @@ struct TemplateLibraryView: View {
     private let columns = [GridItem(.adaptive(minimum: 148), spacing: 12)]
 
     var body: some View {
-        ScrollView {
+        List {
             if templates.isEmpty {
-                VStack(spacing: 8) {
+                Section {
                     EmptyHint(
                         symbol: "square.on.square.dashed",
                         title: String(localized: "No templates yet"),
@@ -28,26 +28,56 @@ struct TemplateLibraryView: View {
                     } label: {
                         Text("New template")
                     }
-                    .buttonStyle(PrimaryActionStyle())
-                    .padding(.horizontal, 40)
                 }
-                .padding(.top, 40)
             } else {
-                LazyVGrid(columns: columns, spacing: 12) {
+                Section {
                     ForEach(templates) { template in
                         card(template)
+                            .listRowInsets(EdgeInsets(top: 4, leading: Theme.pagePadding, bottom: 4, trailing: Theme.pagePadding))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                Button {
+                                    editorTemplate = template
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+
+                                Button(role: .destructive) {
+                                    WorkspaceService.delete(template, in: context)
+                                } label: {
+                                    Label("Delete template", systemImage: "trash")
+                                }
+                            }
                     }
-                    newCard
+                    .onDelete { offsets in
+                        for index in offsets where index < templates.count {
+                            WorkspaceService.delete(templates[index], in: context)
+                        }
+                    }
+
+                    Button {
+                        showsNewEditor = true
+                    } label: {
+                        Label("New template", systemImage: "plus.circle.fill")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Theme.accent)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 }
-                .padding(.horizontal, Theme.pagePadding)
-                .padding(.top, 12)
-                .padding(.bottom, 32)
             }
         }
-        .scrollBounceBehavior(.basedOnSize)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .background(AppBackground())
         .navigationTitle("Templates")
         .toolbar {
+            #if os(iOS)
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     showsNewEditor = true
@@ -73,7 +103,7 @@ struct TemplateLibraryView: View {
 
     @ViewBuilder
     private func card(_ template: ListTemplate) -> some View {
-        let content = TemplateCard(template: template)
+        let content = compactRow(template)
             .contextMenu {
                 Button {
                     editorTemplate = template
@@ -102,6 +132,25 @@ struct TemplateLibraryView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    /// A full-width row rather than the grid card: a 148pt card stretched to
+    /// screen width grows into a lot of empty tile.
+    private func compactRow(_ template: ListTemplate) -> some View {
+        HStack(spacing: 12) {
+            ListGlyph(symbol: template.symbol, color: ListPalette.color(template.colorHex), size: 30)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(template.title)
+                    .font(.subheadline)
+                HStack(spacing: 6) {
+                    MetaChip(icon: "list.bullet", text: "\(template.taskCount)")
+                    MetaChip(icon: "checkmark.square", text: "\(template.checkCount)")
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
     }
 
     private var newCard: some View {

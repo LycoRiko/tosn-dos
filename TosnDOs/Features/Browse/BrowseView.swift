@@ -41,6 +41,8 @@ struct BrowseView: View {
             }
             .groupedRows()
             .scrollContentBackground(.hidden)
+            // The floating tab bar covers the last section otherwise.
+            .contentMargins(.bottom, 92, for: .scrollContent)
             .background(AppBackground())
             .navigationTitle("Browse")
             .navigationDestination(for: SidebarItem.self) { item in
@@ -91,19 +93,6 @@ struct BrowseView: View {
 
     /// Which run this was, and how long it took — the two things you want to
     /// know from a finished list without opening it.
-    private func previousDetail(_ list: TodoList) -> String? {
-        var parts: [String] = []
-        if let period = list.periodDate {
-            parts.append(period.formatted(.dateTime.month(.abbreviated).day()))
-        } else if let finished = list.lastCompletedAt {
-            parts.append(finished.formatted(.dateTime.month(.abbreviated).day()))
-        }
-        if let seconds = list.workedDuration {
-            parts.append(DurationFormat.short(seconds))
-        }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
-    }
-
     private var listsSection: some View {
         Section {
             if activeLists.isEmpty && lists.isEmpty {
@@ -149,43 +138,18 @@ struct BrowseView: View {
         }
     }
 
-    @ViewBuilder
     private var previousSection: some View {
         Section {
-            if previousLists.isEmpty {
-                EmptyHint(
-                    symbol: "checkmark.circle",
-                    title: String(localized: "Nothing checked off yet"),
-                    message: String(localized: "When every task in a list is done, the list moves here so you can look back at it.")
-                )
-            }
-
-            ForEach(previousLists) { list in
-                    NavigationLink(value: SidebarItem.list(list.uid)) {
-                        HStack(spacing: 12) {
-                            ListGlyph(symbol: "checkmark", color: Palette.mint, size: 28)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(list.title)
-                                    .font(.subheadline)
-                                if let detail = previousDetail(list) {
-                                    Text(detail)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            Spacer()
-                            CountBadge(value: list.tasks?.count ?? 0)
-                        }
-                    }
-            }
-            .headerProminence(.standard)
-        } header: {
-            SectionHeader(title: String(localized: "Previous ToDos"), count: previousLists.count)
-        } footer: {
-            if !previousLists.isEmpty {
-                Text("Open one to look back, or add a task to bring it back.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            NavigationLink {
+                PreviousListsView()
+            } label: {
+                HStack(spacing: 12) {
+                    ListGlyph(symbol: "checkmark.circle", color: Palette.mint, size: 28)
+                    Text("Previous ToDos")
+                        .font(.subheadline)
+                    Spacer()
+                    CountBadge(value: previousLists.count)
+                }
             }
         }
     }

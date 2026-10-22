@@ -29,6 +29,11 @@ final class TodoList {
     // turning their names into dates.
     var periodDate: Date?
 
+    /// When the last task was completed. Groups the "previous" section by day.
+    var completedAt: Date?
+    /// Template this list was generated from, shown as a subtitle tag.
+    var sourceTemplateName: String = ""
+
     @Relationship(deleteRule: .cascade, inverse: \TodoItem.list)
     var tasks: [TodoItem]? = []
 
@@ -128,5 +133,19 @@ final class Tag {
         self.name = name
         self.colorHex = colorHex
         self.createdAt = .now
+    }
+}
+
+extension TodoList {
+    /// Single place that decides when a list counts as finished. Every caller
+    /// that changes task state ends with this, so no path can leave a stale date.
+    func reconcileCompletion(now: Date = .now) {
+        let items = tasks ?? []
+        let allDone = !items.isEmpty && items.allSatisfy { $0.isCompleted }
+        if allDone {
+            if completedAt == nil { completedAt = now }
+        } else if completedAt != nil {
+            completedAt = nil
+        }
     }
 }

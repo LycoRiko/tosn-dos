@@ -88,7 +88,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        Form {
+        List {
             Section {
                 Picker("Theme", selection: $appearance) {
                     ForEach(AppearanceMode.allCases) { mode in
@@ -167,6 +167,10 @@ struct SettingsView: View {
                 Text("About")
             }
         }
+        .groupedRows()
+        .scrollContentBackground(.hidden)
+        .contentMargins(.bottom, 92, for: .scrollContent)
+        .background(AppBackground())
         .fileExporter(
             isPresented: $showsExporter,
             document: exportDocument,

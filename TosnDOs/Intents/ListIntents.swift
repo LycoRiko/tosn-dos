@@ -3,9 +3,8 @@ import AppIntents
 import SwiftData
 import UIKit
 
-/// Catch a task without opening the app: Siri, Spotlight, the Action Button, or
-/// any shortcut. Everything runs in-process against the same container the UI
-/// uses, so there is no second store to keep in sync.
+/// Add a task from Siri, Spotlight, or the Action Button.
+/// Runs in-process against the app's own store.
 struct AddTaskIntent: AppIntent {
     static var title: LocalizedStringResource = "Add a task"
     static var description = IntentDescription("Adds a task, understanding dates like “tomorrow 3pm”.")
@@ -42,8 +41,8 @@ struct AddTaskIntent: AppIntent {
     }
 }
 
-/// Completes the first open task whose title contains what was said. Exact
-/// pickers need an AppEntity; a substring match covers "mark buy milk done".
+/// Completes the first open task whose title matches. A substring is enough
+/// here; a real picker would need an AppEntity.
 struct CompleteTaskIntent: AppIntent {
     static var title: LocalizedStringResource = "Complete a task"
     static var description = IntentDescription("Marks the matching open task as done.")

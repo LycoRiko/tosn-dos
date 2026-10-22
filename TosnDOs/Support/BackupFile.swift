@@ -3,9 +3,7 @@ import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Whole-workspace snapshot. There is no server to restore from, so this file
-/// is the only way back if something goes wrong — it deliberately carries every
-/// field the app writes, plus a schema number so a future format can migrate.
+/// Full backup file. Carries every field plus a schema number.
 struct BackupFile: Codable {
     var schema: Int = 1
     var exportedAt: Date = .now
@@ -155,6 +153,7 @@ struct BackupFile: Codable {
                     item.completedAt = task.completedAt ?? .now
                 }
             }
+            target.reconcileCompletion()
         }
 
         for template in templates {

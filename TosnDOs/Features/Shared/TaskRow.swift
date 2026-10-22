@@ -111,6 +111,7 @@ struct TaskRow: View {
         withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
             task.setCompleted(!task.isCompleted)
         }
+        task.list?.reconcileCompletion()
         onToggle?()
         try? context.save()
     }
