@@ -187,6 +187,22 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 4. 是否允许它**自动记住上次用的清单**
 5. 识别不出时间/地点时，是留空，还是让面板高亮提示"这条没识别到地点"
 
+#### 5.10 崩溃修复 + 展示截图（2026-10-29 21:30）
+
+**闪退根因（真 bug，非脚手架）**
+`SharedStore.boot()` 在磁盘库打不开、退回内存库之前调了 `assertionFailure(message)`——
+Debug 构建里 `assertionFailure` 会**直接 trap**。于是"库读不出来"直接变成"点开就闪退"。
+- 已删掉该断言，只打印日志；`StoreBoot` 新增 `didFallbackToMemory` 供界面提示。
+- 触发条件：库文件被异常删除/写坏（这次是我 `rm -rf` 目录时进程还开着）。
+- 教训：**兜底路径里不许留 `assertionFailure` / `fatalError`**，那等于让兜底变成崩溃。
+- 另外崩因之一在 `ShowcaseHarness`：`RootView` 的默认分支返回 `RootView()` 自己，无限递归。
+  这个只影响临时脚手架，但同样值得记：路由的 default 分支**绝不能指回入口**。
+
+**展示截图**
+- `docs/showcase/`：iOS 七张（Today / Browse / Previous / Editor / Review / Templates / Settings）
+  + macOS 四张（today / previous / editor / settings），全部由 `-seedShowcase` 假数据生成。
+- 生成脚本用的临时脚手架已删除，`grep ShowcaseHarness` = 0。
+
 #### 5.9 T2 / T4 / T6 已完成（2026-10-29 18:15）
 
 **T2 设置**

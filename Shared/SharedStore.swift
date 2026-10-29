@@ -5,6 +5,8 @@ struct StoreBoot {
     let container: ModelContainer
     let isShared: Bool
     let usesCloudKit: Bool
+    /// 打不开磁盘库、退回内存库时为 true —— 这次会话的改动不会保存。
+    var didFallbackToMemory: Bool = false
 }
 
 /// One place that knows where the database lives.
@@ -70,12 +72,13 @@ enum SharedStore {
         // Last resort: an in-memory store keeps the UI usable instead of crashing.
         // It also means the user sees an empty app while their real data sits on
         // disk, so say it out loud rather than letting it look like a fresh setup.
+        // 打不开库就用内存库顶上：宁可这一次不保存，也不能让用户看到闪退。
+        // 具体原因写进日志，界面侧通过 StoreBoot.didFallbackToMemory 提示。
         let message = "TosnDOs: both stores failed, running in memory. Nothing will be saved."
         print("⚠️ \(message)")
-        assertionFailure(message)
         let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         if let container = try? ModelContainer(for: schema, configurations: [memory]) {
-            return StoreBoot(container: container, isShared: false, usesCloudKit: false)
+            return StoreBoot(container: container, isShared: false, usesCloudKit: false, didFallbackToMemory: true)
         }
 
         fatalError("Unable to create the SwiftData container.")
