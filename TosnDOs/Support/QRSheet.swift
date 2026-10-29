@@ -45,6 +45,11 @@ struct QRSheet: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
+                Text("Sharing sends the list only. Materials stay on this device.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+
                 #if os(iOS)
                 if saved {
                     Label("Saved to Photos", systemImage: "checkmark.circle")

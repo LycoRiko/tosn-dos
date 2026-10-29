@@ -6,6 +6,9 @@ struct SettingsView: View {
     @AppStorage(PreferenceKey.appearance) private var appearance = AppearanceMode.system.rawValue
     @AppStorage(PreferenceKey.showCompleted) private var showCompleted = true
     @AppStorage(PreferenceKey.templateDueToday) private var templateDueToday = true
+    @AppStorage(PreferenceKey.saveShotToEvidence) private var saveShotToEvidence = true
+    @AppStorage(PreferenceKey.backupEvidenceScope) private var backupScope = BackupEvidenceScope.textOnly.rawValue
+    @AppStorage(PreferenceKey.optimizeImages) private var optimizeImages = true
     @AppStorage(BackgroundKey.imageName) private var backgroundImage = ""
     @AppStorage(BackgroundKey.blur) private var backgroundBlur = 24.0
     @AppStorage(BackgroundKey.opacity) private var backgroundOpacity = 0.92
@@ -46,7 +49,11 @@ struct SettingsView: View {
     // MARK: - Backup
 
     private func exportBackup() {
-        let file = BackupFile.capture(from: context)
+        let file = BackupFile.capture(
+            from: context,
+            evidenceScope: BackupEvidenceScope(rawValue: backupScope) ?? .textOnly,
+            optimizeImages: optimizeImages
+        )
         guard let data = try? file.data() else { return }
         exportDocument = BackupDocument(data: data)
         showsExporter = true
@@ -111,6 +118,8 @@ struct SettingsView: View {
             Section {
                 Toggle("Show completed tasks", isOn: $showCompleted)
                 Toggle("New lists from templates start today", isOn: $templateDueToday)
+                Toggle("Keep screenshots in materials", isOn: $saveShotToEvidence)
+                Toggle("Keep screenshots in materials", isOn: $saveShotToEvidence)
             } header: {
                 Text("Tasks")
             } footer: {
@@ -144,6 +153,15 @@ struct SettingsView: View {
             }
 
             Section {
+                Picker("Materials in backups", selection: $backupScope) {
+                    ForEach(BackupEvidenceScope.allCases) { scope in
+                        Text(scope.title).tag(scope.rawValue)
+                    }
+                }
+                if backupScope == BackupEvidenceScope.all.rawValue {
+                    Toggle("Optimize images", isOn: $optimizeImages)
+                }
+
                 Button("Export backup") { exportBackup() }
                 Button("Restore backup") { showsImporter = true }
                 if let backupNote {
@@ -154,7 +172,7 @@ struct SettingsView: View {
             } header: {
                 Text("Backup")
             } footer: {
-                Text("One JSON file with every list and template. Restoring asks whether to merge or replace.")
+                Text("One file with every list and template. Screenshots make it much larger, so they are optional. Restoring asks whether to merge or replace.")
             }
 
             Section {

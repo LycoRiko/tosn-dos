@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "·": {},
     "%1$lld of %2$lld done": {
       "localizations": {
         "ja": {
@@ -19,6 +20,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "已完成 %1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld": {},
+    "%lld · %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld · %2$lld"
           }
         }
       }
@@ -89,6 +101,16 @@
         }
       }
     },
+    "%lld of %lld done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld of %2$lld done"
+          }
+        }
+      }
+    },
     "%lld waiting": {
       "localizations": {
         "ja": {
@@ -111,6 +133,17 @@
         }
       }
     },
+    "%lld/%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "%lld%%": {},
     "1 day before": {
       "localizations": {
         "ja": {
@@ -331,6 +364,7 @@
         }
       }
     },
+    "Add a task": {},
     "Add all %1$lld %2$@": {
       "localizations": {
         "ja": {
@@ -349,6 +383,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "全部補 %1$lld %2$@"
+          }
+        }
+      }
+    },
+    "Add all %lld %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Add all %1$lld %2$@"
           }
         }
       }
@@ -551,6 +595,30 @@
         }
       }
     },
+    "Added %@.": {},
+    "Added that day": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その日に追加"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当日新增"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "當日新增"
+          }
+        }
+      }
+    },
+    "Adds a task, understanding dates like “tomorrow 3pm”.": {},
     "All": {
       "localizations": {
         "ja": {
@@ -639,6 +707,28 @@
         }
       }
     },
+    "and %lld more": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "他 %lld 件"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还有 %lld 项"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還有 %lld 項"
+          }
+        }
+      }
+    },
     "Appearance": {
       "localizations": {
         "ja": {
@@ -723,6 +813,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "背景預覽"
+          }
+        }
+      }
+    },
+    "Backup": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "備份"
           }
         }
       }
@@ -838,6 +950,7 @@
       }
     },
     "Changing the theme here applies the next time Tos'n DOs comes to the foreground.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -903,6 +1016,30 @@
         }
       }
     },
+    "checks": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "チェック項目"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检查项"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "檢查項"
+          }
+        }
+      }
+    },
+    "Checks": {},
+    "Checks become subtasks when the list is created.": {},
     "Choose photo": {
       "localizations": {
         "ja": {
@@ -991,6 +1128,7 @@
         }
       }
     },
+    "Complete a task": {},
     "Complete task": {
       "localizations": {
         "ja": {
@@ -1035,6 +1173,7 @@
         }
       }
     },
+    "Completed %@.": {},
     "Continue": {
       "localizations": {
         "ja": {
@@ -1053,6 +1192,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "繼續"
+          }
+        }
+      }
+    },
+    "copy": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "のコピー"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "副本"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "副本"
+          }
+        }
+      }
+    },
+    "Could not save to Photos. Check the permission in Settings.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真に保存できません。設定で権限を確認してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存不进相册，去系统设置里检查权限。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存不進相簿，去系統設定裡檢查權限。"
           }
         }
       }
@@ -1097,6 +1280,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "日期"
+          }
+        }
+      }
+    },
+    "days": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
           }
         }
       }
@@ -1585,6 +1790,28 @@
         }
       }
     },
+    "Export backup": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップを書き出す"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出備份"
+          }
+        }
+      }
+    },
     "Filter": {
       "localizations": {
         "ja": {
@@ -1739,6 +1966,28 @@
         }
       }
     },
+    "How should this backup be restored?": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバックアップをどう復元しますか？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份备份怎么恢复？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這份備份怎麼還原？"
+          }
+        }
+      }
+    },
     "Icon": {
       "localizations": {
         "ja": {
@@ -1849,6 +2098,28 @@
         }
       }
     },
+    "left today": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日の残り"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天还剩"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天還剩"
+          }
+        }
+      }
+    },
     "Light": {
       "localizations": {
         "ja": {
@@ -1937,6 +2208,28 @@
         }
       }
     },
+    "lists": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "件のリスト"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "张清单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "張清單"
+          }
+        }
+      }
+    },
     "Lists hold the tasks that belong together. Create one, or start from a template.": {
       "localizations": {
         "ja": {
@@ -2003,6 +2296,7 @@
         }
       }
     },
+    "Marks the matching open task as done.": {},
     "Medium": {
       "localizations": {
         "ja": {
@@ -2021,6 +2315,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "中"
+          }
+        }
+      }
+    },
+    "Merge with what's here": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今あるデータと統合"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和现有数据合并"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "和現有資料合併"
+          }
+        }
+      }
+    },
+    "Merging adds every list as new. Replacing deletes what is here first.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "統合はすべて新しいリストとして追加します。置換は先に既存データを削除します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合并会把每个清单都当新的加进来；覆盖会先删掉现有数据。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合併會把每個清單都當新的加進來；覆蓋會先刪掉現有資料。"
+          }
+        }
+      }
+    },
+    "months": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "か月"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个月"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "個月"
           }
         }
       }
@@ -2311,6 +2671,7 @@
         }
       }
     },
+    "No open task matches %@.": {},
     "No open tasks": {
       "localizations": {
         "ja": {
@@ -2465,6 +2826,28 @@
         }
       }
     },
+    "Nothing added that day": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この日の追加はありません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这天没新增任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這天沒新增任務"
+          }
+        }
+      }
+    },
     "Nothing checked off yet": {
       "localizations": {
         "ja": {
@@ -2553,6 +2936,7 @@
         }
       }
     },
+    "Nothing to add.": {},
     "Nothing written yet": {
       "localizations": {
         "ja": {
@@ -2663,6 +3047,28 @@
         }
       }
     },
+    "One JSON file with every list and template. Restoring asks whether to merge or replace.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのリストとテンプレートを 1 つの JSON に。復元時に統合か置換かを選べます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个 JSON 文件，装下所有清单和模板。恢复时会问你合并还是覆盖。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一個 JSON 檔案，裝下所有清單和範本。還原時會問你合併還是覆蓋。"
+          }
+        }
+      }
+    },
     "One list. Today.": {
       "localizations": {
         "ja": {
@@ -2707,7 +3113,9 @@
         }
       }
     },
+    "Open": {},
     "Open one to look back, or add a task to bring it back.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2729,6 +3137,8 @@
         }
       }
     },
+    "Open Today": {},
+    "Opens the app on today's list.": {},
     "Overdue": {
       "localizations": {
         "ja": {
@@ -2795,6 +3205,29 @@
         }
       }
     },
+    "Point another phone's camera here to import this list.": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "別のスマートフォンのカメラで読み取ると、このリストを読み込めます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用另一台手机扫描这里就能导入这张清单。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用另一台手機掃描這裡就能匯入這張清單。"
+          }
+        }
+      }
+    },
     "Previous ToDos": {
       "localizations": {
         "ja": {
@@ -2835,6 +3268,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "優先順序"
+          }
+        }
+      }
+    },
+    "Progress %lld%%": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "進捗 %lld%%"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进度 %lld%%"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "進度 %lld%%"
+          }
+        }
+      }
+    },
+    "QR code for %@": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ の QR コード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的二维码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的 QR Code"
           }
         }
       }
@@ -2927,6 +3404,28 @@
         }
       }
     },
+    "Replace everything": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべて置き換える"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部覆盖"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部覆蓋"
+          }
+        }
+      }
+    },
     "Reply to the planning thread": {
       "localizations": {
         "ja": {
@@ -2945,6 +3444,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "回覆策劃討論"
+          }
+        }
+      }
+    },
+    "Restore backup": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップから復元"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复备份"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還原備份"
+          }
+        }
+      }
+    },
+    "Restored %lld lists and %lld templates.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 件のリストと %lld 件のテンプレートを復元しました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已恢复 %lld 个清单、%lld 个模板。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已還原 %lld 個清單、%lld 個範本。"
           }
         }
       }
@@ -3037,6 +3580,96 @@
         }
       }
     },
+    "Save to Photos": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真に保存"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存入相册"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存入相簿"
+          }
+        }
+      }
+    },
+    "Saved to Photos": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真に保存しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已存入相册"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已存入相簿"
+          }
+        }
+      }
+    },
+    "Scan this with the Camera app to import the list.": {},
+    "Scan this with the Camera app to import the list. A copy is saved to Photos.": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラで読み取るとリストを読み込めます。写真にも保存しました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用系统相机扫这张图就能导入清单，同时已存一份到相册。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用系統相機掃這張圖就能匯入清單，同時已存一份到相簿。"
+          }
+        }
+      }
+    },
+    "Scan to import": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スキャンして読み込む"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扫码导入"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "掃碼匯入"
+          }
+        }
+      }
+    },
     "Search tasks": {
       "localizations": {
         "ja": {
@@ -3077,6 +3710,51 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定"
+          }
+        }
+      }
+    },
+    "Share": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享"
+          }
+        }
+      }
+    },
+    "Share as code": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コードで共有"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享为分享码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享為分享碼"
           }
         }
       }
@@ -3165,6 +3843,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "收合"
+          }
+        }
+      }
+    },
+    "Show QR code": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "QR コードを表示"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示二维码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示 QR Code"
           }
         }
       }
@@ -3389,6 +4089,28 @@
         }
       }
     },
+    "tasks": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タスク"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任務"
+          }
+        }
+      }
+    },
     "Tasks": {
       "localizations": {
         "ja": {
@@ -3407,6 +4129,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "任務"
+          }
+        }
+      }
+    },
+    "Tasks you type on the Today screen show up here.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホーム画面で入力したタスクがここに表示されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在首页随手输入的任务会出现在这里。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在首頁隨手輸入的任務會出現在這裡。"
           }
         }
       }
@@ -3539,6 +4283,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "寫一次就能一直用"
+          }
+        }
+      }
+    },
+    "That file could not be read.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このファイルを読み込めません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个文件读不了。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這個檔案讀不了。"
           }
         }
       }
@@ -3830,6 +4596,7 @@
       }
     },
     "Tos'n DOs follows the language set in the Settings app.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -3983,6 +4750,28 @@
         }
       }
     },
+    "uses": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用回数"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用次数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用次數"
+          }
+        }
+      }
+    },
     "Version": {
       "localizations": {
         "ja": {
@@ -4071,6 +4860,28 @@
         }
       }
     },
+    "weeks": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週間"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "週"
+          }
+        }
+      }
+    },
     "What is left today, and one tap to check it off.": {
       "localizations": {
         "ja": {
@@ -4137,6 +4948,7 @@
         }
       }
     },
+    "What should I add?": {},
     "When every task in a list is done, the list moves here so you can look back at it.": {
       "localizations": {
         "ja": {
@@ -4291,750 +5103,640 @@
         }
       }
     },
-    "and %lld more": {
+    "Materials": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "他 %lld 件"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还有 %lld 项"
+            "value": "材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還有 %lld 項"
+            "value": "材料"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "素材"
           }
         }
       }
     },
-    "checks": {
+    "Add a note or a link": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "チェック項目"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "检查项"
+            "value": "添加一段文字或链接"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "檢查項"
+            "value": "新增一段文字或連結"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メモやリンクを追加"
           }
         }
       }
     },
-    "copy": {
+    "Screenshots, addresses and notes kept with this task.": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "のコピー"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "副本"
+            "value": "和这条任务相关的截图、地址、备注都放在这里。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "副本"
+            "value": "和這條任務相關的截圖、地址、備註都放在這裡。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このタスクに紐づくスクリーンショット・住所・メモをここに残します。"
           }
         }
       }
     },
-    "days": {
+    "Text": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "天"
+            "value": "文字"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "天"
+            "value": "文字"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキスト"
           }
         }
       }
     },
-    "left today": {
+    "Screenshot": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今日の残り"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天还剩"
+            "value": "截图"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天還剩"
+            "value": "截圖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スクリーンショット"
           }
         }
       }
     },
-    "lists": {
+    "Place": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "件のリスト"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "张清单"
+            "value": "地点"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "張清單"
+            "value": "地點"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "場所"
           }
         }
       }
     },
-    "months": {
+    "Time": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "か月"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "个月"
+            "value": "时间"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "個月"
+            "value": "時間"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時刻"
           }
         }
       }
     },
-    "tasks": {
+    "Keep screenshots in materials": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タスク"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "任务"
+            "value": "把截图存进材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "任務"
+            "value": "把截圖存進材料"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スクリーンショットを素材に保存"
           }
         }
       }
     },
-    "uses": {
+    "Materials in backups": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用回数"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "使用次数"
+            "value": "备份中的材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "使用次數"
+            "value": "備份中的材料"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップに含める素材"
           }
         }
       }
     },
-    "weeks": {
+    "No materials": {
       "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "週間"
-          }
-        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "周"
+            "value": "不含材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "週"
+            "value": "不含材料"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "素材を含めない"
           }
         }
       }
     },
-    "Progress %lld%%": {
+    "Text only": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "进度 %lld%%"
+            "value": "仅文字"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "進度 %lld%%"
+            "value": "僅文字"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "進捗 %lld%%"
+            "value": "テキストのみ"
           }
         }
       }
     },
-    "Share as code": {
+    "All materials": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "分享为分享码"
+            "value": "全部材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "分享為分享碼"
+            "value": "全部材料"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "コードで共有"
+            "value": "すべての素材"
           }
         }
       }
     },
-    "Backup": {
+    "Optimize images": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "备份"
+            "value": "优化图片"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "備份"
+            "value": "最佳化圖片"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "バックアップ"
+            "value": "画像を最適化"
           }
         }
       }
     },
-    "Export backup": {
+    "One file with every list and template. Screenshots make it much larger, so they are optional. Restoring asks whether to merge or replace.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "导出备份"
+            "value": "一个文件装下所有清单和模板。截图会让它变大，所以是可选项。恢复时会问合并还是覆盖。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "匯出備份"
+            "value": "一個檔案裝下所有清單和模板。截圖會讓它變大，所以是可選項。恢復時會問合併還是覆蓋。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "バックアップを書き出す"
+            "value": "すべてのリストとテンプレートを 1 ファイルに。スクリーンショットは大きくなるため任意です。復元時に統合か置換かを選びます。"
           }
         }
       }
     },
-    "Restore backup": {
+    "%lld materials will be deleted with this task.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "恢复备份"
+            "value": "这条任务带着 %lld 条材料，会一起删除。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還原備份"
+            "value": "這條任務帶著 %lld 條材料，會一起刪除。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "バックアップから復元"
+            "value": "このタスクには %lld 件の素材があり、一緒に削除されます。"
           }
         }
       }
     },
-    "One JSON file with every list and template. Restoring asks whether to merge or replace.": {
+    "Delete task and materials": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "一个 JSON 文件，装下所有清单和模板。恢复时会问你合并还是覆盖。"
+            "value": "删除任务和材料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "一個 JSON 檔案，裝下所有清單和範本。還原時會問你合併還是覆蓋。"
+            "value": "刪除任務和素材"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "すべてのリストとテンプレートを 1 つの JSON に。復元時に統合か置換かを選べます。"
+            "value": "タスクと素材を削除"
           }
         }
       }
     },
-    "How should this backup be restored?": {
+    "Keep": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这份备份怎么恢复？"
+            "value": "保留"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "這份備份怎麼還原？"
+            "value": "保留"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このバックアップをどう復元しますか？"
+            "value": "残す"
           }
         }
       }
     },
-    "Merge with what's here": {
+    "Sharing sends the list only. Materials stay on this device.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "和现有数据合并"
+            "value": "分享只发送清单结构，材料留在本机。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "和現有資料合併"
+            "value": "分享只傳送清單結構，素材留在本機。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "今あるデータと統合"
+            "value": "共有されるのはリストの構成だけです。素材はこの端末に残ります。"
           }
         }
       }
     },
-    "Replace everything": {
+    "How many": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "全部覆盖"
+            "value": "识别到几条"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "全部覆蓋"
+            "value": "識別到幾條"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "すべて置き換える"
+            "value": "いくつ追加"
           }
         }
       }
     },
-    "Merging adds every list as new. Replacing deletes what is here first.": {
+    "All of them": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "合并会把每个清单都当新的加进来；覆盖会先删掉现有数据。"
+            "value": "全部"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "合併會把每個清單都當新的加進來；覆蓋會先刪掉現有資料。"
+            "value": "全部"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "統合はすべて新しいリストとして追加します。置換は先に既存データを削除します。"
+            "value": "すべて"
           }
         }
       }
     },
-    "That file could not be read.": {
+    "Just one": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这个文件读不了。"
+            "value": "只要一条"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "這個檔案讀不了。"
+            "value": "只要一條"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このファイルを読み込めません。"
+            "value": "1 件だけ"
           }
         }
       }
     },
-    "Restored %lld lists and %lld templates.": {
+    "Add from screenshot": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已恢复 %lld 个清单、%lld 个模板。"
+            "value": "从截图添加"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "已還原 %lld 個清單、%lld 個範本。"
+            "value": "從截圖新增"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld 件のリストと %lld 件のテンプレートを復元しました。"
+            "value": "スクリーンショットから追加"
           }
         }
       }
     },
-    "Show QR code": {
+    "Empty fields are optional — fill them later or leave them blank.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "显示二维码"
+            "value": "空着的项目是可选的，可以以后再填。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "顯示 QR Code"
+            "value": "空著的項目是可選的，可以以後再填。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "QR コードを表示"
+            "value": "空欄は任意です。後で埋めてもかまいません。"
           }
         }
       }
     },
-    "Scan to import": {
+    "Nothing recognised": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "扫码导入"
+            "value": "没识别到内容"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "掃碼匯入"
+            "value": "沒識別到內容"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スキャンして読み込む"
+            "value": "認識できませんでした"
           }
         }
       }
     },
-    "Point another phone's camera here to import this list.": {
+    "Try a screenshot with clearer text.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "用另一台手机扫描这里就能导入这张清单。"
+            "value": "换一张文字更清楚的截图试试。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "用另一台手機掃描這裡就能匯入這張清單。"
+            "value": "換一張文字更清楚的截圖試試。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "別のスマートフォンのカメラで読み取ると、このリストを読み込めます。"
+            "value": "文字がはっきりした画像で試してください。"
           }
         }
       }
     },
-    "Share": {
+    "Add to": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "分享"
+            "value": "加到"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "分享"
+            "value": "加到"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有"
+            "value": "追加先"
           }
         }
       }
     },
-    "Saved to Photos": {
+    "Add %lld": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已存入相册"
+            "value": "添加 %lld 条"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "已存入相簿"
+            "value": "新增 %lld 條"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "写真に保存しました"
+            "value": "%lld 件を追加"
           }
         }
       }
     },
-    "Could not save to Photos. Check the permission in Settings.": {
+    "Found %lld": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "存不进相册，去系统设置里检查权限。"
+            "value": "识别到 %lld 条"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "存不進相簿，去系統設定裡檢查權限。"
+            "value": "識別到 %lld 條"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "写真に保存できません。設定で権限を確認してください。"
+            "value": "%lld 件"
           }
         }
       }
     },
-    "Scan this with the Camera app to import the list. A copy is saved to Photos.": {
+    "Optional": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "用系统相机扫这张图就能导入清单，同时已存一份到相册。"
+            "value": "可选"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "用系統相機掃這張圖就能匯入清單，同時已存一份到相簿。"
+            "value": "可選"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "カメラで読み取るとリストを読み込めます。写真にも保存しました。"
-          }
-        }
-      }
-    },
-    "QR code for %@": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「%@」的二维码"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "「%@」的 QR Code"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ の QR コード"
-          }
-        }
-      }
-    },
-    "Added that day": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "当日新增"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "當日新增"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "その日に追加"
-          }
-        }
-      }
-    },
-    "Nothing added that day": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这天没新增任务"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "這天沒新增任務"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "この日の追加はありません"
-          }
-        }
-      }
-    },
-    "Tasks you type on the Today screen show up here.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在首页随手输入的任务会出现在这里。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在首頁隨手輸入的任務會出現在這裡。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ホーム画面で入力したタスクがここに表示されます。"
-          }
-        }
-      }
-    },
-    "Save to Photos": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "存入相册"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "存入相簿"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "写真に保存"
+            "value": "任意"
           }
         }
       }

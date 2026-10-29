@@ -66,6 +66,16 @@ final class TodoItem {
     @Relationship(inverse: \Tag.items)
     var tags: [Tag]? = []
 
+    /// 截图、原文、地点等材料。删任务时一并删除——没有归属的图片只会变成垃圾。
+    @Relationship(deleteRule: .cascade, inverse: \Evidence.task)
+    var evidences: [Evidence]? = []
+
+    var orderedEvidences: [Evidence] {
+        (evidences ?? []).sorted { $0.createdAt < $1.createdAt }
+    }
+
+    var evidenceCount: Int { evidences?.count ?? 0 }
+
     init(
         title: String,
         notes: String = "",

@@ -16,6 +16,7 @@ struct TaskEditorView: View {
 
     @State private var newTagName = ""
     @State private var newCheckTitle = ""
+    @State private var newEvidenceText = ""
     @State private var hasDue: Bool
     @State private var dueDraft: Date
     @State private var hasDeadline: Bool
@@ -66,6 +67,24 @@ struct TaskEditorView: View {
             .listRowBackground(rowBackground)
 
             Section {
+                materialsRows
+            } header: {
+                HStack {
+                    Text("Materials")
+                    Spacer()
+                    if task.evidenceCount > 0 {
+                        Text("\(task.evidenceCount)")
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } footer: {
+                Text("Screenshots, addresses and notes kept with this task.")
+                    .font(.footnote)
+            }
+            .listRowBackground(rowBackground)
+
+            Section {
                 listPicker
                 dueRows
                 priorityPicker
@@ -107,6 +126,7 @@ struct TaskEditorView: View {
                 Text("Tags")
             }
             .listRowBackground(rowBackground)
+
 
             Section {
                 checklistRows
@@ -354,7 +374,65 @@ struct TaskEditorView: View {
         save()
     }
 
-    // MARK: - Checklist
+    // MARK: - Materials
+
+    @ViewBuilder
+    private var materialsRows: some View {
+        ForEach(task.orderedEvidences) { evidence in
+            materialRow(evidence)
+        }
+        .onDelete { offsets in
+            let items = task.orderedEvidences
+            for index in offsets where index < items.count {
+                context.delete(items[index])
+            }
+            save()
+        }
+
+        HStack(spacing: 10) {
+            Image(systemName: "plus.circle")
+                .font(.system(size: 16))
+                .foregroundStyle(.tertiary)
+            TextField("Add a note or a link", text: $newEvidenceText)
+                .font(.system(size: 15))
+                .onSubmit(addEvidence)
+        }
+    }
+
+    @ViewBuilder
+    private func materialRow(_ evidence: Evidence) -> some View {
+        HStack(spacing: 10) {
+            if evidence.kind == .image, let data = evidence.imageData, let image = PlatformImage(data: data) {
+                Image(platformImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityLabel(Text("Screenshot"))
+            } else {
+                Image(systemName: evidence.kind.symbol)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 22)
+            }
+
+            TextField(evidence.kind.title, text: Binding(
+                get: { evidence.text },
+                set: { evidence.text = $0 }
+            ))
+            .font(.system(size: 15))
+            .onSubmit(save)
+        }
+    }
+
+    private func addEvidence() {
+        let text = newEvidenceText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        let evidence = Evidence(kind: .text, text: text, task: task)
+        context.insert(evidence)
+        newEvidenceText = ""
+        save()
+    }
 
     @ViewBuilder
     private var checklistRows: some View {

@@ -1,4 +1,17 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+typealias PlatformImage = UIImage
+extension Image {
+    init(platformImage: UIImage) { self.init(uiImage: platformImage) }
+}
+#else
+import AppKit
+typealias PlatformImage = NSImage
+extension Image {
+    init(platformImage: NSImage) { self.init(nsImage: platformImage) }
+}
+#endif
 
 /// The few places where SwiftUI's API still differs between iOS and macOS.
 /// Keeping the shims here means feature files read the same on both platforms.

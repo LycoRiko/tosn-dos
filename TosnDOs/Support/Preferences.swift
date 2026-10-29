@@ -10,6 +10,9 @@ enum PreferenceKey {
     static let appearance = "pref.appearance"
     static let templateDueToday = "pref.templateDueToday"
     static let hasOnboarded = "pref.hasOnboarded"
+    static let saveShotToEvidence = "pref.saveShotToEvidence"
+    static let backupEvidenceScope = "pref.backupEvidenceScope"
+    static let optimizeImages = "pref.optimizeImages"
 }
 
 enum AppearanceMode: Int, CaseIterable, Identifiable {

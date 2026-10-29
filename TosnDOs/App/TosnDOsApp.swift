@@ -48,6 +48,7 @@ struct RootView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @State private var repeatPrompt: RepeatService.Prompt?
+    @State private var capture = CaptureSession.shared
 
     var body: some View {
         Group {
@@ -76,6 +77,14 @@ struct RootView: View {
                 PhoneWatchSync.shared.pushSnapshot()
                 #endif
                 checkRepeat()
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { capture.draft != nil },
+            set: { if !$0 { capture.clear() } }
+        )) {
+            if let draft = capture.draft {
+                CaptureReviewSheet(draft: draft)
             }
         }
         .alert(repeatPrompt?.title ?? "", isPresented: repeatAlertShown) {

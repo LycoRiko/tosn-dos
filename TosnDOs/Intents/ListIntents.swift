@@ -101,6 +101,12 @@ struct TosnShortcuts: AppShortcutsProvider {
             systemImageName: "plus.circle"
         )
         AppShortcut(
+            intent: AddTasksFromScreenshotIntent(),
+            phrases: ["Add tasks from a screenshot in \(.applicationName)"],
+            shortTitle: "From screenshot",
+            systemImageName: "text.viewfinder"
+        )
+        AppShortcut(
             intent: CompleteTaskIntent(),
             phrases: ["Complete a task in \(.applicationName)"],
             shortTitle: "Complete task",

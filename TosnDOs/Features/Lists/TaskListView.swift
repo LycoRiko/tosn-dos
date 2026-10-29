@@ -24,6 +24,7 @@ struct TaskListView: View {
     @State private var showsNewList = false
     @State private var showsTemplates = false
     @State private var showsQR = false
+    @State private var pendingDelete: TodoItem?
     #if os(macOS)
     @State private var isDropTargeted = false
     #endif
@@ -196,6 +197,32 @@ struct TaskListView: View {
             }
         }
         #endif
+        .confirmationDialog(
+            pendingDelete.map { String(localized: "\($0.evidenceCount) materials will be deleted with this task.") } ?? "",
+            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Delete task and materials", role: .destructive) {
+                if let task = pendingDelete {
+                    WorkspaceService.delete(task, in: context)
+                }
+                pendingDelete = nil
+            }
+            Button("Keep", role: .cancel) { pendingDelete = nil }
+        }
+        .confirmationDialog(
+            pendingDelete.map { String(localized: "\($0.evidenceCount) materials will be deleted with this task.") } ?? "",
+            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Delete task and materials", role: .destructive) {
+                if let task = pendingDelete {
+                    WorkspaceService.delete(task, in: context)
+                }
+                pendingDelete = nil
+            }
+            Button("Keep", role: .cancel) { pendingDelete = nil }
+        }
         .sheet(isPresented: $showsQR) {
             if let list = currentList {
                 QRSheet(title: list.title, code: ListCodec.encode(list))
@@ -275,6 +302,15 @@ struct TaskListView: View {
     }
     #endif
 
+    /// 带材料的任务多问一次：删掉之后截图也一起没了，Undo 找不回来。
+    private func requestDelete(_ task: TodoItem) {
+        if task.evidenceCount > 0 {
+            pendingDelete = task
+        } else {
+            WorkspaceService.delete(task, in: context)
+        }
+    }
+
     private func row(_ task: TodoItem) -> some View {
         TaskRow(task: task, showsListName: showsListName)
             .listRowInsets(EdgeInsets(top: 0, leading: Theme.pagePadding, bottom: 0, trailing: Theme.pagePadding))
@@ -291,7 +327,7 @@ struct TaskListView: View {
                 }
 
                 Button(role: .destructive) {
-                    WorkspaceService.delete(task, in: context)
+                    requestDelete(task)
                 } label: {
                     Label("Delete task", systemImage: "trash")
                 }
@@ -309,7 +345,7 @@ struct TaskListView: View {
                 }
                 Divider()
                 Button(role: .destructive) {
-                    WorkspaceService.delete(task, in: context)
+                    requestDelete(task)
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }

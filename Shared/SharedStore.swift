@@ -21,6 +21,7 @@ enum SharedStore {
         Schema([
             TodoList.self,
             TodoItem.self,
+            Evidence.self,
             Subtask.self,
             Tag.self,
             ListTemplate.self,
