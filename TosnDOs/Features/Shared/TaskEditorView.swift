@@ -17,6 +17,7 @@ struct TaskEditorView: View {
     @State private var newTagName = ""
     @State private var newCheckTitle = ""
     @State private var newEvidenceText = ""
+    @State private var previewEvidence: Evidence?
     @State private var hasDue: Bool
     @State private var dueDraft: Date
     @State private var hasDeadline: Bool
@@ -157,6 +158,9 @@ struct TaskEditorView: View {
         .groupedRows()
         .scrollContentBackground(.hidden)
         .background(AppBackground())
+        .sheet(item: $previewEvidence) { evidence in
+            EvidenceViewer(data: evidence.imageData ?? Data())
+        }
         .navigationTitle("Task")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -403,12 +407,17 @@ struct TaskEditorView: View {
     private func materialRow(_ evidence: Evidence) -> some View {
         HStack(spacing: 10) {
             if evidence.kind == .image, let data = evidence.imageData, let image = PlatformImage(data: data) {
-                Image(platformImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 40, height: 40)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    .accessibilityLabel(Text("Screenshot"))
+                Button {
+                    previewEvidence = evidence
+                } label: {
+                    Image(platformImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 40, height: 40)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Screenshot"))
             } else {
                 Image(systemName: evidence.kind.symbol)
                     .font(.system(size: 15))
@@ -490,5 +499,35 @@ struct TaskEditorView: View {
 
     private func save() {
         try? context.save()
+    }
+}
+
+/// 材料里的截图：点开看大图，背景纯黑不抢色。
+private struct EvidenceViewer: View {
+    let data: Data
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Color.black.ignoresSafeArea()
+
+            if let image = PlatformImage(data: data) {
+                Image(platformImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(12)
+            }
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 26))
+                    .foregroundStyle(.white.opacity(0.85), .white.opacity(0.18))
+            }
+            .buttonStyle(.plain)
+            .padding(16)
+            .accessibilityLabel(Text("Close"))
+        }
     }
 }
