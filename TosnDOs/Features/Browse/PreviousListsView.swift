@@ -85,7 +85,9 @@ struct PreviousListsView: View {
     }
 
     private func row(_ list: TodoList) -> some View {
-        NavigationLink(value: SidebarItem.list(list.uid)) {
+        NavigationLink {
+            TaskListView(scope: .list(list.uid), selection: .constant(nil))
+        } label: {
             HStack(spacing: 12) {
                 ListGlyph(symbol: "checkmark", color: Palette.mint, size: 28)
                 VStack(alignment: .leading, spacing: 1) {

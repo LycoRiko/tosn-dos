@@ -9,11 +9,18 @@ struct BrowseView: View {
     @Query(sort: \ListTemplate.updatedAt, order: .reverse) private var templates: [ListTemplate]
 
     @Environment(\.modelContext) private var context
+    /// 导入分享码后由外层塞进来，用来把新清单直接推到眼前。
+    @Binding var pendingList: UUID?
+    @State private var path = NavigationPath()
     @State private var newListSheet = false
+
+    init(pendingList: Binding<UUID?> = .constant(nil)) {
+        _pendingList = pendingList
+    }
     @State private var newTemplateSheet = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 listsSection
                 previousSection
@@ -45,6 +52,11 @@ struct BrowseView: View {
             .contentMargins(.bottom, 92, for: .scrollContent)
             .background(AppBackground())
             .navigationTitle("Browse")
+            .onChange(of: pendingList) { _, uid in
+                guard let uid else { return }
+                path.append(SidebarItem.list(uid))
+                pendingList = nil
+            }
             .navigationDestination(for: SidebarItem.self) { item in
                 TaskListView(scope: item, selection: .constant(nil))
             }
@@ -256,7 +268,7 @@ struct TemplateLibrarySheet: View {
                     }
                 }
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
+                    ToolbarItem(placement: .confirmationAction) {
                         Button("Done") { dismiss() }
                     }
                 }

@@ -11,6 +11,7 @@ struct PhoneRootView: View {
 
     @Environment(\.modelContext) private var context
     @State private var tab: AppTab = .today
+    @State private var pendingList: UUID?
 
     var body: some View {
         TabView(selection: $tab) {
@@ -21,7 +22,7 @@ struct PhoneRootView: View {
             }
 
             Tab("Browse", systemImage: "square.grid.2x2", value: AppTab.browse) {
-                BrowseView()
+                BrowseView(pendingList: $pendingList)
             }
 
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
@@ -50,8 +51,10 @@ struct PhoneRootView: View {
 
         let existing = (try? context.fetch(FetchDescriptor<TodoList>())) ?? []
         let next = (existing.map(\.sortIndex).max() ?? 0) + 1
-        ListCodec.importList(snapshot, into: context, sortIndex: next)
+        let created = ListCodec.importList(snapshot, into: context, sortIndex: next)
         tab = .browse
+        // 光切标签用户会以为没成功，直接把新清单推到眼前。
+        pendingList = created?.uid
     }
 }
 #endif
