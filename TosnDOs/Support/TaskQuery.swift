@@ -34,6 +34,11 @@ enum TaskQuery {
             case .smart(.upcoming):
                 guard !item.isCompleted, let due = item.dueDate else { return false }
                 return due >= endOfToday
+            case .smart(.waiting):
+                // 等待中本来就被排除在所有计数之外，这里只是给它一个入口。
+                return !item.isCompleted && item.isWaiting
+            case .smart(.noDate):
+                return !item.isCompleted && !item.isWaiting && item.dueDate == nil
             case .smart(.all):
                 return !item.isCompleted
             case .smart(.completed):

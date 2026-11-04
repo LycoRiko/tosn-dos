@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA11BB22CC33DD44EE55FF5E /* TodayScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4E /* TodayScope.swift */; };
+		AA11BB22CC33DD44EE55FF5D /* TaskQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4D /* TaskQuery.swift */; };
+		AA11BB22CC33DD44EE55FF5C /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4C /* Navigation.swift */; };
 		AA11BB22CC33DD44EE55FF5B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4B /* NotificationService.swift */; };
 		AA11BB22CC33DD44EE55FF5A /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4A /* NotificationRouter.swift */; };
 		AA11BB22CC33DD44EE55FF59 /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF49 /* TextRecognizer.swift */; };
@@ -67,6 +70,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA11BB22CC33DD44EE55FF4E /* TodayScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/TodayScope.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF4D /* TaskQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/TaskQuery.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF4C /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/Navigation.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF4B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/NotificationService.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF4A /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/NotificationRouter.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF49 /* TextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/TextRecognizer.swift"; sourceTree = "<group>"; };
@@ -424,6 +430,9 @@
 				AA11BB22CC33DD44EE55FF59 /* TextRecognizer.swift in Sources */,
 				AA11BB22CC33DD44EE55FF5A /* NotificationRouter.swift in Sources */,
 				AA11BB22CC33DD44EE55FF5B /* NotificationService.swift in Sources */,
+				AA11BB22CC33DD44EE55FF5C /* Navigation.swift in Sources */,
+				AA11BB22CC33DD44EE55FF5D /* TaskQuery.swift in Sources */,
+				AA11BB22CC33DD44EE55FF5E /* TodayScope.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

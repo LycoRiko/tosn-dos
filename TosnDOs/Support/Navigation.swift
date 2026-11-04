@@ -1,10 +1,12 @@
 import Foundation
 
-/// The five places the app can show. Deliberately small — everything else in
+/// The six places the app can show. Deliberately small — everything else in
 /// the UI is reachable in at most two taps from here.
 enum SmartList: String, CaseIterable, Identifiable, Hashable, Codable {
     case today
     case upcoming
+    case waiting
+    case noDate
     case all
     case completed
 
@@ -14,6 +16,8 @@ enum SmartList: String, CaseIterable, Identifiable, Hashable, Codable {
         switch self {
         case .today: return String(localized: "Today")
         case .upcoming: return String(localized: "Upcoming")
+        case .waiting: return String(localized: "Waiting")
+        case .noDate: return String(localized: "No date")
         case .all: return String(localized: "All")
         case .completed: return String(localized: "Completed")
         }
@@ -23,6 +27,8 @@ enum SmartList: String, CaseIterable, Identifiable, Hashable, Codable {
         switch self {
         case .today: return "sun.max"
         case .upcoming: return "calendar"
+        case .waiting: return "hourglass"
+        case .noDate: return "tray"
         case .all: return "square.stack.3d.up"
         case .completed: return "checkmark.circle"
         }

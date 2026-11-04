@@ -50,8 +50,10 @@ struct MacRootView: View {
     private var sidebar: some View {
         List(selection: $selection) {
             Section {
-                Label(SmartList.today.title, systemImage: SmartList.today.symbol)
-                    .tag(SidebarItem.smart(.today))
+                ForEach([SmartList.today, .upcoming, .waiting, .noDate]) { smart in
+                    Label(smart.title, systemImage: smart.symbol)
+                        .tag(SidebarItem.smart(smart))
+                }
             }
 
             Section {

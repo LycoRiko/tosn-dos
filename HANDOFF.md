@@ -334,6 +334,25 @@ var evidences: [Evidence]? = []
 - T6 确认面板（Optional 占位、勾选、目标清单、时间归属）
 - T7 测试（解析用例 + 假截图）+ 三端编译 + 装机验证
 
+#### 5.13 B · 智能列表扩展（2026-11-04 完成）
+
+**做了什么**
+- `SmartList` 从 4 个变 6 个：`today / upcoming / waiting / noDate / all / completed`。
+- 新增两个谓词（`TaskQuery.items`）：
+  - `waiting`：`!isCompleted && isWaiting`
+  - `noDate`：`!isCompleted && !isWaiting && dueDate == nil`
+- iPhone 的入口在 Today 顶部筛选菜单——那里遍历 `SmartList.allCases`，加 case 自动出现。
+- macOS 侧栏原来是手写的单行 Today，改成 `ForEach([.today, .upcoming, .waiting, .noDate])`。
+- 空态文案补齐：`Nothing is waiting` / `Everything has a date`。
+
+**注意**
+- 「等待中不计入任何数字」的约定没有被打破：新范围只是**给等待中的任务一个入口**，
+  `TodayScope` 的六个排除点一处没动，`today` 范围依旧排除 `isWaiting`。
+- 「没日期」也排除等待中——否则同一批任务会同时出现在两个范围里。
+
+**测试**：新增 2 项（等待范围只收 parked；没日期范围跳过等待与有日期），合计 **22 项全过**；
+三端编译通过。
+
 #### 5.12 A · 通知「稍后提醒」（2026-11-04 完成）
 
 **做了什么**

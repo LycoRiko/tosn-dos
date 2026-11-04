@@ -139,6 +139,51 @@ struct LogicTests {
         #expect(decoded.templates.first?.items.first?.checks == ["Wipe", "Mop"])
     }
 
+
+    // MARK: - 智能列表
+
+    private func makeContext() throws -> ModelContext {
+        ModelContext(try memoryContainer())
+    }
+
+    @Test func waitingScopeOnlyListsParkedTasks() throws {
+        let context = try makeContext()
+        let list = TodoList(title: "W")
+        context.insert(list)
+        let parked = TodoItem(title: "parked", list: list, sortIndex: 0)
+        let open = TodoItem(title: "open", list: list, sortIndex: 1)
+        context.insert(parked)
+        context.insert(open)
+        parked.startWaiting(for: "Landlord")
+        try context.save()
+
+        let all = try context.fetch(FetchDescriptor<TodoItem>())
+        let waiting = TaskQuery.items(from: all, scope: .smart(.waiting), lists: [], tags: [])
+        #expect(waiting.map(\.title) == ["parked"])
+
+        // 等待中不进 Today，这是全局约定。
+        let today = TaskQuery.items(from: all, scope: .smart(.today), lists: [], tags: [])
+        #expect(!today.contains { $0.title == "parked" })
+    }
+
+    @Test func noDateScopeSkipsWaitingAndDated() throws {
+        let context = try makeContext()
+        let list = TodoList(title: "W")
+        context.insert(list)
+        let undated = TodoItem(title: "undated", list: list, sortIndex: 0)
+        let dated = TodoItem(title: "dated", dueDate: .now, list: list, sortIndex: 1)
+        let parked = TodoItem(title: "parked", list: list, sortIndex: 2)
+        context.insert(undated)
+        context.insert(dated)
+        context.insert(parked)
+        parked.startWaiting(for: "Bank")
+        try context.save()
+
+        let all = try context.fetch(FetchDescriptor<TodoItem>())
+        let noDate = TaskQuery.items(from: all, scope: .smart(.noDate), lists: [], tags: [])
+        #expect(noDate.map(\.title) == ["undated"])
+    }
+
     // MARK: - 稍后提醒
 
     private func date(_ hour: Int, _ minute: Int = 0) -> Date {

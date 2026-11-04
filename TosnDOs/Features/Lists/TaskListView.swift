@@ -386,6 +386,8 @@ struct TaskListView: View {
             switch smart {
             case .today: return "sun.max"
             case .upcoming: return "calendar"
+            case .waiting: return "hourglass"
+            case .noDate: return "tray"
             case .all: return "square.stack.3d.up"
             case .completed: return "checkmark.circle"
             }
@@ -399,6 +401,8 @@ struct TaskListView: View {
             // The hero card above already says "Nothing due today"; repeating it here reads as a stutter.
             case .today: return String(localized: "No open tasks")
             case .upcoming: return String(localized: "Nothing scheduled")
+            case .waiting: return String(localized: "Nothing is waiting")
+            case .noDate: return String(localized: "Everything has a date")
             case .all: return String(localized: "No open tasks")
             case .completed: return String(localized: "Nothing completed yet")
             }
