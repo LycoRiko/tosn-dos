@@ -334,6 +334,35 @@ var evidences: [Evidence]? = []
 - T6 确认面板（Optional 占位、勾选、目标清单、时间归属）
 - T7 测试（解析用例 + 假截图）+ 三端编译 + 装机验证
 
+#### 5.11 2026-11-04 一致性与导航收口
+
+**导航（静态审查 + 修复）**
+- 全仓 `navigationBarBackButtonHidden` / `.toolbar(.hidden)` 各 0 处，被 push 的页面都有标题，栈不嵌套 → 没有"进得去出不来"。
+- 修：`TemplateLibrarySheet` 的 Done 从 `.cancellationAction`（左侧，和返回键抢位）移到 `.confirmationAction`。
+- 修：`PreviousListsView` 的行改成自带目的地 `NavigationLink { TaskListView(...) }`，
+  不再依赖祖先的 `navigationDestination`（换了栈就会静默失效）。
+- 修：扫码导入只切标签、不进新清单 → Browse 加 `path`，导入后 `path.append(.list(uid))`。
+- 修：**点击穿透**——往期点进清单后，抬手事件被新页面接住，自动弹出任务编辑页。
+  `TaskListView` 现在进入 0.35 秒内 `.allowsHitTesting(false)`，`open()` 再兜一层。
+- 修：`TaskListView` 有**两处一模一样的 confirmationDialog**（批量替换重复执行留下的），已去重。
+
+**按钮风格**
+- 确认按钮统一 `.confirmationAction` + `.fontWeight(.semibold)`；取消统一 `.cancellationAction`。
+- 修：清单编辑器原来是 **Save**，其余编辑页是 Done → 统一为「新建 Add / 编辑 Done」。
+- 修：删除策略不一致——列表页带材料要确认，编辑页却直接删 → 编辑页也走确认。
+
+**菜单与滑动（2026-11-04 追加）**
+- 修：清单行原来**没有滑动操作**（任务、模板都有）→ 补上「存为模板 / 删除清单」，`allowsFullSwipe: false`。
+- 修：行级删除文案统一带对象名（Delete task / Delete template / Delete list），朗读不歧义。
+- 修：模板条目的长按菜单补 `Divider`，和其余菜单的「非破坏性 → 分隔线 → 删除」一致。
+- **待用户判断**：给清单加滑动删除是行为变更，不是纯样式；若不合适，删掉那一段 `swipeActions` 即可。
+
+**交互风险扫描**
+- 修：**删清单没有二次确认**（会连带删掉全部任务，且无撤销）→ 空清单一步删，非空弹「N 条任务会一起删除」。
+- 未改：删模板仍是一步（模板可重建，风险低）；如果要求一致，照清单的写法补一段即可。
+
+**回归**：三端编译通过；测试 15 项全过。
+
 ### 5.2 还没做的（2026-10-22 收尾时）
 
 | 事项                      | 卡在哪                                    |

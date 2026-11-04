@@ -5762,6 +5762,50 @@
           }
         }
       }
+    },
+    "%lld tasks will be deleted with this list.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条清单里的 %lld 条任务会一起删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這條清單裡的 %lld 條任務會一起刪除。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリストの %lld 件のタスクも削除されます。"
+          }
+        }
+      }
+    },
+    "Delete list and tasks": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除清单和任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除清單和任務"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リストとタスクを削除"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

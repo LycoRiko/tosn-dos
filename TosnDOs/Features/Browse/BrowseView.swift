@@ -13,6 +13,7 @@ struct BrowseView: View {
     @Binding var pendingList: UUID?
     @State private var path = NavigationPath()
     @State private var newListSheet = false
+    @State private var pendingDeleteList: TodoList?
 
     init(pendingList: Binding<UUID?> = .constant(nil)) {
         _pendingList = pendingList
@@ -52,6 +53,19 @@ struct BrowseView: View {
             .contentMargins(.bottom, 92, for: .scrollContent)
             .background(AppBackground())
             .navigationTitle("Browse")
+            .confirmationDialog(
+                pendingDeleteList.map { String(localized: "\($0.tasks?.count ?? 0) tasks will be deleted with this list.") } ?? "",
+                isPresented: Binding(get: { pendingDeleteList != nil }, set: { if !$0 { pendingDeleteList = nil } }),
+                titleVisibility: .visible
+            ) {
+                Button("Delete list and tasks", role: .destructive) {
+                    if let list = pendingDeleteList {
+                        WorkspaceService.delete(list, in: context)
+                    }
+                    pendingDeleteList = nil
+                }
+                Button("Keep", role: .cancel) { pendingDeleteList = nil }
+            }
             .onChange(of: pendingList) { _, uid in
                 guard let uid else { return }
                 path.append(SidebarItem.list(uid))
@@ -103,6 +117,15 @@ struct BrowseView: View {
             .sorted { ($0.lastCompletedAt ?? .distantPast) > ($1.lastCompletedAt ?? .distantPast) }
     }
 
+    /// 清单删除会连带删掉里面的任务，空清单才允许一步到位。
+    private func requestDeleteList(_ list: TodoList) {
+        if (list.tasks ?? []).isEmpty {
+            WorkspaceService.delete(list, in: context)
+        } else {
+            pendingDeleteList = list
+        }
+    }
+
     /// Which run this was, and how long it took — the two things you want to
     /// know from a finished list without opening it.
     private var listsSection: some View {
@@ -127,7 +150,7 @@ struct BrowseView: View {
                     }
                     Divider()
                     Button(role: .destructive) {
-                        WorkspaceService.delete(list, in: context)
+                        requestDeleteList(list)
                     } label: {
                         Label("Delete list", systemImage: "trash")
                     }
@@ -139,7 +162,7 @@ struct BrowseView: View {
                         Label("Save as template", systemImage: "square.on.square.dashed")
                     }
                     Button(role: .destructive) {
-                        WorkspaceService.delete(list, in: context)
+                        requestDeleteList(list)
                     } label: {
                         Label("Delete list", systemImage: "trash")
                     }
