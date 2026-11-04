@@ -334,6 +334,38 @@ var evidences: [Evidence]? = []
 - T6 确认面板（Optional 占位、勾选、目标清单、时间归属）
 - T7 测试（解析用例 + 假截图）+ 三端编译 + 装机验证
 
+#### 5.14 撤销（2026-11-04 完成）
+
+**结论先说：SwiftData 不会把 `delete` 记进 `UndoManager`。**
+我先按「给 mainContext 挂 UndoManager，删完 `undo()`」写，测试直接失败（删掉的没回来）。
+所以改成**延迟落盘**：
+
+- `WorkspaceService.delete(...)` 只 `context.delete(...)`，**不马上 save**；
+- `UndoCenter.stage(message:commit:undo:)` 弹「已删除“X”」+ Undo，5 秒后自动 `save()`；
+- 点撤销就是 `context.rollback()`（测试已验证能恢复未保存的删除）。
+
+**为什么不做快照重建**：任务、清单、模板、材料、子项五类对象，快照要写五份字段映射，
+还得处理子项和证据的从属关系；延迟落盘对五类一视同仁，代码只有二十行。
+
+**统一的入口与措辞**
+- 所有删除都走 `WorkspaceService.delete(...)`，包括模板条目、子项、材料（原来这三处是直接 `context.delete`）。
+- 提示只有一种：`Deleted “名字”`，按钮只有一种：`Undo`，时长固定 5 秒。
+- macOS 的 ⌘Z 也指向同一个 `UndoCenter.perform()`。
+- 底部提示条 `UndoBanner` 挂在 RootView，全 App 只有一份实现。
+
+**边界处理**
+- 连删两次：`stage` 会先把上一次落盘，再登记新的，不会互相覆盖。
+- App 切到后台：`scenePhase != .active` 时立即落盘，避免进程被杀后任务"复活"。
+- 撤销时用 uid 回查一次：`rollback` 若因自动保存没恢复成功，不会假装成功。
+
+**顺手修掉的**：`WorkspaceService.save` 里也有一个 `assertionFailure`（和之前 SharedStore 那个同类），
+Debug 构建下保存失败会直接崩，改成打印。
+
+**测试**：新增 1 项（未保存的删除能被 rollback 恢复），合计 **23 项全过**；三端编译通过。
+
+**已知取舍**：五秒窗口内如果还有别的未保存改动，会一起被撤回。项目里所有编辑都即时保存，
+所以实际只剩删除本身。真要更严谨得给每个对象写快照——暂时不值当。
+
 #### 5.13 B · 智能列表扩展（2026-11-04 完成）
 
 **做了什么**

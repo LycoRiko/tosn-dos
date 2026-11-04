@@ -19,6 +19,10 @@ struct TosnDOsApp: App {
         .defaultSize(width: 1080, height: 700)
         .commands {
             SidebarCommands()
+            CommandGroup(replacing: .undoRedo) {
+                Button("Undo") { UndoCenter.shared.perform() }
+                    .keyboardShortcut("z", modifiers: .command)
+            }
         }
     }
     #else
@@ -66,6 +70,7 @@ struct RootView: View {
                 OnboardingView()
             }
         }
+        .overlay(alignment: .bottom) { UndoBanner() }
         .preferredColorScheme(AppearanceMode(rawValue: appearanceRaw)?.colorScheme)
         .task {
             #if os(iOS)
@@ -76,6 +81,10 @@ struct RootView: View {
         .onChange(of: scenePhase) { _, phase in
             // The watch may have been asleep through several edits; hand it the
             // newest picture whenever we come back to the front.
+            // 离开前台就把挂着的删除落盘，免得进程被杀后任务"复活"。
+            if phase != .active {
+                UndoCenter.shared.flush()
+            }
             if phase == .active {
                 #if os(iOS)
                 PhoneWatchSync.shared.pushSnapshot()

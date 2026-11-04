@@ -150,31 +150,87 @@ enum WorkspaceService {
 
     // MARK: Delete
 
+    /// 所有删除共用一条路：改内存 → 弹提示 → 五秒后落盘；点撤销就 rollback。
+    /// 提示文案统一成 `Deleted “名字”`，不要在别处另写一种说法。
     static func delete(_ task: TodoItem, in context: ModelContext) {
         let owner = task.list
+        let uid = task.uid
+        let name = task.title
         NotificationService.cancel(task)
         context.delete(task)
         // Removing the last open task is a completion in every way the UI cares about.
         owner?.reconcileCompletion()
-        save(context)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<TodoItem>())) ?? []).contains { $0.uid == uid }
+        }
     }
 
     static func delete(_ list: TodoList, in context: ModelContext) {
+        let uid = list.uid
+        let name = list.title
         NotificationService.cancel(list)
         context.delete(list)
-        save(context)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<TodoList>())) ?? []).contains { $0.uid == uid }
+        }
     }
 
     static func delete(_ template: ListTemplate, in context: ModelContext) {
+        let uid = template.uid
+        let name = template.title
         context.delete(template)
-        save(context)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<ListTemplate>())) ?? []).contains { $0.uid == uid }
+        }
+    }
+
+    static func delete(_ item: TemplateItem, in context: ModelContext) {
+        let uid = item.uid
+        let name = item.title
+        context.delete(item)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<TemplateItem>())) ?? []).contains { $0.uid == uid }
+        }
+    }
+
+    static func delete(_ subtask: Subtask, in context: ModelContext) {
+        let uid = subtask.uid
+        let name = subtask.title
+        context.delete(subtask)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<Subtask>())) ?? []).contains { $0.uid == uid }
+        }
+    }
+
+    static func delete(_ evidence: Evidence, in context: ModelContext) {
+        let uid = evidence.uid
+        let name = evidence.text.isEmpty ? String(localized: "Material") : evidence.text
+        context.delete(evidence)
+        stage(context: context, name: name) {
+            ((try? context.fetch(FetchDescriptor<Evidence>())) ?? []).contains { $0.uid == uid }
+        }
+    }
+
+    private static func stage(
+        context: ModelContext,
+        name: String,
+        verify: @escaping () -> Bool
+    ) {
+        UndoCenter.shared.stage(
+            message: String(localized: "Deleted “\(name)”"),
+            commit: { save(context) },
+            undo: {
+                context.rollback()
+                return verify()
+            }
+        )
     }
 
     static func save(_ context: ModelContext) {
         do {
             try context.save()
         } catch {
-            assertionFailure("Save failed: \(error)")
+            print("⚠️ Save failed: \(error)")
         }
     }
 }

@@ -95,7 +95,7 @@ struct TemplateDetailView: View {
                             }
 
                             Button(role: .destructive) {
-                                context.delete(item)
+                                WorkspaceService.delete(item, in: context)
                                 touch(template)
                             } label: {
                                 Label("Delete task", systemImage: "trash")
@@ -219,7 +219,7 @@ struct TemplateDetailView: View {
             }
             Divider()
             Button(role: .destructive) {
-                context.delete(item)
+                WorkspaceService.delete(item, in: context)
                 touch(template)
             } label: {
                 Label("Delete task", systemImage: "trash")

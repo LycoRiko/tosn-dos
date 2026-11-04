@@ -136,7 +136,7 @@ struct TemplateEditorView: View {
             }
 
             Button(role: .destructive) {
-                context.delete(item)
+                WorkspaceService.delete(item, in: context)
                 touch()
             } label: {
                 Label("Delete task", systemImage: "trash")

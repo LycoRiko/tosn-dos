@@ -140,6 +140,27 @@ struct LogicTests {
     }
 
 
+
+    // MARK: - 撤销
+
+    /// 删除先不落盘，撤销就是 rollback——SwiftData 自带的 UndoManager 不接管 delete。
+    @Test func rollbackRestoresAnUnsavedDelete() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+
+        let list = TodoList(title: "L")
+        context.insert(list)
+        let task = TodoItem(title: "T", list: list, sortIndex: 0)
+        context.insert(task)
+        try context.save()
+
+        context.delete(task)
+        #expect(try context.fetch(FetchDescriptor<TodoItem>()).isEmpty, "delete is visible right away")
+
+        context.rollback()
+        #expect(try context.fetch(FetchDescriptor<TodoItem>()).count == 1, "rollback must bring it back")
+    }
+
     // MARK: - 智能列表
 
     private func makeContext() throws -> ModelContext {

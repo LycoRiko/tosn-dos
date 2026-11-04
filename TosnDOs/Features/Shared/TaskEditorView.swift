@@ -405,9 +405,8 @@ struct TaskEditorView: View {
         .onDelete { offsets in
             let items = task.orderedEvidences
             for index in offsets where index < items.count {
-                context.delete(items[index])
+                WorkspaceService.delete(items[index], in: context)
             }
-            save()
         }
 
         HStack(spacing: 10) {
