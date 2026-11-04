@@ -334,6 +334,31 @@ var evidences: [Evidence]? = []
 - T6 确认面板（Optional 占位、勾选、目标清单、时间归属）
 - T7 测试（解析用例 + 假截图）+ 三端编译 + 装机验证
 
+#### 5.12 A · 通知「稍后提醒」（2026-11-04 完成）
+
+**做了什么**
+- `NotificationService` 注册通知分类 `tosn.reminder`，挂三个一键动作：
+  `1 hour` / `Tonight` / `Tomorrow morning`，identifier 前缀 `tosn.snooze.`。
+- 已有提醒通知（清单截止日、任务截止日）现在都带 `categoryIdentifier`，因此长按通知就能看到这三个动作。
+- `NotificationRouter`（`UNUserNotificationCenterDelegate`）在 App `init()` 里挂上——
+  **必须在启动完成前设置**，否则冷启动点动作收不到。前台也声明 `willPresent` 返回 banner，
+  不然通知在 App 打开时会被吞掉。
+- 动作处理：不碰 UI、不查库，直接用通知自带的 content 复制一份，改触发时间后重排，
+  identifier 加后缀 `.snooze`。`reschedule` 会连带清掉这个后缀的旧请求，避免改完时间后旧提醒还在。
+
+**时间规则**（`Snooze.snoozeDate`，纯函数）
+- 1 hour：`now + 3600`
+- Tonight：今天 20:00；已过则明天 20:00
+- Tomorrow morning：至少明天 08:00
+- 未知动作返回 nil（忽略）
+
+**为什么不做「改 dueDate」**：稍后提醒只是把这一次通知往后挪，不该偷偷改用户定下的截止时间。
+
+**测试**：新增 5 项纯时间用例（整小时、今晚未过/已过、明早永远往后、未知动作忽略），
+合计 **20 项全过**；三端编译通过。
+
+**还没验证的**：真机上通知长按是否出现三个动作、后台点击动作能否排上——**需要装机实测**。
+
 #### 5.11 2026-11-04 一致性与导航收口
 
 **导航（静态审查 + 修复）**

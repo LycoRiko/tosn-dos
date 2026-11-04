@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA11BB22CC33DD44EE55FF5B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4B /* NotificationService.swift */; };
+		AA11BB22CC33DD44EE55FF5A /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4A /* NotificationRouter.swift */; };
 		AA11BB22CC33DD44EE55FF59 /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF49 /* TextRecognizer.swift */; };
 		AA11BB22CC33DD44EE55FF58 /* CaptureParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF48 /* CaptureParser.swift */; };
 		AA11BB22CC33DD44EE55FF57 /* Evidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF47 /* Evidence.swift */; };
@@ -65,6 +67,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA11BB22CC33DD44EE55FF4B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/NotificationService.swift"; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF4A /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/NotificationRouter.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF49 /* TextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/TextRecognizer.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF48 /* CaptureParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/CaptureParser.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF47 /* Evidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/Models/Evidence.swift"; sourceTree = "<group>"; };
@@ -418,6 +422,8 @@
 				AA11BB22CC33DD44EE55FF57 /* Evidence.swift in Sources */,
 				AA11BB22CC33DD44EE55FF58 /* CaptureParser.swift in Sources */,
 				AA11BB22CC33DD44EE55FF59 /* TextRecognizer.swift in Sources */,
+				AA11BB22CC33DD44EE55FF5A /* NotificationRouter.swift in Sources */,
+				AA11BB22CC33DD44EE55FF5B /* NotificationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

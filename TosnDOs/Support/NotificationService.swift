@@ -8,6 +8,30 @@ enum NotificationService {
     private static let listPrefix = "tosn.deadline."
     private static let taskPrefix = "tosn.task."
 
+    /// 通知上的「稍后提醒」动作。identifier 前缀和 category 名要跟 NotificationRouter 对齐。
+    static let category = "tosn.reminder"
+    static let snoozePrefix = "tosn.snooze."
+    static let snoozeHour = "tosn.snooze.hour"
+    static let snoozeEvening = "tosn.snooze.evening"
+    static let snoozeMorning = "tosn.snooze.morning"
+    static let snoozeSuffix = ".snooze"
+
+    /// 每次启动都注册一次：系统会记住上一次的分类，重复设置是安全的。
+    static func registerCategories() {
+        let actions = [
+            UNNotificationAction(identifier: snoozeHour, title: String(localized: "1 hour")),
+            UNNotificationAction(identifier: snoozeEvening, title: String(localized: "Tonight")),
+            UNNotificationAction(identifier: snoozeMorning, title: String(localized: "Tomorrow morning"))
+        ]
+        let reminder = UNNotificationCategory(
+            identifier: category,
+            actions: actions,
+            intentIdentifiers: [],
+            options: []
+        )
+        UNUserNotificationCenter.current().setNotificationCategories([reminder])
+    }
+
     /// Lead-time choices offered next to the reminder switch, in minutes.
     static let leadChoices: [Int] = [0, 60, 1440, 4320]
 
@@ -110,8 +134,9 @@ enum NotificationService {
     }
 
     private static func remove(_ identifier: String) {
+        // 连「稍后提醒」排出来的那条一起清掉，否则改完时间还会有旧提醒冒出来。
         UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: [identifier])
+            .removePendingNotificationRequests(withIdentifiers: [identifier, identifier + snoozeSuffix])
     }
 
     /// Drops the old request, then schedules one at `deadline - leadMinutes`.
@@ -131,6 +156,7 @@ enum NotificationService {
         content.title = title
         content.body = String(localized: "The deadline is coming up.")
         content.sound = .default
+        content.categoryIdentifier = category
 
         let components = Calendar.current.dateComponents(
             [.year, .month, .day, .hour, .minute],

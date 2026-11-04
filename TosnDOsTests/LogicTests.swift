@@ -138,6 +138,53 @@ struct LogicTests {
         #expect(decoded.lists.first?.tasks.first?.priority == 3)
         #expect(decoded.templates.first?.items.first?.checks == ["Wipe", "Mop"])
     }
+
+    // MARK: - 稍后提醒
+
+    private func date(_ hour: Int, _ minute: Int = 0) -> Date {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 11
+        components.day = 4
+        components.hour = hour
+        components.minute = minute
+        return Calendar.current.date(from: components)!
+    }
+
+    @Test func snoozeHourIsExactlyOneHour() {
+        let now = date(10)
+        let target = Snooze.snoozeDate(forAction: NotificationService.snoozeHour, now: now)
+        #expect(target == now.addingTimeInterval(3600))
+    }
+
+    @Test func snoozeEveningUsesTodayWhenStillAhead() {
+        let now = date(10)
+        let target = Snooze.snoozeDate(forAction: NotificationService.snoozeEvening, now: now)
+        #expect(Calendar.current.component(.hour, from: target ?? now) == 20)
+        #expect(Calendar.current.isDate(target ?? now, inSameDayAs: now))
+    }
+
+    @Test func snoozeEveningRollsOverAfterEight() {
+        let now = date(21)
+        let target = Snooze.snoozeDate(forAction: NotificationService.snoozeEvening, now: now)
+        #expect(Calendar.current.component(.hour, from: target ?? now) == 20)
+        #expect(!Calendar.current.isDate(target ?? now, inSameDayAs: now), "must not schedule in the past")
+    }
+
+    @Test func snoozeMorningIsAlwaysTomorrow() {
+        let early = date(6)
+        let late = date(23)
+        for now in [early, late] {
+            let target = Snooze.snoozeDate(forAction: NotificationService.snoozeMorning, now: now)
+            #expect(Calendar.current.component(.hour, from: target ?? now) == 8)
+            #expect(target! > now)
+        }
+    }
+
+    @Test func unknownActionIsIgnored() {
+        #expect(Snooze.snoozeDate(forAction: "tosn.snooze.nope", now: .now) == nil)
+    }
+
     // MARK: - 截图解析
 
     private func line(_ text: String, x: CGFloat = 0.1, y: CGFloat = 0.9) -> RecognizedLine {

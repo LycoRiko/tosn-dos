@@ -1,9 +1,13 @@
 import SwiftUI
+import UserNotifications
 
 @main
 struct TosnDOsApp: App {
     init() {
         Prefs.registerDefaults()
+        NotificationService.registerCategories()
+        // 代理必须在 App 结束启动前挂上，否则冷启动点通知动作会收不到。
+        UNUserNotificationCenter.current().delegate = NotificationRouter.shared
     }
 
     #if os(macOS)
