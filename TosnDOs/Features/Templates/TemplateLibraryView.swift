@@ -119,7 +119,7 @@ struct TemplateLibraryView: View {
                 Button(role: .destructive) {
                     WorkspaceService.delete(template, in: context)
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("Delete template", systemImage: "trash")
                 }
             }
 

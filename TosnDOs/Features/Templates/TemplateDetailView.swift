@@ -217,6 +217,7 @@ struct TemplateDetailView: View {
             } label: {
                 Label("Settings", systemImage: "slider.horizontal.3")
             }
+            Divider()
             Button(role: .destructive) {
                 context.delete(item)
                 touch(template)

@@ -132,6 +132,18 @@ struct BrowseView: View {
                         Label("Delete list", systemImage: "trash")
                     }
                 }
+                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    Button {
+                        WorkspaceService.saveAsTemplate(from: list, in: context)
+                    } label: {
+                        Label("Save as template", systemImage: "square.on.square.dashed")
+                    }
+                    Button(role: .destructive) {
+                        WorkspaceService.delete(list, in: context)
+                    } label: {
+                        Label("Delete list", systemImage: "trash")
+                    }
+                }
             }
 
             Button {

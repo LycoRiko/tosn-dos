@@ -338,7 +338,7 @@ struct TaskListView: View {
                 Button(role: .destructive) {
                     requestDelete(task)
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("Delete task", systemImage: "trash")
                 }
             }
     }
