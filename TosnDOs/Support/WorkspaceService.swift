@@ -33,13 +33,8 @@ enum WorkspaceService {
 
     // MARK: Templates → Workspace
 
-    /// Turns a blueprint into a real list. The template itself is never
-    /// modified except for usage metadata, so the same checklist can be
-    /// pulled as many times as needed.
-    ///
-    /// `period` is set for repeating templates: it records which run of the
-    /// checklist this is, and doubles as the due day so a catch-up list from
-    /// last week still reads as last week's.
+    /// The template is never modified except for usage metadata, so it can be pulled
+    /// repeatedly. `period` records which run of a repeating checklist this is.
     @discardableResult
     static func instantiate(
         template: ListTemplate,
@@ -150,8 +145,7 @@ enum WorkspaceService {
 
     // MARK: Delete
 
-    /// 所有删除共用一条路：改内存 → 弹提示 → 五秒后落盘；点撤销就 rollback。
-    /// 提示文案统一成 `Deleted “名字”`，不要在别处另写一种说法。
+    /// One shape for every deletion: `Deleted “name”`.
     static func delete(_ task: TodoItem, in context: ModelContext) {
         let owner = task.list
         let uid = task.uid

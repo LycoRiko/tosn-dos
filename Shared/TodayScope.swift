@@ -1,11 +1,6 @@
 import Foundation
 
-/// The single definition of "today" for the app and the widget extension.
-///
-/// It lives in `Shared/` on purpose: `TaskQuery` depends on navigation types
-/// that only the app target compiles, so the widget cannot import it. Keeping
-/// the rule here is what stops the Today screen and the widget from drifting
-/// into two different sets of numbers.
+/// Lives in `Shared/` because the widget cannot import the app's navigation types.
 enum TodayScope {
 
     /// A due date belongs to today when it falls before tomorrow's midnight,

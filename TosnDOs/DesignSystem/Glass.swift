@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// The whole Liquid Glass story lives in this file.
-///
-/// On iOS 26 / macOS 26 we hand the surface to the system (`.glassEffect`),
-/// which gives real refraction, specular highlights and neighbor merging.
-/// On iOS 18 / macOS 15 we fall back to `.ultraThinMaterial` plus a hairline
-/// stroke — close enough that the layout never shifts between OS versions.
+/// iOS 26 uses `.glassEffect`; older versions fall back to `.ultraThinMaterial` plus
+/// a hairline stroke.
 struct GlassSurface: ViewModifier {
     var radius: CGFloat = Theme.radius
     var tint: Color?

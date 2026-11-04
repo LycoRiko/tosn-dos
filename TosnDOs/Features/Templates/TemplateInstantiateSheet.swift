@@ -1,10 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Pulling a template into the workspace.
-///
-/// The only two decisions are "what should this copy be called" and "does it
-/// start today", because those are the only two things the app cannot guess.
+/// Only two questions: what this copy is called, and whether it starts today.
 struct TemplateInstantiateSheet: View {
     let template: ListTemplate
     var onCreated: ((TodoList) -> Void)?

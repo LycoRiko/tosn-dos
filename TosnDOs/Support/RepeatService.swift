@@ -1,12 +1,8 @@
 import Foundation
 import SwiftData
 
-/// Turns a repeating template into a real list when its period comes around.
-///
-/// There is no background timer on purpose: the check runs when the app opens
-/// or comes back to the front, and a miss is surfaced to the user instead of
-/// being quietly papered over. Skipping still marks the period as handled, so
-/// the same miss is not asked about twice.
+/// No background timer: the check runs on open or on return to the front, and a miss
+/// is surfaced rather than papered over.
 @MainActor
 enum RepeatService {
 

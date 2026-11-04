@@ -1,11 +1,8 @@
 import SwiftUI
 import SwiftData
 
-/// Template editor.
-///
-/// Editing is live on a draft object inserted when the sheet opens, so the
-/// nested structure (task → checks) can be edited with real bindings. If the
-/// sheet is cancelled while still blank, the draft is removed again.
+/// Edits a draft inserted when the sheet opens, so nested items keep real bindings;
+/// cancelling a still-blank draft removes it again.
 struct TemplateEditorView: View {
     var template: ListTemplate?
 

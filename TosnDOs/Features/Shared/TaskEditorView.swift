@@ -147,7 +147,6 @@ struct TaskEditorView: View {
 
             Section {
                 Button(role: .destructive) {
-                    // 和列表页同一套规矩：带材料要先确认，别让截图无声消失。
                     if task.evidenceCount > 0 {
                         confirmDelete = true
                     } else {
@@ -518,7 +517,7 @@ struct TaskEditorView: View {
     }
 }
 
-/// 材料里的截图：点开看大图，背景纯黑不抢色。
+/// Black backdrop so the screenshot is the only colour.
 private struct EvidenceViewer: View {
     let data: Data
     @Environment(\.dismiss) private var dismiss

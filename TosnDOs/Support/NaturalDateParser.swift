@@ -6,12 +6,8 @@ struct ParsedTaskInput {
     var hasTime: Bool
 }
 
-/// A deliberately small natural-date parser for the quick-add field.
-///
-/// It understands the handful of expressions people actually type in a todo
-/// app — 今天 / 明天 / 后天 / 周三 / 下周一 / 10月20日 / 下午3点 / 15:30 —
-/// and leaves everything else alone. No AI, no surprises, no rewriting of the
-/// user's sentence beyond removing the words it consumed.
+/// Small and deliberate: it understands 今天 / 明天 / 周三 / 下午3点 / 15:30 and
+/// leaves the rest of the sentence alone.
 enum NaturalDateParser {
 
     static func parse(_ raw: String, now: Date = .now, calendar: Calendar = .current) -> ParsedTaskInput {
@@ -32,7 +28,7 @@ enum NaturalDateParser {
             hour = adjustedHour(hour, period: period)
             text = removing(result.range, from: text)
         }
-        // 2. Spoken clock time: 下午3点 / 8点半 / 7点15分
+        // Spoken clock time: 下午3点 / 8点半 / 7点15分
         else if let result = firstMatch(#"(上午|下午|晚上|中午|早上|凌晨|傍晚)?\s*(\d{1,2})\s*点\s*(半|\d{1,2}\s*分)?"#, in: text) {
             let period = capture(1, result, text)
             hour = Int(capture(2, result, text) ?? "")

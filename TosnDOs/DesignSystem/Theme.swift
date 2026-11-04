@@ -42,11 +42,7 @@ enum ListSymbols {
     ]
 }
 
-/// Page backdrop.
-///
-/// Plain white by default — the app supplies no decoration of its own. When the
-/// user picks a photo (globally, or for a single list) that photo becomes the
-/// backdrop, with user-controlled blur and a scrim that keeps text readable.
+/// Plain white unless the user picks a photo; blur and scrim come from settings.
 struct AppBackground: View {
     /// `nil` means "use the global setting".
     var setting: BackgroundSetting?

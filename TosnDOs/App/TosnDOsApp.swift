@@ -6,7 +6,7 @@ struct TosnDOsApp: App {
     init() {
         Prefs.registerDefaults()
         NotificationService.registerCategories()
-        // 代理必须在 App 结束启动前挂上，否则冷启动点通知动作会收不到。
+        // Must be set before launch finishes, or cold-start actions are dropped.
         UNUserNotificationCenter.current().delegate = NotificationRouter.shared
     }
 
@@ -81,7 +81,7 @@ struct RootView: View {
         .onChange(of: scenePhase) { _, phase in
             // The watch may have been asleep through several edits; hand it the
             // newest picture whenever we come back to the front.
-            // 离开前台就把挂着的删除落盘，免得进程被杀后任务"复活"。
+            // Flush staged deletions on the way out.
             if phase != .active {
                 UndoCenter.shared.flush()
             }

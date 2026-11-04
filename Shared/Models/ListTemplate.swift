@@ -1,10 +1,7 @@
 import Foundation
 import SwiftData
 
-/// How often a template should produce a new list.
-///
-/// Raw `Int` for the same reason as `TaskPriority`: migration-safe and
-/// CloudKit-friendly. `off` is zero so an old record reads as "no repeat".
+/// Raw `Int` for migration safety; `off` is zero so old records read as "no repeat".
 enum RepeatRule: Int, CaseIterable, Identifiable, Codable, Sendable {
     case off = 0
     case daily = 1
@@ -23,16 +20,8 @@ enum RepeatRule: Int, CaseIterable, Identifiable, Codable, Sendable {
     }
 }
 
-/// A reusable list blueprint.
-///
-/// Templates live outside the workspace: they never appear in "今天" or in any
-/// list count, and editing one never touches tasks that were already created
-/// from it. The hierarchy mirrors the runtime model one-to-one, which keeps
-/// instantiation a straight copy:
-///
-///     ListTemplate  →  TodoList
-///     TemplateItem  →  TodoItem
-///     TemplateCheck →  Subtask
+/// Blueprint only: never in Today, never counted.
+/// The hierarchy mirrors the runtime model, so instantiation is a straight copy.
 @Model
 final class ListTemplate {
     var uid: UUID = UUID()
@@ -45,10 +34,8 @@ final class ListTemplate {
     var lastUsedAt: Date?
     var usageCount: Int = 0
 
-    // Repeat. `repeatStart` is the anchor that periods are counted from, so
-    // turning repeat on today does not backfill from the template's creation.
-    // `lastGeneratedAt` is the newest period already handled — skipped periods
-    // count as handled, which is what stops the app from asking twice.
+    // Periods count from `repeatStart`, not creation, so turning repeat on today
+    // does not backfill. `lastGeneratedAt` covers skipped periods too.
     var repeatRuleRaw: Int = 0
     var repeatStart: Date?
     var lastGeneratedAt: Date?

@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// Shared preference keys.
-///
-/// The same keys are declared in `Settings.bundle/Root.plist`, which is what
-/// puts these switches inside the system Settings app on iOS. Keep the two
-/// files in sync when adding a preference.
+/// Mirrored in `Settings.bundle/Root.plist`; keep both in sync.
 enum PreferenceKey {
     static let showCompleted = "pref.showCompleted"
     static let appearance = "pref.appearance"

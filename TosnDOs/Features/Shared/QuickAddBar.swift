@@ -1,11 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// The only always-visible input in the app.
-///
-/// Type, press return, done — the date words are parsed on the fly so the
-/// user never has to open a picker for the common case. The bar shows what it
-/// understood before committing, which is what makes text input trustworthy.
+/// Shows the parsed date before committing — that is what makes text input trustworthy.
 struct QuickAddBar: View {
     var targetList: TodoList?
     /// Used when the typed text contains no date of its own.

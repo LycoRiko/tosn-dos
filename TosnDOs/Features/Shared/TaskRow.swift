@@ -1,10 +1,7 @@
 import SwiftUI
 
-/// The single row used by every list in the app.
-///
-/// It shows only four things: completion, title, due state, and a compact
-/// meta line. Anything else belongs in the editor — that constraint is what
-/// keeps a 50-task day scannable.
+/// Four things only: completion, title, due state, meta. Anything else belongs in the
+/// editor — that constraint is what keeps a 50-task day scannable.
 struct TaskRow: View {
     @Bindable var task: TodoItem
     var showsListName: Bool = true

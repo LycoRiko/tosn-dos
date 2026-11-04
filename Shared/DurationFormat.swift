@@ -1,7 +1,6 @@
 import Foundation
 
-/// Human-length durations, localized by Foundation so "3h 20m" becomes
-/// "3时间20分" or "3 小时 20 分" without any strings of our own.
+/// "3h 20m" → "3 小时 20 分"; Foundation does the localising.
 enum DurationFormat {
     static func short(_ seconds: TimeInterval) -> String {
         Duration.seconds(seconds).formatted(

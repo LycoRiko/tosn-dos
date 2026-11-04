@@ -1,9 +1,7 @@
 import Foundation
 import SwiftData
 
-/// 任务的材料：截图、原文、地点、时间等能回溯的信息。
-/// 独立成实体而不是塞进 notes，是因为一张截图和一行文字的生命周期不一样——
-/// 删除任务时它们要一起走，但查找时又要能单独看见。
+/// Kept separate from `notes` so it can cascade with the task.
 enum EvidenceKind: Int, CaseIterable, Identifiable {
     case text = 0
     case image = 1

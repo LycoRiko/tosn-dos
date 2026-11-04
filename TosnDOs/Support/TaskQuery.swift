@@ -1,9 +1,7 @@
 import Foundation
 
-/// Filtering and grouping live in one place so every screen agrees on what
-/// "today" means. Kept intentionally simple: for a personal task list the
-/// cost of filtering in memory is negligible, and it avoids predicate drift
-/// between platforms.
+/// In-memory filtering: cheap at this scale, and it keeps every screen (and the
+/// widget) on one definition of "today".
 enum TaskQuery {
 
     /// A due date counts as "today" when it is before tomorrow's midnight, so
@@ -35,7 +33,7 @@ enum TaskQuery {
                 guard !item.isCompleted, let due = item.dueDate else { return false }
                 return due >= endOfToday
             case .smart(.waiting):
-                // 等待中本来就被排除在所有计数之外，这里只是给它一个入口。
+                // Waiting tasks stay out of every count; this scope only surfaces them.
                 return !item.isCompleted && item.isWaiting
             case .smart(.noDate):
                 return !item.isCompleted && !item.isWaiting && item.dueDate == nil

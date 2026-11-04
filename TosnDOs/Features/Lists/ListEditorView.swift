@@ -133,7 +133,6 @@ struct ListEditorView: View {
                 Button("Cancel") { dismiss() }
             }
             ToolbarItem(placement: .confirmationAction) {
-                // 和别处一致：新建用 Add，编辑用 Done，不再出现第三种叫法。
                 Button(list == nil ? String(localized: "Add") : String(localized: "Done")) { save() }
                     .fontWeight(.semibold)
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)

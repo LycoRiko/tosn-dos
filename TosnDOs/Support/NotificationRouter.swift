@@ -1,12 +1,10 @@
 import Foundation
 import UserNotifications
 
-/// 通知上的「稍后提醒」。动作在 App 没打开时也会回调，所以这里不碰 UI，
-/// 只用 userInfo 里的 uid 找回对象，再按动作算出新的时间。
 final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationRouter()
 
-    /// 打开 App 时也要能收到（前台通知默认被吞掉）。
+    /// Foreground banners have to be asked for explicitly.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
@@ -41,7 +39,7 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
     }
 }
 
-/// 纯时间计算，单独拎出来是为了能测。
+/// Pure date math, split out so it can be tested.
 enum Snooze {
     static func snoozeDate(
         forAction action: String,
@@ -60,7 +58,7 @@ enum Snooze {
         }
     }
 
-    /// 「今晚 20:00」今天已过就顺延到明天；「明早 8:00」至少往后一天。
+    /// Tonight rolls to tomorrow after 20:00; morning is always the next day.
     private static func next(
         hour: Int,
         after now: Date,

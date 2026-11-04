@@ -53,7 +53,6 @@ struct PhoneRootView: View {
         let next = (existing.map(\.sortIndex).max() ?? 0) + 1
         let created = ListCodec.importList(snapshot, into: context, sortIndex: next)
         tab = .browse
-        // 光切标签用户会以为没成功，直接把新清单推到眼前。
         pendingList = created?.uid
     }
 }

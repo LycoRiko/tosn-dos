@@ -9,7 +9,7 @@ struct BrowseView: View {
     @Query(sort: \ListTemplate.updatedAt, order: .reverse) private var templates: [ListTemplate]
 
     @Environment(\.modelContext) private var context
-    /// 导入分享码后由外层塞进来，用来把新清单直接推到眼前。
+    /// Set by the import handler so the new list opens straight away.
     @Binding var pendingList: UUID?
     @State private var path = NavigationPath()
     @State private var newListSheet = false
@@ -117,7 +117,7 @@ struct BrowseView: View {
             .sorted { ($0.lastCompletedAt ?? .distantPast) > ($1.lastCompletedAt ?? .distantPast) }
     }
 
-    /// 清单删除会连带删掉里面的任务，空清单才允许一步到位。
+    /// Empty lists delete at once; non-empty ones ask first.
     private func requestDeleteList(_ list: TodoList) {
         if (list.tasks ?? []).isEmpty {
             WorkspaceService.delete(list, in: context)

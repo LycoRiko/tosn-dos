@@ -1,10 +1,8 @@
 import Foundation
 import CoreGraphics
 
-/// One line the OCR saw, with where it sat on the screen.
-/// Coordinates are normalized (0…1) with the origin at the bottom-left, which is
-/// what Vision returns — keeping them means "明天 3 点" can be matched to the
-/// todo it sits next to instead of to whichever line came first.
+/// One OCR line plus its box. Bottom-left origin because that is what Vision
+/// returns, and the position is what ties "明天 3 点" to the right line.
 struct RecognizedLine: Equatable {
     var text: String
     var minX: CGFloat
@@ -67,7 +65,7 @@ enum CaptureParser {
         var seen = Set<String>()
         var result: [CapturedTask] = []
 
-        // 「地点：…」常常单独占一行，先并回上一条，否则它既不是候选、也找不到归属。
+        // A "地点：" line is a modifier: merge it into the row above.
         var merged: [String] = []
         for row in rows(from: lines) {
             if isModifier(row), !merged.isEmpty {
@@ -127,8 +125,7 @@ enum CaptureParser {
         if trimmed.range(of: #"^\d{1,2}[.、)]"#, options: .regularExpression) != nil { return true }
         if trimmed.contains("待办") || trimmed.lowercased().contains("todo") { return true }
 
-        // 带日期但没有项目符号的行，只有当它像一条待办时才收：
-        // 短、且没有句读。否则「我们今天聊了很多，回头再说吧」也会变成任务。
+        // Short, comma-free lines only.
         guard trimmed.count <= 40, !trimmed.contains("，"), !trimmed.contains(",") else { return false }
         if dateDetector.firstMatch(in: trimmed, options: [], range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
             return true
@@ -142,7 +139,7 @@ enum CaptureParser {
     private static func isModifier(_ row: String) -> Bool {
         let trimmed = row.trimmingCharacters(in: .whitespaces)
         if modifierPrefixes.contains(where: { trimmed.hasPrefix($0) }) { return true }
-        // 整行只有一个时间（比如「15:30」或「明天 15:30」）也算修饰。
+        // A row holding nothing but a time is also a modifier.
         let ns = trimmed as NSString
         if let match = dateDetector.firstMatch(in: trimmed, options: [], range: NSRange(location: 0, length: ns.length)) {
             return match.range.length >= trimmed.count - 1

@@ -1,7 +1,6 @@
 import SwiftUI
 import SwiftData
 
-/// 截图 → 候选任务 → 用户逐条确认。默认全选，改完点「添加」才落库。
 struct CaptureReviewSheet: View {
     let draft: CaptureSession.Draft
 
@@ -128,7 +127,7 @@ struct CaptureReviewSheet: View {
                     DatePicker(
                         "",
                         selection: Binding(get: { due }, set: { row.dueDate.wrappedValue = $0 }),
-                        // 只有识别到时间才给时间选择器，否则「18:06」会是凭空造出来的。
+                        // Time picker only when a time was parsed.
                         displayedComponents: row.hasTime.wrappedValue ? [.date, .hourAndMinute] : [.date]
                     )
                     .labelsHidden()
@@ -184,7 +183,6 @@ struct CaptureReviewSheet: View {
             let title = row.title.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !title.isEmpty else { continue }
 
-            // 没时间 → 今天；有时间 → 落在那一天并带上时间。
             let due = row.dueDate ?? today
             let task = TodoItem(
                 title: title,
@@ -201,7 +199,7 @@ struct CaptureReviewSheet: View {
                 context.insert(Evidence(kind: .place, text: place, task: task))
             }
             if keepScreenshot, let image = draft.imageData {
-                // 原图动辄几 MB，存进库之前先压一下；备份时还会再压一次。
+                // Shrink before storing; backups compress again.
                 context.insert(Evidence(
                     kind: .image,
                     text: String(localized: "Screenshot"),
@@ -222,6 +220,5 @@ struct CaptureReviewSheet: View {
 }
 
 private extension CaptureReviewSheet.Row {
-    /// 用户没手动关掉时间就当作带时间。
     var hasTimeEffective: Bool { hasTime }
 }

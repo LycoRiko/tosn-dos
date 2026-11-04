@@ -5,16 +5,12 @@ struct StoreBoot {
     let container: ModelContainer
     let isShared: Bool
     let usesCloudKit: Bool
-    /// 打不开磁盘库、退回内存库时为 true —— 这次会话的改动不会保存。
+    /// True when the store fell back to memory: this session will not be saved.
     var didFallbackToMemory: Bool = false
 }
 
-/// One place that knows where the database lives.
-///
-/// The store sits in an App Group container so the widget extension opens the
-/// exact same file as the app. If the group (or CloudKit) is unavailable —
-/// for example on an unsigned build — everything degrades to a local store
-/// instead of failing to launch.
+/// App Group container so the widget opens the same file; unsigned builds fall
+/// back to a local store instead of failing.
 enum SharedStore {
     static let appGroupID = "group.com.rikomiyazaki.TosnDOs"
     static let storeName = "TosnDOs"
@@ -69,11 +65,7 @@ enum SharedStore {
             return StoreBoot(container: container, isShared: isShared, usesCloudKit: false)
         }
 
-        // Last resort: an in-memory store keeps the UI usable instead of crashing.
-        // It also means the user sees an empty app while their real data sits on
-        // disk, so say it out loud rather than letting it look like a fresh setup.
-        // 打不开库就用内存库顶上：宁可这一次不保存，也不能让用户看到闪退。
-        // 具体原因写进日志，界面侧通过 StoreBoot.didFallbackToMemory 提示。
+        // Fall back to memory instead of crashing; the reason is logged above.
         let message = "TosnDOs: both stores failed, running in memory. Nothing will be saved."
         print("⚠️ \(message)")
         let memory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)

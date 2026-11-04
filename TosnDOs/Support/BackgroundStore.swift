@@ -20,11 +20,7 @@ struct BackgroundSetting: Equatable {
     }
 }
 
-/// Stores user-chosen backdrop images on disk and hands them back as `Image`.
-///
-/// Images are downsampled on import (long edge capped) and encoded as JPEG, so
-/// a library of backdrops costs a few hundred kilobytes instead of tens of
-/// megabytes.
+/// Downsampled and JPEG-encoded, so a library of backdrops costs hundreds of KB.
 enum BackgroundStore {
     static let folderName = "Backgrounds"
     static let maxPixelSize = 2048

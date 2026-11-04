@@ -1,8 +1,7 @@
 import Foundation
 import Observation
 
-/// 截图解析出来、还没确认的草稿。Intent 写、界面读，都在同一个进程里，
-/// 所以不需要 App Group 也不落盘。
+/// In-process handoff from the intent to the review sheet; never persisted.
 @Observable
 final class CaptureSession {
     static let shared = CaptureSession()

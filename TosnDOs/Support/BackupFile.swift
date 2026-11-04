@@ -11,7 +11,7 @@ extension BackupFile {
     static var contentType: UTType { UTType(filenameExtension: "tndbackup") ?? .json }
 }
 
-/// 备份时证据怎么处理。默认只带文字：截图会让文件从 KB 涨到几十 MB。
+/// Images turn a KB file into tens of MB, so text-only is the default.
 enum BackupEvidenceScope: Int, CaseIterable, Identifiable {
     case none = 0
     case textOnly = 1
@@ -52,7 +52,7 @@ struct BackupFile: Codable {
         var isCompleted: Bool
         var completedAt: Date?
         var sortIndex: Double
-        /// 缺省代表这份备份里没有材料（旧文件或用户选了「不备份」）。
+        /// nil means this backup carries no materials.
         var evidences: [EvidenceRecord]?
     }
 
@@ -60,7 +60,7 @@ struct BackupFile: Codable {
         var kind: Int
         var text: String
         var createdAt: Date
-        /// 只有选了「全部材料 + 不优化」时才是原图；其余情况是压缩后的 JPEG。
+        /// Original bytes only when all materials are exported unoptimised.
         var image: Data?
     }
 
@@ -264,7 +264,7 @@ struct BackupDocument: FileDocument {
     }
 }
 
-/// 备份里的图片压缩：长边 1600、JPEG 0.8。只走 ImageIO/CoreImage，两端通用。
+/// Long edge 1600, JPEG 0.8; ImageIO only, so both platforms share it.
 enum ImageShrink {
     static func jpeg(_ data: Data?, longEdge: CGFloat = 1600, quality: CGFloat = 0.8) -> Data? {
         guard let data,

@@ -1,11 +1,7 @@
 import Foundation
 
-/// Turns a list into plain text people can paste into a message.
-///
-/// The shape is deliberately strict — two leading lines, then `[x]` / `[ ]`
-/// marks, sub-items indented with four spaces — because the share code planned
-/// later will parse the same structure. Anything that changes here should stay
-/// parseable: no prose, no trailing decoration.
+/// Format is strict — two header lines, `[x]` / `[ ]`, four-space indent — because a
+/// machine has to parse it back.
 enum ListShareText {
 
     static func make(for list: TodoList) -> String {

@@ -3,15 +3,8 @@ import Foundation
 import SwiftData
 import WatchConnectivity
 
-/// The phone half of the watch link.
-///
-/// The phone owns the data; the watch mirrors "what is left today". Two things
-/// flow back: a request for a snapshot when the watch opens, and a tick when
-/// the user completes something on the wrist.
-///
-/// Delivery is best-effort on purpose. `updateApplicationContext` keeps the
-/// latest snapshot and hands it over whenever the watch next wakes, so nothing
-/// is lost if the watch app is not running at that moment.
+/// The phone owns the data; the watch mirrors "what is left today". Delivery is
+/// best-effort, so the next snapshot repairs anything dropped.
 @MainActor
 final class PhoneWatchSync: NSObject {
     static let shared = PhoneWatchSync()

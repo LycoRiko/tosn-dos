@@ -1,10 +1,6 @@
 import Foundation
 
-/// What travels between the phone and the watch.
-///
-/// Only plain data crosses the wire — no SwiftData objects, no model context.
-/// The watch keeps its own store and mirrors whatever the last snapshot said,
-/// so a dropped message is never fatal: the next snapshot fixes everything.
+/// Plain data only. A dropped snapshot is harmless: the next one replaces everything.
 struct WatchTaskPayload: Codable, Identifiable {
     var id: UUID
     var title: String

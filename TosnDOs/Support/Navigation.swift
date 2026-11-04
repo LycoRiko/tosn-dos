@@ -35,10 +35,7 @@ enum SmartList: String, CaseIterable, Identifiable, Hashable, Codable {
     }
 }
 
-/// A stable sidebar / navigation selection.
-///
-/// Lists and tags are referenced by their own `uid` instead of by object
-/// identity, so a selection never dangles after a delete or a CloudKit merge.
+/// Keyed by `uid`, not object identity, so a selection survives deletes and merges.
 enum SidebarItem: Hashable, Identifiable {
     case smart(SmartList)
     case list(UUID)

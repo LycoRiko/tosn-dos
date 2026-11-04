@@ -1,14 +1,7 @@
 import SwiftUI
 import Observation
 
-/// 撤销的唯一入口。
-///
-/// 做法不是快照重建，而是**延迟落盘**：删除只改内存，五秒后才 `save()`；
-/// 点「撤销」就是 `rollback()`。好处是对任务、清单、模板、材料一视同仁，
-/// 不需要为每种类型写一份快照。
-///
-/// 代价：这五秒里如果还有别的未保存改动，会一起被撤回去。项目里所有编辑
-/// 都是即时 `save()`，所以这个窗口里基本只剩删除本身。
+/// Deletes stay unsaved until the window closes.
 @Observable
 @MainActor
 final class UndoCenter {
@@ -22,7 +15,7 @@ final class UndoCenter {
 
     private init() {}
 
-    /// 登记一次可撤销的删除。会先把上一次挂着的删除落盘，避免互相覆盖。
+    /// Commits any pending deletion first, so two deletes cannot overwrite each other.
     func stage(message: String, commit: @escaping () -> Void, undo: @escaping () -> Bool) {
         flush()
 
@@ -40,22 +33,20 @@ final class UndoCenter {
         }
     }
 
-    /// 点「撤销」。
     func perform() {
         let undo = pendingUndo
         clearState()
-        // rollback 没成的话不要谎报「已撤销」。
+        // Announce success only when rollback really restored the object.
         if undo?() == true {
             announce(String(localized: "Undone"))
         }
     }
 
-    /// VoiceOver 用户看不到底部那一条，所以用播报代替。
+    /// VoiceOver cannot see the banner, so announce instead.
     private func announce(_ text: String) {
         AccessibilityNotification.Announcement(text).post()
     }
 
-    /// 五秒到了（或者又删了一次）：把删除落盘。
     func flush() {
         let commit = pendingCommit
         clearState()
@@ -71,7 +62,6 @@ final class UndoCenter {
     }
 }
 
-/// 底部那一条。样式固定，别在别处再写第二份。
 struct UndoBanner: View {
     private var center = UndoCenter.shared
 

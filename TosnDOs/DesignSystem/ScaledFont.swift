@@ -1,11 +1,6 @@
 import SwiftUI
 
-/// Dynamic Type for the hand-picked point sizes used across the design system.
-///
-/// The app deliberately uses exact sizes so a 50-task day stays scannable, but
-/// a fixed `.system(size:)` ignores the user's text-size setting entirely.
-/// `@ScaledMetric` keeps the design at the default setting and grows it only
-/// when someone actually asks for larger text.
+/// `@ScaledMetric` keeps the hand-picked sizes responsive to the text-size setting.
 private struct ScaledFontModifier: ViewModifier {
     @ScaledMetric private var size: CGFloat
     private let weight: Font.Weight

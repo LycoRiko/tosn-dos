@@ -82,10 +82,8 @@ struct SettingsView: View {
         pendingBackup = nil
     }
 
-    /// Language only. `Locale.current.identifier` carries the region too, which
-    /// reads as "English (China Mainland)" — nobody picks a language by region.
-    /// The script is kept only for Chinese, where it is what distinguishes
-    /// Simplified from Traditional; for everything else it adds "English (Latin)".
+    /// Language only: `Locale.current` would append the region, e.g. "English (China
+    /// Mainland)". Script matters only for Chinese, to split Simplified from Traditional.
     private var languageName: String {
         let language = Locale.current.language
         let code = language.languageCode?.identifier ?? "en"

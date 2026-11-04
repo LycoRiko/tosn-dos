@@ -25,8 +25,7 @@ struct TaskListView: View {
     @State private var showsTemplates = false
     @State private var showsQR = false
     @State private var pendingDelete: TodoItem?
-    /// 刚进入页面的一小段时间里忽略点击：上一屏的抬手会被转发到这里，
-    /// 表现成"打开清单后立刻弹出某个任务"。
+    /// Ignore taps for 350 ms: the previous screen's touch-up lands here.
     @State private var appearedAt = Date()
     @State private var canTap = true
     #if os(macOS)
@@ -293,7 +292,6 @@ struct TaskListView: View {
     }
     #endif
 
-    /// 带材料的任务多问一次：删掉之后截图也一起没了，Undo 找不回来。
     private func requestDelete(_ task: TodoItem) {
         if task.evidenceCount > 0 {
             pendingDelete = task

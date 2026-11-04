@@ -8,7 +8,7 @@ enum NotificationService {
     private static let listPrefix = "tosn.deadline."
     private static let taskPrefix = "tosn.task."
 
-    /// 通知上的「稍后提醒」动作。identifier 前缀和 category 名要跟 NotificationRouter 对齐。
+    /// Prefixes and category must match `NotificationRouter`.
     static let category = "tosn.reminder"
     static let snoozePrefix = "tosn.snooze."
     static let snoozeHour = "tosn.snooze.hour"
@@ -16,7 +16,7 @@ enum NotificationService {
     static let snoozeMorning = "tosn.snooze.morning"
     static let snoozeSuffix = ".snooze"
 
-    /// 每次启动都注册一次：系统会记住上一次的分类，重复设置是安全的。
+    /// Safe to re-register on every launch: the system keeps the last set.
     static func registerCategories() {
         let actions = [
             UNNotificationAction(identifier: snoozeHour, title: String(localized: "1 hour")),
@@ -65,10 +65,8 @@ enum NotificationService {
 
     // MARK: - Lists
 
-    /// Rebuilds the reminder for a list. Safe to call on every save: the old
-    /// request is dropped first, and nothing is scheduled when the switch is
-    /// off, the deadline is gone, the list is finished, or the fire date has
-    /// already passed.
+    /// Idempotent: drops the old request first and schedules nothing when the switch
+    /// is off, the list is finished, or the fire date has passed.
     @MainActor
     static func sync(_ list: TodoList) {
         let deadline = list.deadlineReminderEnabled && !list.isFinished ? list.deadline : nil
@@ -134,7 +132,7 @@ enum NotificationService {
     }
 
     private static func remove(_ identifier: String) {
-        // 连「稍后提醒」排出来的那条一起清掉，否则改完时间还会有旧提醒冒出来。
+        // Drop the snoozed copy too, or editing a deadline resurrects it.
         UNUserNotificationCenter.current()
             .removePendingNotificationRequests(withIdentifiers: [identifier, identifier + snoozeSuffix])
     }
