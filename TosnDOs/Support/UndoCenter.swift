@@ -30,6 +30,8 @@ final class UndoCenter {
         pendingCommit = commit
         pendingUndo = undo
 
+        announce("\(message). \(String(localized: "You can undo this."))")
+
         timer?.cancel()
         timer = Task { @MainActor in
             try? await Task.sleep(for: .seconds(5))
@@ -42,7 +44,15 @@ final class UndoCenter {
     func perform() {
         let undo = pendingUndo
         clearState()
-        _ = undo?()
+        // rollback 没成的话不要谎报「已撤销」。
+        if undo?() == true {
+            announce(String(localized: "Undone"))
+        }
+    }
+
+    /// VoiceOver 用户看不到底部那一条，所以用播报代替。
+    private func announce(_ text: String) {
+        AccessibilityNotification.Announcement(text).post()
     }
 
     /// 五秒到了（或者又删了一次）：把删除落盘。
@@ -86,6 +96,10 @@ struct UndoBanner: View {
             .background(.regularMaterial, in: Capsule())
             .overlay(Capsule().strokeBorder(Color.primary.opacity(0.06)))
             .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(Text("You can undo this."))
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(Text("You can undo this."))
             .padding(.horizontal, Theme.pagePadding)
             .padding(.bottom, 100)
             .transition(.move(edge: .bottom).combined(with: .opacity))

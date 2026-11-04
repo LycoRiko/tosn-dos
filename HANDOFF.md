@@ -334,6 +334,16 @@ var evidences: [Evidence]? = []
 - T6 确认面板（Optional 占位、勾选、目标清单、时间归属）
 - T7 测试（解析用例 + 假截图）+ 三端编译 + 装机验证
 
+#### 5.15 撤销的无障碍播报（2026-11-04 完成）
+
+- 删除后播报「已删除“X”。可以撤销。」——VoiceOver 用户看不到底部那条提示，得用声音代替。
+- 撤销成功后播报「已撤销」；**只有 rollback 真的把对象找回来才播**（用 uid 回查的结果判断），
+  避免 UI 说撤销了、数据其实没回来。
+- 提示条本身设成 `accessibilityElement(children: .combine)`，并带 `You can undo this.` 的 hint，
+  这样逐项浏览时也不会只念到一个孤零零的「撤销」按钮。
+
+新增 2 条文案（You can undo this. / Undone），四语言齐全；三端编译通过，测试 23 项全过。
+
 #### 5.14 撤销（2026-11-04 完成）
 
 **结论先说：SwiftData 不会把 `delete` 记进 `UndoManager`。**
