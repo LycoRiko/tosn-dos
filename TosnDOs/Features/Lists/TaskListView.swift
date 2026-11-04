@@ -25,6 +25,10 @@ struct TaskListView: View {
     @State private var showsTemplates = false
     @State private var showsQR = false
     @State private var pendingDelete: TodoItem?
+    /// 刚进入页面的一小段时间里忽略点击：上一屏的抬手会被转发到这里，
+    /// 表现成"打开清单后立刻弹出某个任务"。
+    @State private var appearedAt = Date()
+    @State private var canTap = true
     #if os(macOS)
     @State private var isDropTargeted = false
     #endif
@@ -197,19 +201,6 @@ struct TaskListView: View {
             }
         }
         #endif
-        .confirmationDialog(
-            pendingDelete.map { String(localized: "\($0.evidenceCount) materials will be deleted with this task.") } ?? "",
-            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-            titleVisibility: .visible
-        ) {
-            Button("Delete task and materials", role: .destructive) {
-                if let task = pendingDelete {
-                    WorkspaceService.delete(task, in: context)
-                }
-                pendingDelete = nil
-            }
-            Button("Keep", role: .cancel) { pendingDelete = nil }
-        }
         .confirmationDialog(
             pendingDelete.map { String(localized: "\($0.evidenceCount) materials will be deleted with this task.") } ?? "",
             isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
@@ -425,6 +416,7 @@ struct TaskListView: View {
     // MARK: - Actions
 
     private func open(_ task: TodoItem) {
+        guard Date().timeIntervalSince(appearedAt) > 0.35 else { return }
         #if os(macOS)
         selection = task
         #else
