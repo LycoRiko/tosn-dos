@@ -18,6 +18,7 @@ struct TaskEditorView: View {
     @State private var newCheckTitle = ""
     @State private var newEvidenceText = ""
     @State private var previewEvidence: Evidence?
+    @State private var confirmDelete = false
     @State private var hasDue: Bool
     @State private var dueDraft: Date
     @State private var hasDeadline: Bool
@@ -146,8 +147,13 @@ struct TaskEditorView: View {
 
             Section {
                 Button(role: .destructive) {
-                    WorkspaceService.delete(task, in: context)
-                    dismiss()
+                    // 和列表页同一套规矩：带材料要先确认，别让截图无声消失。
+                    if task.evidenceCount > 0 {
+                        confirmDelete = true
+                    } else {
+                        WorkspaceService.delete(task, in: context)
+                        dismiss()
+                    }
                 } label: {
                     Label("Delete task", systemImage: "trash")
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -158,6 +164,17 @@ struct TaskEditorView: View {
         .groupedRows()
         .scrollContentBackground(.hidden)
         .background(AppBackground())
+        .confirmationDialog(
+            String(localized: "\(task.evidenceCount) materials will be deleted with this task."),
+            isPresented: $confirmDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Delete task and materials", role: .destructive) {
+                WorkspaceService.delete(task, in: context)
+                dismiss()
+            }
+            Button("Keep", role: .cancel) {}
+        }
         .sheet(item: $previewEvidence) { evidence in
             EvidenceViewer(data: evidence.imageData ?? Data())
         }
