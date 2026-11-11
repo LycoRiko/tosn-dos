@@ -460,6 +460,38 @@ Debug 构建下保存失败会直接崩，改成打印。
 
 **回归**：三端编译通过；测试 15 项全过。
 
+### 5.17 待做：deadline 提醒升级为 Time Sensitive + Live Activity（2026-11-11 提出）
+
+**需求原话**：用户开启 deadline 之后，在达到 deadline 之前设定的提醒时间时，
+发送 time sensitive 通知，并创建 Live Activity 提醒用户完成。
+
+**现有基础**：`NotificationService.reschedule` 已经在 `deadline - leadMinutes` 排了本地通知
+（lead 可选 0 / 1h / 1d / 3d），所以「在提醒时间触发」这一层不用新建，只需要给这条通知加级别，
+再在同一个时刻起一个 Activity。
+
+**两个能力的真实门槛**
+
+| 能力 | 需要什么 | 现状 |
+|---|---|---|
+| Time Sensitive | `content.interruptionLevel = .timeSensitive` + 用户在系统设置里允许「时效性通知」+ App 侧 **`com.apple.developer.usernotifications.time-sensitive` 能力** | 该 entitlement 免费账号加不了；缺失时 iOS 会**静默降级**成普通通知，不会报错 |
+| Live Activity | `Info.plist` 加 `NSSupportsLiveActivities`；`ActivityAttributes` 同时编进 App 与 Widget 扩展；Widget 里加 `ActivityConfiguration` | 现在 Info.plist **没有**这个键；`TosnDOsWidget` 已存在可复用；本地更新不需要服务端、也不需要 App Group |
+
+**分期建议**
+- **P1（免费账号可做）**：Live Activity 本地起止。锁屏 / 灵动岛显示任务名、剩余时间、完成按钮；
+  完成后 App Intent 在后台写库并 `end()`。注意 ActivityKit 的限制：单个 Activity 最长 8 小时，
+  结束后续命 4 小时，所以**不能常驻**，只在提醒时刻起、任务完成或过期即结束。
+- **P2（需付费账号）**：把同一条通知升级为 Time Sensitive。
+
+**设计约束（贴合本项目）**
+- 不引入服务器、不做远程推送：Activity 全部由 App 本地 start / update / end。
+- 同时最多 1 个 Activity（iOS 本身也限制），否则锁屏会被刷屏。
+- 任务被删除、完成、改期时都要 `Activity.update()` 或 `end()`，否则会留下僵尸 Activity。
+
+**需要用户拍板**
+1. 触发时机：只在「deadline 提醒时刻」起，还是「任务进入今天」就起？
+2. 完成按钮：直接标完成（要后台写库），还是只打开 App 落到该任务？
+3. 是否所有 deadline 都起，还是只给「今天/明天」这类临近任务起？
+
 ### 5.2 还没做的（2026-10-22 收尾时）
 
 | 事项                      | 卡在哪                                    |
