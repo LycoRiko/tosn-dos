@@ -488,6 +488,9 @@ Debug 构建下保存失败会直接崩，改成打印。
 `-seedLedgerDemo` 会删掉旧的演示模板再重建（否则它会一直欠着周期、每次启动弹断档提示）。
 
 History 区块实拍：`docs/showcase/ledger-history2.png`（Nov 5 手动拉取 / Oct 29 已跳过 / Oct 22 已补）。
+`-seedLedgerDemo` 会删掉旧的演示模板再重建（否则它会一直欠着周期、每次启动弹断档提示）。
+
+History 区块实拍：`docs/showcase/ledger-history2.png`（Nov 5 手动拉取 / Oct 29 已跳过 / Oct 22 已补）。
 
 #### 5.36 设置页瘦身 + 模板删除确认（2026-11-12 用户标注后完成）
 
