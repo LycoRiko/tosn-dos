@@ -291,6 +291,114 @@ struct LogicTests {
     }
 
 
+
+    // MARK: - 重复模板账本
+
+    private func scheduleCalendar() -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 8 * 3600)!
+        return calendar
+    }
+
+    /// Noon on 2026-11-12, so day arithmetic never straddles midnight.
+    private func scheduleBase(_ calendar: Calendar) -> Date {
+        calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 12))!
+    }
+
+    private func day(_ offset: Int, from base: Date, _ calendar: Calendar) -> Date {
+        calendar.date(byAdding: .day, value: offset, to: base)!
+    }
+
+    @Test func latestAndAllLeaveDifferentLedgers() {
+        let calendar = scheduleCalendar()
+        let base = scheduleBase(calendar)
+        let missed = (0..<3).map { day($0, from: base, calendar) }
+
+        let latest = RepeatSchedule.ledger(for: missed, taking: [missed[2]])
+        #expect(latest.map(\.outcome) == [.skipped, .skipped, .generated])
+
+        let all = RepeatSchedule.ledger(for: missed, taking: missed)
+        #expect(all.allSatisfy { $0.outcome == .generated })
+
+        let skip = RepeatSchedule.ledger(for: missed, taking: [])
+        #expect(skip.allSatisfy { $0.outcome == .skipped })
+    }
+
+    @Test func aManualPullDoesNotCloseAPeriod() {
+        let calendar = scheduleCalendar()
+        let base = scheduleBase(calendar)
+        let log = [PeriodRecord(start: base, outcome: .manual)]
+
+        let missed = RepeatSchedule.missedStarts(
+            anchor: base, rule: .daily, log: log, lastGeneratedAt: nil,
+            now: day(2, from: base, calendar), calendar: calendar, limit: 30
+        )
+        #expect(missed.count == 3, "the period is logged but still offered")
+    }
+
+    @Test func skippedPeriodsAreNotOfferedAgain() {
+        let calendar = scheduleCalendar()
+        let base = scheduleBase(calendar)
+        let log = [
+            PeriodRecord(start: base, outcome: .skipped),
+            PeriodRecord(start: day(1, from: base, calendar), outcome: .skipped)
+        ]
+
+        let missed = RepeatSchedule.missedStarts(
+            anchor: base, rule: .daily, log: log, lastGeneratedAt: nil,
+            now: day(2, from: base, calendar), calendar: calendar, limit: 30
+        )
+        #expect(missed == [day(2, from: base, calendar)])
+    }
+
+    @Test func legacyTemplateFallsBackToItsLastGeneratedDate() {
+        let calendar = scheduleCalendar()
+        let base = scheduleBase(calendar)
+
+        let missed = RepeatSchedule.missedStarts(
+            anchor: base, rule: .daily, log: [], lastGeneratedAt: day(1, from: base, calendar),
+            now: day(2, from: base, calendar), calendar: calendar, limit: 30
+        )
+        #expect(missed == [day(2, from: base, calendar)], "older periods stay settled")
+    }
+
+    @Test func monthlyPeriodsClampToShortMonths() {
+        let calendar = scheduleCalendar()
+        let january31 = calendar.date(from: DateComponents(year: 2026, month: 1, day: 31, hour: 12))!
+        let february = RepeatSchedule.start(anchor: january31, rule: .monthly, index: 1, calendar: calendar)!
+        #expect(calendar.component(.month, from: february) == 2)
+        #expect(calendar.component(.day, from: february) == 28)
+    }
+
+
+    /// The ledger is a new attribute; this proves SwiftData round-trips it and that a
+    /// template written before the ledger existed still reads as nil.
+    @Test func periodLedgerSurvivesARoundTrip() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let calendar = scheduleCalendar()
+        let base = scheduleBase(calendar)
+
+        let template = ListTemplate(title: "Daily")
+        template.repeatRuleRaw = RepeatRule.daily.rawValue
+        template.repeatStart = base
+        template.periodLog = [
+            PeriodRecord(start: base, outcome: .generated),
+            PeriodRecord(start: day(1, from: base, calendar), outcome: .skipped)
+        ]
+        context.insert(template)
+
+        let legacy = ListTemplate(title: "Old")
+        context.insert(legacy)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<ListTemplate>())
+        let stored = fetched.first { $0.title == "Daily" }
+        #expect(stored?.periodLog?.count == 2)
+        #expect(stored?.periodLog?.map(\.outcome) == [.generated, .skipped])
+        #expect(fetched.first { $0.title == "Old" }?.periodLog == nil, "no ledger is the old state")
+    }
+
     // MARK: - 时间合并迁移
 
     @Test func migrationMovesALoneDeadlineIntoTheDueDate() throws {

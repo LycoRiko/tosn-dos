@@ -149,7 +149,13 @@ struct RootView: View {
             previous = String(localized: "No list has been made from it yet.")
         }
 
-        return "\(cadence)\n\(previous)"
+        // Saying what happens to the periods left behind is the point of the prompt:
+        // silence here is what made "skip" feel like it had no consequence.
+        let leftBehind = prompt.count > 1
+            ? String(localized: "Periods you do not catch up are recorded as skipped and will not be asked about again.")
+            : ""
+
+        return [cadence, previous, leftBehind].filter { !$0.isEmpty }.joined(separator: "\n")
     }
 
     private var latestLabel: String {

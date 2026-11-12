@@ -39,6 +39,9 @@ final class ListTemplate {
     var repeatRuleRaw: Int = 0
     var repeatStart: Date?
     var lastGeneratedAt: Date?
+    /// Per-period ledger. Optional on purpose: adding it needs no migration, and a
+    /// nil log simply means "this template predates the ledger".
+    var periodLog: [PeriodRecord]?
 
     @Relationship(deleteRule: .cascade, inverse: \TemplateItem.template)
     var items: [TemplateItem]? = []

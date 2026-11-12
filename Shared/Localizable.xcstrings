@@ -6664,6 +6664,28 @@
           }
         }
       }
+    },
+    "Periods you do not catch up are recorded as skipped and will not be asked about again.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没补的期会记为跳过，以后不再询问。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒補的期會記為跳過，以後不再詢問。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作成しなかった回はスキップとして記録され、今後たずねません。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

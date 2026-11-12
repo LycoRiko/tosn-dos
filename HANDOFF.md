@@ -465,6 +465,44 @@ Debug 构建下保存失败会直接崩，改成打印。
 **选 B：显示与计数分离。** 跨天任务在它经过的每一天都显示，但**只计入结束那天的圆环**。
 今天的列表里能看到它、能勾，但今天的百分比不算它。
 
+#### 5.34 ⑤ 按期记账（2026-11-12 完成）
+
+**问题（复核后的原话）**：账本只有一个 `lastGeneratedAt`，`resolve` 的三种选择
+（补最近 / 补全部 / 都不补）**都写 newest**，所以"补一条"和"补全部"在账上完全等价，
+被跳过的期数不留痕迹；用户要的是按期号记账。
+
+**改法**
+
+1. 新模型 `PeriodRecord { start, outcome: generated|skipped|manual, recordedAt }`
+   （`Shared/Models/PeriodRecord.swift`）。
+2. `ListTemplate.periodLog: [PeriodRecord]?` —— **可选**，加字段不需要迁移；
+   nil 表示"这模板早于账本"。
+3. 纯计算抽到 `Shared/RepeatSchedule.swift`：周期起点、月度钳制、当前期、missed 判定、账本生成。
+   `RepeatService` 变成薄封装。**抽出来的原因是测试**：`RepeatService` 依赖 `WorkspaceService`
+   → `UndoCenter` → `AppContainer` → `SharedStore`，整条链进测试包太重；纯函数进测试包没有副作用。
+4. `resolve` 现在为**每一个被提示的期**写一条记录：
+   - 补最近 → 最新 `.generated`，其余 `.skipped`
+   - 补全部 → 全部 `.generated`
+   - 都不补 → 全部 `.skipped`
+5. 手动从模板拉一次 → `noteManualPull` 写 `.manual`；`missedStarts` **不把 manual 当已处理**，
+   所以手动拉不会消账（符合要求）。
+6. 判定用的 horizon = `max(lastGeneratedAt, 账本里非 manual 的最新期)`：
+   账本给审计，horizon 保证旧模板（没有账本）的古老期数不会重新冒出来。
+7. 账本上限 400 条，超出丢最旧（日更模板不会无限增长）。
+
+**弹窗正文**加一句后果说明（仅当期数 > 1 时显示）：
+「没补的期会记为跳过，以后不再询问。」—— 之前"跳过"没有任何后果说明。
+
+**测试 +6 项（合计 41 项全过）**
+- 补最近 / 补全部 / 都不补 三种账本不同
+- 手动拉不消账（仍会被提示）
+- 跳过的期不再提示
+- 旧模板（无账本）按 `lastGeneratedAt` 兜底
+- 月度 31 号钳到 2 月 28
+- 账本经 SwiftData 存取的往返，且旧模板读出来是 nil
+
+**没做**：账本目前只写不读（UI 上没有"历史"视图）。要不要展示留到有需求时再说。
+
 #### 5.33 隐私清单 + 无障碍图标标签（2026-11-12 完成）
 
 **隐私清单**：全仓原本没有 `PrivacyInfo.xcprivacy`，上架必被退。

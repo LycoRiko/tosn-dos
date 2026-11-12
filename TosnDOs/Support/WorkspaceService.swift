@@ -54,6 +54,12 @@ enum WorkspaceService {
         list.sourceTemplateName = template.title
         context.insert(list)
 
+        // No period means the user pulled this themselves; log it as such, because a
+        // manual pull must never close a missed period.
+        if period == nil {
+            RepeatService.noteManualPull(for: template)
+        }
+
         let startOfToday = Calendar.current.startOfDay(for: .now)
         let dueDay = period.map { Calendar.current.startOfDay(for: $0) } ?? startOfToday
         for (taskIndex, blueprint) in template.orderedItems.enumerated() {
