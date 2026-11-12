@@ -95,22 +95,37 @@ enum NotificationService {
         remove(listPrefix + list.uid.uuidString)
     }
 
+    private static let startSuffix = ".start"
+    private static let endSuffix = ".end"
+
     // MARK: - Tasks
 
     @MainActor
     static func sync(_ task: TodoItem) {
-        let deadline = task.deadlineReminderEnabled && !task.isCompleted ? task.deadline : nil
+        let base = taskPrefix + task.uid.uuidString
+        guard !task.isCompleted else {
+            remove(base)
+            return
+        }
+
+        let anchor = task.endDate ?? task.dueDate
         reschedule(
-            identifier: taskPrefix + task.uid.uuidString,
+            identifier: base + endSuffix,
             title: task.title,
-            deadline: deadline,
-            leadMinutes: task.deadlineLeadMinutes
+            deadline: task.endReminderEnabled ? anchor : nil,
+            leadMinutes: task.endReminderLeadMinutes
+        )
+        reschedule(
+            identifier: base + startSuffix,
+            title: task.title,
+            deadline: task.endDate == nil || !task.startReminderEnabled ? nil : task.dueDate,
+            leadMinutes: task.startReminderLeadMinutes
         )
     }
 
     @MainActor
     static func apply(_ task: TodoItem) async {
-        guard task.deadlineReminderEnabled, !task.isCompleted else {
+        guard task.endReminderEnabled || task.startReminderEnabled, !task.isCompleted else {
             cancel(task)
             return
         }
@@ -123,6 +138,9 @@ enum NotificationService {
         remove(taskPrefix + task.uid.uuidString)
     }
 
+    /// `remove` clears the two suffixed copies as well, so editing a time cannot
+    /// leave an orphaned reminder behind.
+
     // MARK: - Shared plumbing
 
     private static func authorizeIfNeeded() async {
@@ -132,9 +150,9 @@ enum NotificationService {
     }
 
     private static func remove(_ identifier: String) {
-        // Drop the snoozed copy too, or editing a deadline resurrects it.
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: [identifier, identifier + snoozeSuffix])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [identifier, identifier + snoozeSuffix, identifier + startSuffix, identifier + endSuffix]
+        )
     }
 
     /// Drops the old request, then schedules one at `deadline - leadMinutes`.

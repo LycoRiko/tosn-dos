@@ -6,7 +6,7 @@ enum TodayScope {
     /// A due date belongs to today when it falls before tomorrow's midnight,
     /// so anything overdue is rolled in.
     static func isDue(_ item: TodoItem, endOfToday: Date) -> Bool {
-        guard let due = item.dueDate else { return false }
+        guard let due = item.focusDate else { return false }
         return due < endOfToday
     }
 
@@ -18,8 +18,8 @@ enum TodayScope {
     /// the widget read the order from here.
     static func sort(_ items: [TodoItem]) -> [TodoItem] {
         items.sorted { lhs, rhs in
-            let l = lhs.dueDate ?? .distantFuture
-            let r = rhs.dueDate ?? .distantFuture
+            let l = lhs.focusDate ?? .distantFuture
+            let r = rhs.focusDate ?? .distantFuture
             if l != r { return l < r }
             if lhs.priorityRaw != rhs.priorityRaw { return lhs.priorityRaw > rhs.priorityRaw }
             if lhs.sortIndex != rhs.sortIndex { return lhs.sortIndex < rhs.sortIndex }

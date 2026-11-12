@@ -42,11 +42,20 @@ final class TodoItem {
     var completedAt: Date?
     var dueDate: Date?
     var hasDueTime: Bool = false
-    /// A due date is when you plan to do it; the deadline is the last moment
-    /// it may be done. Kept separate so a task can have both.
+    /// Non-nil turns `dueDate` into the start of a range; `dueDate` alone is a deadline.
+    var endDate: Date?
+    var startReminderEnabled: Bool = false
+    var startReminderLeadMinutes: Int = 60
+    var endReminderEnabled: Bool = false
+    var endReminderLeadMinutes: Int = 1440
+
+    /// Superseded by `endDate`; kept only so old rows can be migrated in place.
     var deadline: Date?
     var deadlineReminderEnabled: Bool = false
     var deadlineLeadMinutes: Int = 1440
+
+    /// The day a task belongs to: the end of a range, otherwise its only date.
+    var focusDate: Date? { endDate ?? dueDate }
     var priorityRaw: Int = TaskPriority.none.rawValue
     var createdAt: Date = Date()
     /// Fractional index keeps manual ordering cheap; ties fall back to title.

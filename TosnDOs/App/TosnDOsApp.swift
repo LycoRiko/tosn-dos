@@ -76,6 +76,7 @@ struct RootView: View {
             #if os(iOS)
             PhoneWatchSync.shared.start(context: context)
             #endif
+            TimeMerge.runIfNeeded(context)
             checkRepeat()
         }
         .onChange(of: scenePhase) { _, phase in

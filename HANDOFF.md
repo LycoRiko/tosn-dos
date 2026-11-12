@@ -460,6 +460,23 @@ Debug 构建下保存失败会直接崩，改成打印。
 
 **回归**：三端编译通过；测试 15 项全过。
 
+#### 5.24 时间合并 · 第一批落地（2026-11-12）
+
+已完成（模型层，可编译、旧数据可迁移）：
+
+- `TodoItem` 新增 `endDate` / `startReminderEnabled` / `startReminderLeadMinutes` /
+  `endReminderEnabled` / `endReminderLeadMinutes`，以及只读的 `focusDate`（= `endDate ?? dueDate`）。
+- `deadline` 三个旧字段保留但**停止写入**，留给下个版本删除。
+- `TimeMerge.runIfNeeded`：启动时按 `data.version < 2` 一次性搬运，迁移后写版本号。
+- Today / Upcoming / No date / 排序全部改看 `focusDate`，跨天任务因此计入**结束那天**的圆环。
+- 提醒拆成 `.start` / `.end` 两条，`remove` 一并清理，避免改时间后留孤儿。
+
+**还没做**（下一批）：
+- 编辑器 UI 合并（删「最后期限」块，改成一个开关 + 时间范围 + 两个提醒）
+- 设置页「新建任务默认提醒」与三种方式开关
+- 迁移与双提醒的单元测试
+- 跨天范围在列表行的显示（`18:00–明天 02:00`）
+
 ### 5.23 时间合并 · 定稿方案（2026-11-12 回答后）
 
 **开关语义（一个开关，两种模式，默认关）**

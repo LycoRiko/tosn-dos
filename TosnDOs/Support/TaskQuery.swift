@@ -30,13 +30,13 @@ enum TaskQuery {
                 guard !item.isCompleted, !item.isWaiting else { return false }
                 return isDueToday(item, endOfToday: endOfToday)
             case .smart(.upcoming):
-                guard !item.isCompleted, let due = item.dueDate else { return false }
+                guard !item.isCompleted, let due = item.focusDate else { return false }
                 return due >= endOfToday
             case .smart(.waiting):
                 // Waiting tasks stay out of every count; this scope only surfaces them.
                 return !item.isCompleted && item.isWaiting
             case .smart(.noDate):
-                return !item.isCompleted && !item.isWaiting && item.dueDate == nil
+                return !item.isCompleted && !item.isWaiting && item.focusDate == nil
             case .smart(.all):
                 return !item.isCompleted
             case .smart(.completed):
@@ -101,7 +101,7 @@ enum TaskQuery {
                 // Checked before the date buckets: a parked task stays parked
                 // even if its due date has passed.
                 kind = .waiting
-            } else if let due = item.dueDate {
+            } else if let due = item.focusDate {
                 if item.hasDueTime ? (due < now) : (due < startOfToday) {
                     kind = .overdue
                 } else if due < endOfToday {
