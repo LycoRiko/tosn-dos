@@ -6048,6 +6048,28 @@
           }
         }
       }
+    },
+    "Materials are included in backups when you export them.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出备份时会一并带上材料。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "匯出備份時會一併帶上素材。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックアップに書き出すと素材も含まれます。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

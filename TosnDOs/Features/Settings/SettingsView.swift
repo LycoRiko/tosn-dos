@@ -6,7 +6,7 @@ struct SettingsView: View {
     @AppStorage(PreferenceKey.appearance) private var appearance = AppearanceMode.system.rawValue
     @AppStorage(PreferenceKey.showCompleted) private var showCompleted = true
     @AppStorage(PreferenceKey.templateDueToday) private var templateDueToday = true
-    @AppStorage(PreferenceKey.saveShotToEvidence) private var saveShotToEvidence = true
+    @AppStorage(PreferenceKey.saveShotToEvidence) private var saveShotToEvidence = false
     @AppStorage(PreferenceKey.backupEvidenceScope) private var backupScope = BackupEvidenceScope.textOnly.rawValue
     @AppStorage(PreferenceKey.optimizeImages) private var optimizeImages = true
     @AppStorage(BackgroundKey.imageName) private var backgroundImage = ""
@@ -116,7 +116,6 @@ struct SettingsView: View {
             Section {
                 Toggle("Show completed tasks", isOn: $showCompleted)
                 Toggle("New lists from templates start today", isOn: $templateDueToday)
-                Toggle("Keep screenshots in materials", isOn: $saveShotToEvidence)
                 Toggle("Keep screenshots in materials", isOn: $saveShotToEvidence)
             } header: {
                 Text("Tasks")

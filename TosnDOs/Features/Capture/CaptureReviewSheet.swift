@@ -6,7 +6,7 @@ struct CaptureReviewSheet: View {
 
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-    @AppStorage(PreferenceKey.saveShotToEvidence) private var keepScreenshot = true
+    @AppStorage(PreferenceKey.saveShotToEvidence) private var keepScreenshot = false
 
     @Query(sort: \TodoList.sortIndex) private var lists: [TodoList]
 
