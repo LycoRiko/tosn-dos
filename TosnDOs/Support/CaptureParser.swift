@@ -16,6 +16,8 @@ struct CapturedTask: Identifiable, Equatable {
     let id = UUID()
     var title: String
     var dueDate: Date?
+    /// Set when the line carried a range; the review sheet keeps it.
+    var endDate: Date?
     var hasTime: Bool
     var place: String?
     var sourceLine: String
@@ -93,7 +95,9 @@ enum CaptureParser {
 
             guard !title.isEmpty, title.count <= 200 else { continue }
 
-            let key = title.lowercased() + "|" + (parsed.dueDate.map { String(Int($0.timeIntervalSince1970 / 86_400)) } ?? "-")
+            let key = title.lowercased()
+                + "|" + (parsed.dueDate.map { String(Int($0.timeIntervalSince1970 / 86_400)) } ?? "-")
+                + "|" + (parsed.endDate.map { String(Int($0.timeIntervalSince1970 / 86_400)) } ?? "-")
             guard !seen.contains(key) else { continue }
             seen.insert(key)
 
@@ -101,6 +105,7 @@ enum CaptureParser {
                 CapturedTask(
                     title: title,
                     dueDate: parsed.dueDate,
+                    endDate: parsed.endDate,
                     hasTime: parsed.hasTime,
                     place: place,
                     sourceLine: row

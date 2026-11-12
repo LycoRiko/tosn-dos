@@ -258,6 +258,38 @@ struct LogicTests {
         #expect(NaturalDateParser.parse("迟到了要罚钱", now: now, calendar: calendar).dueDate == nil)
     }
 
+
+    // MARK: - 跨天归属
+
+    /// A range shows on every day it touches but counts only where it ends.
+    @Test func rangeCountsOnlyOnItsLastDay() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let list = TodoList(title: "Shift")
+        context.insert(list)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10))!
+
+        // 18:00 today → 02:00 tomorrow: visible today, counted tomorrow.
+        let ahead = TodoItem(title: "night shift", dueDate: now, hasDueTime: true, list: list, sortIndex: 0)
+        ahead.dueDate = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: now)
+        ahead.endDate = calendar.date(byAdding: .day, value: 1,
+                                      to: calendar.date(bySettingHour: 2, minute: 0, second: 0, of: now)!)
+
+        // 22:00 yesterday → 02:00 today: visible today, counted today.
+        let ended = TodoItem(title: "last night", dueDate: now, hasDueTime: true, list: list, sortIndex: 1)
+        ended.dueDate = calendar.date(byAdding: .day, value: -1,
+                                      to: calendar.date(bySettingHour: 22, minute: 0, second: 0, of: now)!)
+        ended.endDate = calendar.date(bySettingHour: 2, minute: 0, second: 0, of: now)
+        try context.save()
+
+        let snapshot = TodayScope.snapshot(from: [ahead, ended], now: now, calendar: calendar)
+        #expect(snapshot.open.count == 2, "both are visible today")
+        #expect(snapshot.total == 1, "only the one ending today is counted")
+    }
+
     // MARK: - 稍后提醒
 
     private func date(_ hour: Int, _ minute: Int = 0) -> Date {

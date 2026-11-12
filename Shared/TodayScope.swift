@@ -20,6 +20,14 @@ enum TodayScope {
         calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? now
     }
 
+    /// A range is shown on every day it touches but counted only on the day it ends,
+    /// so one overnight shift does not inflate two rings.
+    static func counts(_ item: TodoItem, endOfToday: Date) -> Bool {
+        guard let end = item.endDate else { return isDue(item, endOfToday: endOfToday) }
+        let startOfToday = endOfToday.addingTimeInterval(-86_400)
+        return end < endOfToday && end >= startOfToday
+    }
+
     /// Due date first, then priority, then insertion order. Both the hero and
     /// the widget read the order from here.
     static func sort(_ items: [TodoItem]) -> [TodoItem] {
@@ -39,9 +47,10 @@ enum TodayScope {
         calendar: Calendar = .current
     ) -> TodaySnapshot {
         let end = endOfToday(now, calendar: calendar)
-        let todays = all.filter { !$0.isWaiting && isDue($0, endOfToday: end) }
-        let done = todays.reduce(0) { $0 + ($1.isCompleted ? 1 : 0) }
-        return TodaySnapshot(done: done, total: todays.count, open: sort(todays.filter { !$0.isCompleted }))
+        let shown = all.filter { !$0.isWaiting && isDue($0, endOfToday: end) }
+        let counted = shown.filter { counts($0, endOfToday: end) }
+        let done = counted.reduce(0) { $0 + ($1.isCompleted ? 1 : 0) }
+        return TodaySnapshot(done: done, total: counted.count, open: sort(shown.filter { !$0.isCompleted }))
     }
 }
 

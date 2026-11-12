@@ -21,6 +21,7 @@ struct CaptureReviewSheet: View {
         var isSelected: Bool
         var title: String
         var dueDate: Date?
+        var endDate: Date?
         var hasTime: Bool
         var place: String
     }
@@ -32,6 +33,7 @@ struct CaptureReviewSheet: View {
                 isSelected: !$0.isEmptyTitle,
                 title: $0.title,
                 dueDate: $0.dueDate,
+                endDate: $0.endDate,
                 hasTime: $0.hasTime,
                 place: $0.place ?? ""
             )
@@ -211,6 +213,7 @@ struct CaptureReviewSheet: View {
                 list: chosenList,
                 sortIndex: nextIndex
             )
+            task.endDate = row.endDate
             context.insert(task)
             nextIndex += 1
 
