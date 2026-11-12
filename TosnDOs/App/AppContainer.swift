@@ -22,14 +22,5 @@ enum AppContainer {
             case .deviceOnly: return String(localized: "On this device")
             }
         }
-
-        var detail: String {
-            switch self {
-            case .iCloud:
-                return String(localized: "Your lists stay in sync across your devices and appear in the widget.")
-            case .deviceOnly:
-                return String(localized: "Your lists are saved on this device. Nothing is uploaded, and nothing is lost.")
-            }
-        }
     }
 }

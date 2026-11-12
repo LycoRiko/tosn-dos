@@ -292,6 +292,47 @@ struct LogicTests {
 
 
 
+
+    // MARK: - 大清单
+
+    /// Nothing here was ever measured. A loose bound only: it catches a change that
+    /// turns filtering quadratic, not a 10% regression.
+    @Test func aLargeListStaysResponsive() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let list = TodoList(title: "Big")
+        context.insert(list)
+
+        let now = Date()
+        for index in 0..<500 {
+            let task = TodoItem(
+                title: "task \(index)",
+                dueDate: now.addingTimeInterval(Double(index) * 60),
+                hasDueTime: true,
+                list: list,
+                sortIndex: Double(index)
+            )
+            context.insert(task)
+        }
+        try context.save()
+
+        let all = try context.fetch(FetchDescriptor<TodoItem>())
+
+        let snapshotStart = Date()
+        let snapshot = TodayScope.snapshot(from: all, now: now)
+        let snapshotCost = Date().timeIntervalSince(snapshotStart)
+
+        let queryStart = Date()
+        let todays = TaskQuery.items(from: all, scope: .smart(.today), lists: [], tags: [])
+        let queryCost = Date().timeIntervalSince(queryStart)
+
+        print(String(format: "perf · 500 tasks · snapshot %.1f ms · query %.1f ms · %d open",
+                     snapshotCost * 1000, queryCost * 1000, todays.count))
+        #expect(snapshot.total > 0)
+        #expect(snapshotCost < 0.5, "snapshot must not crawl on a big list")
+        #expect(queryCost < 0.5, "filtering must not crawl on a big list")
+    }
+
     // MARK: - 重复模板账本
 
     private func scheduleCalendar() -> Calendar {

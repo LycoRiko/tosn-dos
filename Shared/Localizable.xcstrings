@@ -4397,50 +4397,6 @@
         }
       }
     },
-    "These switches apply to every window and are shared with iCloud.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "これらのスイッチはすべてのウインドウに適用され、iCloud で共有されます。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这些开关对所有窗口生效，并通过 iCloud 同步。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "這些開關對所有視窗生效，並透過 iCloud 同步。"
-          }
-        }
-      }
-    },
-    "These switches are also available in Settings › Tos'n DOs.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "これらのスイッチは「設定 › Tos'n DOs」にもあります。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这些开关在「设置 › Tos'n DOs」里也有。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "這些開關在「設定 › Tos'n DOs」裡也有。"
-          }
-        }
-      }
-    },
     "This list is empty": {
       "localizations": {
         "ja": {
@@ -5059,50 +5015,6 @@
         }
       }
     },
-    "Your lists are saved on this device. Nothing is uploaded, and nothing is lost.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リストはこのデバイスに保存されます。何もアップロードされず、失われることもありません。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清单保存在这台设备上，不上传，也不会丢。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清單保存在這台裝置上，不上傳，也不會遺失。"
-          }
-        }
-      }
-    },
-    "Your lists stay in sync across your devices and appear in the widget.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リストは各デバイス間で同期され、ウィジェットにも表示されます。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清单会在你的设备之间同步，也会显示在小组件里。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "清單會在你的裝置之間同步，也會顯示在 widget 裡。"
-          }
-        }
-      }
-    },
     "Materials": {
       "localizations": {
         "zh-Hans": {
@@ -5385,28 +5297,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "画像を最適化"
-          }
-        }
-      }
-    },
-    "One file with every list and template. Screenshots make it much larger, so they are optional. Restoring asks whether to merge or replace.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一个文件装下所有清单和模板。截图会让它变大，所以是可选项。恢复时会问合并还是覆盖。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一個檔案裝下所有清單和模板。截圖會讓它變大，所以是可選項。恢復時會問合併還是覆蓋。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのリストとテンプレートを 1 ファイルに。スクリーンショットは大きくなるため任意です。復元時に統合か置換かを選びます。"
           }
         }
       }
@@ -6269,28 +6159,6 @@
         }
       }
     },
-    "Tasks created from the quick-add bar start with this reminder.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从快速输入栏新建的任务会带上这个提醒。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "從快速輸入列新建的任務會帶上這個提醒。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "クイック追加で作ったタスクにこの通知が付きます。"
-          }
-        }
-      }
-    },
     "How to remind": {
       "localizations": {
         "zh-Hans": {
@@ -6352,7 +6220,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "時差し迫った通知"
+            "value": "緊急通知"
           }
         }
       }
