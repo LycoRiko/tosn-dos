@@ -6,6 +6,12 @@ enum TodayScope {
     /// A due date belongs to today when it falls before tomorrow's midnight,
     /// so anything overdue is rolled in.
     static func isDue(_ item: TodoItem, endOfToday: Date) -> Bool {
+        // A range shows on every day it touches, so a shift running into tomorrow
+        // does not vanish at midnight.
+        if let end = item.endDate, let start = item.dueDate {
+            let startOfToday = endOfToday.addingTimeInterval(-86_400)
+            return start < endOfToday && end >= startOfToday
+        }
         guard let due = item.focusDate else { return false }
         return due < endOfToday
     }
