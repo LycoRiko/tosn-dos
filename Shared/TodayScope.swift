@@ -6,14 +6,32 @@ enum TodayScope {
     /// A due date belongs to today when it falls before tomorrow's midnight,
     /// so anything overdue is rolled in.
     static func isDue(_ item: TodoItem, endOfToday: Date) -> Bool {
-        // A range shows on every day it touches, so a shift running into tomorrow
-        // does not vanish at midnight.
-        if let end = item.endDate, let start = item.dueDate {
-            let startOfToday = endOfToday.addingTimeInterval(-86_400)
-            return start < endOfToday && end >= startOfToday
+        // A range shows on every day it touches — and an unfinished range that
+        // ended yesterday still rolls in, the same way an overdue deadline does.
+        if item.endDate != nil, let start = item.dueDate {
+            return start < endOfToday
         }
         guard let due = item.focusDate else { return false }
         return due < endOfToday
+    }
+
+    /// Where a task sits on a list page. A range is filed under the day it
+    /// touches, so an overnight shift stays under Today instead of Upcoming.
+    enum DayBucket { case overdue, today, upcoming }
+
+    static func dayBucket(
+        _ item: TodoItem,
+        now: Date,
+        startOfToday: Date,
+        endOfToday: Date
+    ) -> DayBucket? {
+        if let end = item.endDate, let start = item.dueDate {
+            if end < startOfToday { return .overdue }
+            return start < endOfToday ? .today : .upcoming
+        }
+        guard let due = item.focusDate else { return nil }
+        if item.hasDueTime ? (due < now) : (due < startOfToday) { return .overdue }
+        return due < endOfToday ? .today : .upcoming
     }
 
     static func endOfToday(_ now: Date = .now, calendar: Calendar = .current) -> Date {

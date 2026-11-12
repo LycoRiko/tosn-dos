@@ -290,6 +290,61 @@ struct LogicTests {
         #expect(snapshot.total == 1, "only the one ending today is counted")
     }
 
+    @Test func overdueRangeRollsIntoToday() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let list = TodoList(title: "Shift")
+        context.insert(list)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10))!
+
+        // Yesterday 10:00–18:00, never ticked: overdue, so it must still be here.
+        let stale = TodoItem(title: "yesterday", dueDate: now, hasDueTime: true, list: list, sortIndex: 0)
+        stale.dueDate = calendar.date(byAdding: .day, value: -1,
+                                      to: calendar.date(bySettingHour: 10, minute: 0, second: 0, of: now)!)
+        stale.endDate = calendar.date(byAdding: .day, value: -1,
+                                      to: calendar.date(bySettingHour: 18, minute: 0, second: 0, of: now)!)
+        try context.save()
+
+        let snapshot = TodayScope.snapshot(from: [stale], now: now, calendar: calendar)
+        #expect(snapshot.open.count == 1, "an overdue range rolls in like an overdue deadline")
+        #expect(snapshot.total == 0, "but it never counts toward today's ring")
+    }
+
+    @Test func dayBucketsFollowTheDayARangeTouches() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let list = TodoList(title: "Shift")
+        context.insert(list)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10))!
+        let startOfToday = calendar.startOfDay(for: now)
+        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday)!
+
+        func bucket(_ start: Date, _ end: Date) -> TodayScope.DayBucket? {
+            let item = TodoItem(title: "shift", dueDate: start, hasDueTime: true, list: list, sortIndex: 0)
+            item.endDate = end
+            context.insert(item)
+            return TodayScope.dayBucket(item, now: now, startOfToday: startOfToday, endOfToday: endOfToday)
+        }
+
+        let tonight = calendar.date(bySettingHour: 22, minute: 0, second: 0, of: now)!
+        let tomorrowEarly = calendar.date(byAdding: .hour, value: 4, to: tonight)!
+        let lastNight = calendar.date(byAdding: .day, value: -1, to: tonight)!
+        let tomorrowNight = calendar.date(byAdding: .day, value: 1, to: tonight)!
+
+        #expect(bucket(tonight, tomorrowEarly) == .today, "an overnight shift is today's work")
+        #expect(bucket(lastNight, tonight) == .today, "it started yesterday but ends today")
+        #expect(bucket(calendar.date(byAdding: .hour, value: -12, to: lastNight)!,
+                       calendar.date(byAdding: .hour, value: -4, to: lastNight)!) == .overdue,
+                "a range that ended yesterday is overdue")
+        #expect(bucket(tomorrowNight, calendar.date(byAdding: .hour, value: 4, to: tomorrowNight)!) == .upcoming)
+    }
+
 
 
 

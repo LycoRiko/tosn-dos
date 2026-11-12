@@ -20,7 +20,8 @@ enum TaskQuery {
         now: Date = .now,
         calendar: Calendar = .current
     ) -> [TodoItem] {
-        let endOfToday = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? now
+        let startOfToday = calendar.startOfDay(for: now)
+        let endOfToday = calendar.date(byAdding: .day, value: 1, to: startOfToday) ?? now
 
         var result: [TodoItem] = all.filter { item in
             switch scope {
@@ -30,8 +31,11 @@ enum TaskQuery {
                 guard !item.isCompleted, !item.isWaiting else { return false }
                 return isDueToday(item, endOfToday: endOfToday)
             case .smart(.upcoming):
-                guard !item.isCompleted, let due = item.focusDate else { return false }
-                return due >= endOfToday
+                guard !item.isCompleted else { return false }
+                let bucket = TodayScope.dayBucket(item, now: now,
+                                                  startOfToday: startOfToday,
+                                                  endOfToday: endOfToday)
+                return bucket == .upcoming
             case .smart(.waiting):
                 // Waiting tasks stay out of every count; this scope only surfaces them.
                 return !item.isCompleted && item.isWaiting
@@ -101,13 +105,13 @@ enum TaskQuery {
                 // Checked before the date buckets: a parked task stays parked
                 // even if its due date has passed.
                 kind = .waiting
-            } else if let due = item.focusDate {
-                if item.hasDueTime ? (due < now) : (due < startOfToday) {
-                    kind = .overdue
-                } else if due < endOfToday {
-                    kind = .today
-                } else {
-                    kind = .upcoming
+            } else if let bucket = TodayScope.dayBucket(item, now: now,
+                                                        startOfToday: startOfToday,
+                                                        endOfToday: endOfToday) {
+                switch bucket {
+                case .overdue: kind = .overdue
+                case .today: kind = .today
+                case .upcoming: kind = .upcoming
                 }
             } else {
                 kind = .anytime
