@@ -446,6 +446,12 @@ struct TaskEditorView: View {
             ))
             .font(.system(size: 15))
             .onSubmit(save)
+
+            if evidence.kind == .time {
+                Text("Display only")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
         }
     }
 

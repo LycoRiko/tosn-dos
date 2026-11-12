@@ -7,6 +7,7 @@ enum PreferenceKey {
     static let templateDueToday = "pref.templateDueToday"
     static let hasOnboarded = "pref.hasOnboarded"
     static let saveShotToEvidence = "pref.saveShotToEvidence"
+    static let hasAskedShotPreference = "pref.hasAskedShotPreference"
     static let backupEvidenceScope = "pref.backupEvidenceScope"
     static let optimizeImages = "pref.optimizeImages"
 }

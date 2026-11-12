@@ -100,15 +100,17 @@ struct RootView: View {
                 CaptureReviewSheet(draft: draft)
             }
         }
-        .alert(repeatPrompt?.title ?? "", isPresented: repeatAlertShown) {
+        .confirmationDialog(
+            repeatPrompt?.title ?? "",
+            isPresented: repeatAlertShown,
+            titleVisibility: .visible
+        ) {
             if let prompt = repeatPrompt {
-                if prompt.count == 1 {
-                    Button("Add it") { resolve(.latest, prompt) }
-                } else {
-                    Button("Add just one") { resolve(.latest, prompt) }
-                    Button(allButtonLabel(prompt)) { resolve(.all, prompt) }
+                Button(latestLabel) { resolve(.latest, prompt) }
+                if prompt.count > 1 {
+                    Button(allLabel(prompt)) { resolve(.all, prompt) }
                 }
-                Button("Don't add", role: .cancel) { resolve(.skip, prompt) }
+                Button(skipLabel, role: .cancel) { resolve(.skip, prompt) }
             }
         } message: {
             if let prompt = repeatPrompt {
@@ -140,15 +142,16 @@ struct RootView: View {
         return "\(cadence)\n\(previous)"
     }
 
-    private func allButtonLabel(_ prompt: RepeatService.Prompt) -> String {
-        let unit: String
-        switch prompt.rule {
-        case .daily: unit = String(localized: "days")
-        case .weekly: unit = String(localized: "weeks")
-        case .monthly: unit = String(localized: "months")
-        case .off: unit = String(localized: "lists")
-        }
-        return String(localized: "Add all \(prompt.count) \(unit)")
+    private var latestLabel: String {
+        String(localized: "Catch up the latest — 1 list")
+    }
+
+    private func allLabel(_ prompt: RepeatService.Prompt) -> String {
+        String(localized: "Catch up all \(prompt.count) — \(prompt.count) lists")
+    }
+
+    private var skipLabel: String {
+        String(localized: "Skip these — they will not be asked again")
     }
 
     private var repeatAlertShown: Binding<Bool> {

@@ -7,6 +7,8 @@ struct CaptureReviewSheet: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @AppStorage(PreferenceKey.saveShotToEvidence) private var keepScreenshot = false
+    @AppStorage(PreferenceKey.hasAskedShotPreference) private var hasAskedShot = false
+    @State private var asksAboutScreenshot = false
 
     @Query(sort: \TodoList.sortIndex) private var lists: [TodoList]
 
@@ -84,6 +86,24 @@ struct CaptureReviewSheet: View {
             .groupedRows()
             .scrollContentBackground(.hidden)
             .background(AppBackground())
+            .task {
+                // Ask once, then let the switch in Settings own the answer.
+                if !hasAskedShot && draft.imageData != nil {
+                    asksAboutScreenshot = true
+                }
+            }
+            .alert("Keep this screenshot in the task?", isPresented: $asksAboutScreenshot) {
+                Button("Keep it") {
+                    keepScreenshot = true
+                    hasAskedShot = true
+                }
+                Button("Don't keep it", role: .cancel) {
+                    keepScreenshot = false
+                    hasAskedShot = true
+                }
+            } message: {
+                Text("Screenshots are included when you export a backup.")
+            }
             .navigationTitle("Add from screenshot")
             .inlineNavigationTitle()
             .toolbar {

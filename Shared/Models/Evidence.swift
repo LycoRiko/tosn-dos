@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 
 /// Kept separate from `notes` so it can cascade with the task.
+/// `time` is display only: `dueDate` decides the day, the order and the counts.
 enum EvidenceKind: Int, CaseIterable, Identifiable {
     case text = 0
     case image = 1
