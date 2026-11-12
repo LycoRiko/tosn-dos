@@ -56,6 +56,10 @@ enum RepeatService {
         now: Date = .now,
         calendar: Calendar = .current
     ) -> [Date] {
+        // A card can still be laid out once after its template was deleted; reading a
+        // transformable attribute off a detached object traps, so bail out first.
+        guard template.modelContext != nil else { return [] }
+
         let anchor = calendar.startOfDay(for: template.repeatStart ?? template.createdAt)
         return RepeatSchedule.missedStarts(
             anchor: anchor,

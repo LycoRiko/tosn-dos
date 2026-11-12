@@ -12,6 +12,9 @@ struct TemplateLibraryView: View {
     @State private var editorTemplate: ListTemplate?
     @State private var showsNewEditor = false
     @State private var pendingDelete: ListTemplate?
+    /// Behind-counts are computed off-render: reading `periodLog` on a template that
+    /// was deleted mid-frame resolves a fault on detached data and traps.
+    @State private var behindByUID: [UUID: Int] = [:]
 
     private let columns = [GridItem(.adaptive(minimum: 148), spacing: 12)]
 
@@ -70,6 +73,7 @@ struct TemplateLibraryView: View {
             }
         }
         .listStyle(.plain)
+        .task(id: templates.map(\.uid)) { refreshBehind() }
         .confirmationDialog(
             pendingDelete.map { String(localized: "\($0.items?.count ?? 0) tasks will be deleted with this template.") } ?? "",
             isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
@@ -170,10 +174,36 @@ struct TemplateLibraryView: View {
                     MetaChip(icon: "checkmark.square", text: "\(template.checkCount)")
                 }
             }
-            Spacer(minLength: 0)
+            Spacer(minLength: 8)
+
+            // A repeating template that owes periods says so here, instead of only
+            // after opening it.
+            let behind = behindByUID[template.uid] ?? 0
+            if behind > 0 {
+                HStack(spacing: 3) {
+                    Image(systemName: "clock.badge.exclamationmark")
+                        .font(.caption2)
+                    Text("\(behind)")
+                        .font(.caption.weight(.semibold))
+                        .monospacedDigit()
+                }
+                .foregroundStyle(Theme.accent)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text("\(behind) behind"))
+            }
         }
         .padding(.vertical, 4)
         .contentShape(Rectangle())
+    }
+
+    /// Runs on the main actor over live templates only; the cards then read the result.
+    private func refreshBehind() {
+        var next: [UUID: Int] = [:]
+        for template in templates where template.modelContext != nil {
+            guard template.repeatRule != .off else { continue }
+            next[template.uid] = RepeatService.missedPeriods(for: template).count
+        }
+        behindByUID = next
     }
 
     private var newCard: some View {

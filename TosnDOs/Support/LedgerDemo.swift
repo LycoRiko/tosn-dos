@@ -33,7 +33,7 @@ enum LedgerDemo {
         item.template = template
         context.insert(item)
 
-        template.lastGeneratedAt = .now          // no prompt for the demo
+        template.lastGeneratedAt = calendar.date(byAdding: .weekOfYear, value: -1, to: .now)
         try? context.save()
         lastSeededUID = template.uid
     }

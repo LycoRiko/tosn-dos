@@ -465,6 +465,32 @@ Debug 构建下保存失败会直接崩，改成打印。
 **选 B：显示与计数分离。** 跨天任务在它经过的每一天都显示，但**只计入结束那天的圆环**。
 今天的列表里能看到它、能勾，但今天的百分比不算它。
 
+#### 5.38 崩溃：模板删除后读 periodLog（2026-11-12 修复）
+
+**现象**：`EXC_BAD_INSTRUCTION`，栈顶 `ListTemplate.periodLog.getter` →
+`RepeatService.missedPeriods` → `TemplateLibraryView.behindCount`。
+日志原文：`This backing data was detached from a context without resolving attribute faults …
+\ListTemplate.periodLog`。模拟器与 macOS 都中过。
+
+**原因**：5.37 加的"欠 N 期"徽标在**卡片渲染时**读 `periodLog`。模板被删除后，
+`@Query` 的结果要下一帧才刷新，这一帧里卡片仍会画一次，而 `periodLog` 是
+transformable 属性、它的 fault 从未被解析过 → 在已分离的对象上取它会直接 trap。
+
+为什么只有它崩：`title`、`symbol` 这些字段在删除前已经被读过（fault 已解析），
+新建的 `periodLog` 没被读过，正好卡在这个窗口里。
+
+**修法（两层）**
+1. 徽标数字改成**离渲染计算**：`TemplateLibraryView` 用 `@State behindByUID`，
+   在 `.task(id: templates.map(\.uid))` 里对**存活的**模板算一次，卡片只读字典。
+2. `RepeatService.missedPeriods` 增加 `guard template.modelContext != nil else { return [] }`，
+   兜住"已彻底分离"的对象。
+
+**验证**：`-seedLedgerDemo` 每次启动都会先删再建模板，正好是触发路径；
+iOS 模拟器连跑 4 次、macOS 连跑 1 次，均无 fatal；徽标仍正常显示（`docs/showcase/template-behind2.png`）。
+
+**教训（写进约定）**：卡片/列表这类"每帧可能重算"的地方，**不要直接读模型的
+transformable / 关系属性**；要么提前算好放进 @State，要么加 `modelContext` 判空。
+
 #### 5.37 大字号、深色、边界与账本视图（2026-11-12 完成）
 
 **大字号（accessibility-extra-extra-extra-large）实测**：首页大标题会被撑成一屏

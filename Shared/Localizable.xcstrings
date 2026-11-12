@@ -6708,6 +6708,28 @@
           }
         }
       }
+    },
+    "%lld behind": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "欠 %lld 期"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "欠 %lld 期"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 回分たまっています"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
