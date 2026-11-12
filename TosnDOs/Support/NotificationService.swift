@@ -73,8 +73,7 @@ enum NotificationService {
         reschedule(
             identifier: listPrefix + list.uid.uuidString,
             title: list.title,
-            deadline: deadline,
-            leadMinutes: list.deadlineLeadMinutes
+            fireDate: fireDate(anchor: deadline, leadMinutes: list.deadlineLeadMinutes)
         )
     }
 
@@ -108,18 +107,18 @@ enum NotificationService {
             return
         }
 
-        let anchor = task.endDate ?? task.dueDate
+        let end = task.endDate ?? task.dueDate
         reschedule(
             identifier: base + endSuffix,
             title: task.title,
-            deadline: task.endReminderEnabled ? anchor : nil,
-            leadMinutes: task.endReminderLeadMinutes
+            fireDate: task.endReminderEnabled ? fireDate(anchor: end, leadMinutes: task.endReminderLeadMinutes) : nil
         )
         reschedule(
             identifier: base + startSuffix,
             title: task.title,
-            deadline: task.endDate == nil || !task.startReminderEnabled ? nil : task.dueDate,
-            leadMinutes: task.startReminderLeadMinutes
+            fireDate: task.startReminderEnabled && task.endDate != nil
+                ? startFireDate(start: task.dueDate, leadMinutes: task.startReminderLeadMinutes, end: task.endDate)
+                : nil
         )
     }
 
@@ -141,6 +140,21 @@ enum NotificationService {
     /// `remove` clears the two suffixed copies as well, so editing a time cannot
     /// leave an orphaned reminder behind.
 
+    /// A reminder fires this long before the moment it warns about.
+    static func fireDate(anchor: Date?, leadMinutes: Int) -> Date? {
+        guard let anchor else { return nil }
+        return anchor.addingTimeInterval(-Double(leadMinutes) * 60)
+    }
+
+    /// A start reminder must still land before the range ends; a reversed range
+    /// (however it got that way) would otherwise queue a pointless reminder.
+    static func startFireDate(start: Date?, leadMinutes: Int, end: Date?) -> Date? {
+        guard let start else { return nil }
+        let raw = start.addingTimeInterval(-Double(leadMinutes) * 60)
+        guard let end, raw >= end else { return raw }
+        return end.addingTimeInterval(-60)
+    }
+
     // MARK: - Shared plumbing
 
     private static func authorizeIfNeeded() async {
@@ -155,19 +169,12 @@ enum NotificationService {
         )
     }
 
-    /// Drops the old request, then schedules one at `deadline - leadMinutes`.
-    private static func reschedule(
-        identifier: String,
-        title: String,
-        deadline: Date?,
-        leadMinutes: Int
-    ) {
+    /// Drops the old request, then schedules one at the given moment.
+    private static func reschedule(identifier: String, title: String, fireDate: Date?) {
         remove(identifier)
 
         guard UserDefaults.standard.bool(forKey: PreferenceKey.remindViaNotification) else { return }
-        guard let deadline else { return }
-        let fireDate = deadline.addingTimeInterval(-Double(leadMinutes) * 60)
-        guard fireDate > .now else { return }
+        guard let fireDate, fireDate > .now else { return }
 
         let content = UNMutableNotificationContent()
         content.title = title

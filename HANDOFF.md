@@ -465,6 +465,40 @@ Debug 构建下保存失败会直接崩，改成打印。
 **选 B：显示与计数分离。** 跨天任务在它经过的每一天都显示，但**只计入结束那天的圆环**。
 今天的列表里能看到它、能勾，但今天的百分比不算它。
 
+#### 5.31 Live Activity + 时效性通知（2026-11-12 完成）
+
+**做了什么**
+- `Shared/TodoActivityAttributes.swift`：`uid` / `title` + `ContentState(isDone, endsAt)`。
+  放 `Shared/` 是因为 App 与 Widget 扩展都要编译它；整个文件包在 `#if os(iOS)` 里，
+  macOS 上没有 ActivityKit，否则 macOS 编译必挂。
+- `TosnDOsWidget/TodoActivityWidget.swift`：锁屏横幅 + 灵动岛（展开 / 紧凑 / 最小）。
+  倒计时用 `Text(timerInterval:countsDown:)`，系统自己走秒，不需要刷新。
+- `TosnDOs/Support/LiveActivityService.swift`：`refresh(for:)` 一个入口决定 start / update / end。
+  **同时只保留一个活动**，换任务时先把别的结束掉；结束时间超过 8 小时的不起（ActivityKit 上限）。
+- 接线：编辑器每次保存、任务行勾选、删除任务、App 回到前台（`reconcile` 选最近到期的那一条）。
+- Info.plist 加 `NSSupportsLiveActivities`。
+- 时效性通知：设置里打开后 `content.interruptionLevel = .timeSensitive`，DEBUG 打印实际级别。
+
+**模拟器实测**：`xcrun simctl launch … -activityDemo`（DEBUG-only 的临时入口，会造一条 25 分钟后到期、
+开了结束提醒的任务）→ 应用切后台后灵动岛出现「沙漏 + 实时倒计时」，截图存
+`docs/showcase/activity-island.png`。前台时灵动岛不显示内容（系统行为），必须切后台才看得到。
+
+**必须说清的限制**：本地 Live Activity 只能在 App 运行时启动/更新。iOS 不允许一个没有服务端的 App
+在后台某个时刻"自己"起一个活动，所以「到提醒时间自动出现」这件事在本项目约束下**做不到**。
+现在的行为是：回到前台时挑最近到期的一条起活动；App 没打开时只有通知，没有活动。
+要真正实现"到点自动出现"，只能加服务端推送（与本项目"不上云"的约束冲突）。
+
+**清单级截止**：清单只有一条时间，没有可合并的第二条，所以只统一了措辞——
+`Deadline` → `Due`、`Remind me before this deadline` → `Remind me before it is due`，
+和任务页同一套词；模型字段 `deadline` 不动（清单没有 dueDate，改名只是改名）。
+
+**提醒排期重构**：`reschedule` 从「deadline + lead」改为直接收「发送时刻」，
+新增两个纯函数 `fireDate(anchor:leadMinutes:)` 与 `startFireDate(start:leadMinutes:end:)`。
+后者保证开始提醒永远不会落在区间结束之后（迁移出错导致反向区间时的兜底）。
+
+**新增测试 6 项**：迁移三条（单时间搬家 / 双时间变区间 / 版本号只跑一次）、
+提醒时刻三条（提前量、反向区间钳制、正常区间不变）。合计 **35 项全过**；三端编译通过。
+
 #### 5.30 跨天计数 B 口径 + 截图识别同步（2026-11-12 完成）
 
 - `TodayScope.counts(...)`：范围任务在**经过的每一天都显示**（`isDue` 不变），

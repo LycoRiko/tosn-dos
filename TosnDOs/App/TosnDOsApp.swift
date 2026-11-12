@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import UserNotifications
 
 @main
@@ -77,6 +78,11 @@ struct RootView: View {
             PhoneWatchSync.shared.start(context: context)
             #endif
             TimeMerge.runIfNeeded(context)
+            #if DEBUG && os(iOS)
+            if CommandLine.arguments.contains("-activityDemo") {
+                ActivityDemo.seed(context)
+            }
+            #endif
             checkRepeat()
         }
         .onChange(of: scenePhase) { _, phase in
@@ -87,6 +93,9 @@ struct RootView: View {
                 UndoCenter.shared.flush()
             }
             if phase == .active {
+                LiveActivityService.reconcile(
+                    (try? context.fetch(FetchDescriptor<TodoItem>())) ?? []
+                )
                 #if os(iOS)
                 PhoneWatchSync.shared.pushSnapshot()
                 #endif

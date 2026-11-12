@@ -43,11 +43,11 @@ struct ListEditorView: View {
             }
 
             Section {
-                Toggle("Deadline", isOn: $hasDeadline.animation())
+                Toggle("Due", isOn: $hasDeadline.animation())
 
                 if hasDeadline {
                     DatePicker("Date", selection: $deadline)
-                    Toggle("Remind me before this deadline", isOn: $remindBeforeDeadline.animation())
+                    Toggle("Remind me before it is due", isOn: $remindBeforeDeadline.animation())
 
                     if remindBeforeDeadline {
                         Picker("Notify", selection: $leadMinutes) {
@@ -58,9 +58,9 @@ struct ListEditorView: View {
                     }
                 }
             } header: {
-                Text("Deadline")
+                Text("Due")
             } footer: {
-                Text("A deadline belongs to this list, not to a single task.")
+                Text("A due date belongs to this list, not to a single task.")
                     .font(.footnote)
             }
 

@@ -290,6 +290,91 @@ struct LogicTests {
         #expect(snapshot.total == 1, "only the one ending today is counted")
     }
 
+
+    // MARK: - 时间合并迁移
+
+    @Test func migrationMovesALoneDeadlineIntoTheDueDate() throws {
+        UserDefaults.standard.set(0, forKey: "data.version")
+        let context = ModelContext(try memoryContainer())
+        let deadline = date(18)
+
+        let task = TodoItem(title: "old", list: nil, sortIndex: 0)
+        task.deadline = deadline
+        task.deadlineReminderEnabled = true
+        task.deadlineLeadMinutes = 30
+        context.insert(task)
+        try context.save()
+
+        TimeMerge.runIfNeeded(context)
+
+        #expect(task.dueDate == deadline, "the single time becomes the due date")
+        #expect(task.hasDueTime)
+        #expect(task.endReminderEnabled, "the old reminder becomes the end reminder")
+        #expect(task.endReminderLeadMinutes == 30)
+        #expect(task.endDate == nil, "one time stays single-mode")
+        #expect(task.deadline == nil, "the legacy field is emptied")
+        #expect(UserDefaults.standard.integer(forKey: "data.version") == TimeMerge.current)
+    }
+
+    @Test func migrationTurnsTwoTimesIntoARange() throws {
+        UserDefaults.standard.set(0, forKey: "data.version")
+        let context = ModelContext(try memoryContainer())
+        let due = date(10)
+        let deadline = date(18)
+
+        let task = TodoItem(title: "both", dueDate: due, hasDueTime: true, list: nil, sortIndex: 0)
+        task.deadline = deadline
+        task.deadlineReminderEnabled = true
+        task.deadlineLeadMinutes = 15
+        context.insert(task)
+        try context.save()
+
+        TimeMerge.runIfNeeded(context)
+
+        #expect(task.dueDate == due, "the plan time is untouched")
+        #expect(task.endDate == deadline, "the deadline becomes the end of the range")
+        #expect(task.startReminderEnabled)
+        #expect(task.startReminderLeadMinutes == 15)
+    }
+
+    @Test func migrationRunsOnlyOnce() throws {
+        let context = ModelContext(try memoryContainer())
+        let task = TodoItem(title: "already", list: nil, sortIndex: 0)
+        context.insert(task)
+        try context.save()
+
+        UserDefaults.standard.set(TimeMerge.current, forKey: "data.version")
+        task.deadline = date(18)
+        TimeMerge.runIfNeeded(context)
+
+        #expect(task.deadline != nil, "a stamped version means no second pass")
+        UserDefaults.standard.set(0, forKey: "data.version")
+    }
+
+    // MARK: - 双提醒的时刻
+
+    @Test func reminderFiresTheLeadBeforeItsAnchor() {
+        let deadline = date(18)
+        #expect(NotificationService.fireDate(anchor: deadline, leadMinutes: 60)
+                == deadline.addingTimeInterval(-3600))
+        #expect(NotificationService.fireDate(anchor: nil, leadMinutes: 60) == nil)
+    }
+
+    @Test func startReminderNeverLandsAfterTheRangeEnds() {
+        // A reversed range can exist after a bad migration; the reminder must not.
+        let start = date(10)
+        let end = date(9)
+        #expect(NotificationService.startFireDate(start: start, leadMinutes: 0, end: end)
+                == end.addingTimeInterval(-60))
+    }
+
+    @Test func startReminderKeepsItsLeadOnASaneRange() {
+        let start = date(10)
+        let end = date(18)
+        #expect(NotificationService.startFireDate(start: start, leadMinutes: 60, end: end)
+                == start.addingTimeInterval(-3600))
+    }
+
     // MARK: - 稍后提醒
 
     private func date(_ hour: Int, _ minute: Int = 0) -> Date {

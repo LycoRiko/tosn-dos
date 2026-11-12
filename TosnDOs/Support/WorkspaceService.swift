@@ -151,6 +151,7 @@ enum WorkspaceService {
         let uid = task.uid
         let name = task.title
         NotificationService.cancel(task)
+        LiveActivityService.end(for: task, done: false)
         context.delete(task)
         // Removing the last open task is a completion in every way the UI cares about.
         owner?.reconcileCompletion()

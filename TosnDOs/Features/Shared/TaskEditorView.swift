@@ -546,6 +546,7 @@ struct TaskEditorView: View {
 
     private func save() {
         try? context.save()
+        LiveActivityService.refresh(for: task)
     }
 }
 

@@ -6554,6 +6554,28 @@
           }
         }
       }
+    },
+    "A due date belongs to this list, not to a single task.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这条截止时间属于整个清单，不属于某一条任务。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這條截止時間屬於整個清單，不屬於某一條任務。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この期限はリスト全体のもので、個々のタスクのものではありません。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

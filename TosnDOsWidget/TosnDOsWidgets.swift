@@ -121,5 +121,8 @@ struct TodayWidget: Widget {
 struct TosnDOsWidgets: WidgetBundle {
     var body: some Widget {
         TodayWidget()
+        #if os(iOS)
+        TodoActivityWidget()
+        #endif
     }
 }

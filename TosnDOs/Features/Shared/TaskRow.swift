@@ -118,5 +118,6 @@ struct TaskRow: View {
         task.list?.reconcileCompletion()
         onToggle?()
         try? context.save()
+        LiveActivityService.refresh(for: task)
     }
 }
