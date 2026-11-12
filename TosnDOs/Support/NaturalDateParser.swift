@@ -69,7 +69,7 @@ enum NaturalDateParser {
             let period = capture(1, result, text)
             hour = Int(capture(2, result, text) ?? "")
             minute = Int(capture(3, result, text) ?? "") ?? 0
-            hour = adjustedHour(hour, period: period)
+            hour = adjustedHour(hour, period: period, bareIsAfternoon: false)
             text = removing(result.range, from: text)
         }
         // Spoken clock time: 下午3点 / 8点半 / 7点15分
@@ -82,7 +82,7 @@ enum NaturalDateParser {
             } else if let value = Int(tail.replacingOccurrences(of: "分", with: "").trimmingCharacters(in: .whitespaces)) {
                 minute = value
             }
-            hour = adjustedHour(hour, period: period)
+            hour = adjustedHour(hour, period: period, bareIsAfternoon: true)
             text = removing(result.range, from: text)
         }
 
@@ -93,8 +93,8 @@ enum NaturalDateParser {
         var fixedDay: Date?
 
         let dayKeywords: [(String, Int)] = [
-            ("大后天", 3), ("后天", 2), ("明天", 1), ("明日", 1),
-            ("今天", 0), ("今日", 0), ("今晚", 0)
+            ("day after tomorrow", 2), ("大后天", 3), ("后天", 2), ("明天", 1), ("明日", 1),
+            ("tomorrow", 1), ("今天", 0), ("today", 0), ("今日", 0), ("今晚", 0), ("tonight", 0)
         ]
 
         for (keyword, offset) in dayKeywords {
@@ -202,7 +202,10 @@ enum NaturalDateParser {
             let right = String(text[range.upperBound...])
             guard looksLikeTime(left), looksLikeTime(right) else { continue }
             if connector == "-" {
-                guard endsWithClockTime(left), startsWithClockTime(right) else { continue }
+                let clock = endsWithClockTime(left) && startsWithClockTime(right)
+                let spoken = left.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
+                    && right.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
+                guard clock || spoken else { continue }
             }
             return (left, right)
         }
@@ -232,7 +235,7 @@ enum NaturalDateParser {
 
     // MARK: - Helpers
 
-    private static func adjustedHour(_ hour: Int?, period: String?) -> Int? {
+    private static func adjustedHour(_ hour: Int?, period: String?, bareIsAfternoon: Bool) -> Int? {
         guard var hour else { return nil }
         switch period {
         case "下午", "晚上", "傍晚":
@@ -242,8 +245,8 @@ enum NaturalDateParser {
         case "凌晨":
             if hour == 12 { hour = 0 }
         default:
-            // A bare 1–6 is read as afternoon; 7–11 stays morning.
-            if hour < 7 { hour += 12 }
+            // Only a spoken "3点" leans afternoon; "03:00" is taken literally.
+            if bareIsAfternoon, hour < 7 { hour += 12 }
         }
         return min(max(hour, 0), 23)
     }
