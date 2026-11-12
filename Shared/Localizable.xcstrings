@@ -6686,6 +6686,28 @@
           }
         }
       }
+    },
+    "Drop QR share code or .tndbackup to import.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖入分享二维码或 .tndbackup 文件即可导入。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖入分享二維碼或 .tndbackup 檔案即可匯入。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有コードか .tndbackup をドロップして読み込みます。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

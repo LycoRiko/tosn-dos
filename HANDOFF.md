@@ -465,6 +465,21 @@ Debug 构建下保存失败会直接崩，改成打印。
 **选 B：显示与计数分离。** 跨天任务在它经过的每一天都显示，但**只计入结束那天的圆环**。
 今天的列表里能看到它、能勾，但今天的百分比不算它。
 
+#### 5.35 本地化缺口审计（2026-11-12 完成）
+
+扫了 App / Widget / Watch 三个目录里所有 `Text("…")` / `Button("…")` / `Toggle("…")` /
+`Label("…")` / `navigationTitle("…")` 字面量，与 `Localizable.xcstrings` 的键对了一遍：
+
+- 真实缺口只有 **2 条**：`Drop QR share code or .tndbackup to import.`（已补四语言）、
+  以及我在 5.33 引入的 `Remind me before it is due`——它和既有的
+  `Remind me before this is due` 是同一件事的两种说法，**已改回既有键**，不新增文案。
+- `Tos'n DOs` 是产品名，不翻译。
+
+**结论**：文案覆盖率没问题，问题出在"同一件事写了两种说法"——这正是需要靠审计而不是靠眼睛发现的类型。
+
+**顺手验证了 schema 迁移**：在模拟器里用旧构建留下的库直接启动新构建（含新增的 `periodLog`），
+任务、清单、进度环全部正常，没有崩溃或数据丢失。截图 `docs/showcase/after-ledger.png`。
+
 #### 5.34 ⑤ 按期记账（2026-11-12 完成）
 
 **问题（复核后的原话）**：账本只有一个 `lastGeneratedAt`，`resolve` 的三种选择

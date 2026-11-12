@@ -47,7 +47,7 @@ struct ListEditorView: View {
 
                 if hasDeadline {
                     DatePicker("Date", selection: $deadline)
-                    Toggle("Remind me before it is due", isOn: $remindBeforeDeadline.animation())
+                    Toggle("Remind me before this is due", isOn: $remindBeforeDeadline.animation())
 
                     if remindBeforeDeadline {
                         Picker("Notify", selection: $leadMinutes) {
