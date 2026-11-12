@@ -7,6 +7,11 @@ struct SettingsView: View {
     @AppStorage(PreferenceKey.showCompleted) private var showCompleted = true
     @AppStorage(PreferenceKey.templateDueToday) private var templateDueToday = true
     @AppStorage(PreferenceKey.saveShotToEvidence) private var saveShotToEvidence = false
+    @AppStorage(PreferenceKey.defaultReminderEnabled) private var defaultReminder = false
+    @AppStorage(PreferenceKey.defaultReminderLead) private var defaultLead = 1440
+    @AppStorage(PreferenceKey.remindViaNotification) private var remindViaNotification = true
+    @AppStorage(PreferenceKey.remindViaTimeSensitive) private var remindViaTimeSensitive = false
+    @AppStorage(PreferenceKey.remindViaLiveActivity) private var remindViaLiveActivity = false
     @AppStorage(PreferenceKey.backupEvidenceScope) private var backupScope = BackupEvidenceScope.textOnly.rawValue
     @AppStorage(PreferenceKey.optimizeImages) private var optimizeImages = true
     @AppStorage(BackgroundKey.imageName) private var backgroundImage = ""
@@ -111,6 +116,30 @@ struct SettingsView: View {
                 Text("Background")
             } footer: {
                 Text("Shown on every screen that does not have its own photo.")
+            }
+
+            Section {
+                Toggle("Remind me by default", isOn: $defaultReminder)
+                if defaultReminder {
+                    Picker("Lead time", selection: $defaultLead) {
+                        ForEach(NotificationService.leadChoices, id: \.self) { minutes in
+                            Text(NotificationService.title(forLead: minutes)).tag(minutes)
+                        }
+                    }
+                }
+            } header: {
+                Text("New tasks")
+            } footer: {
+                Text("Tasks created from the quick-add bar start with this reminder.")
+                    .font(.footnote)
+            }
+
+            Section {
+                Toggle("Notification", isOn: $remindViaNotification)
+                Toggle("Time sensitive notification", isOn: $remindViaTimeSensitive)
+                Toggle("Live Activity", isOn: $remindViaLiveActivity)
+            } header: {
+                Text("How to remind")
             }
 
             Section {

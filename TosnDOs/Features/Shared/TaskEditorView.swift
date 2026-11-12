@@ -21,16 +21,18 @@ struct TaskEditorView: View {
     @State private var confirmDelete = false
     @State private var hasDue: Bool
     @State private var dueDraft: Date
-    @State private var hasDeadline: Bool
-    @State private var deadlineDraft: Date
+    @State private var endDraft: Date
 
     init(task: TodoItem, onDone: (() -> Void)? = nil) {
         self.task = task
         self.onDone = onDone
         _hasDue = State(initialValue: task.dueDate != nil)
         _dueDraft = State(initialValue: task.dueDate ?? Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now)
-        _hasDeadline = State(initialValue: task.deadline != nil)
-        _deadlineDraft = State(initialValue: task.deadline ?? Calendar.current.date(byAdding: .day, value: 3, to: .now) ?? .now)
+        _endDraft = State(
+            initialValue: task.endDate
+                ?? Calendar.current.date(byAdding: .hour, value: 1, to: task.dueDate ?? .now)
+                ?? .now
+        )
     }
 
     private var rowBackground: Color {
@@ -108,16 +110,6 @@ struct TaskEditorView: View {
                 Text("Waiting")
             } footer: {
                 Text("Waiting tasks move into their own group and stay out of Today and out of every count.")
-                    .font(.footnote)
-            }
-            .listRowBackground(rowBackground)
-
-            Section {
-                deadlineRows
-            } header: {
-                Text("Deadline")
-            } footer: {
-                Text("The last moment this task may be done. Separate from the due date.")
                     .font(.footnote)
             }
             .listRowBackground(rowBackground)
@@ -237,9 +229,13 @@ struct TaskEditorView: View {
         .onChange(of: hasDue) { _, newValue in
             withAnimation {
                 task.dueDate = newValue ? dueDraft : nil
-                if !newValue { task.hasDueTime = false }
+                if !newValue {
+                    task.hasDueTime = false
+                    task.endDate = nil
+                }
             }
             save()
+            syncReminder()
         }
 
         if hasDue {
@@ -247,63 +243,93 @@ struct TaskEditorView: View {
                 selection: $dueDraft,
                 displayedComponents: task.hasDueTime ? [.date, .hourAndMinute] : [.date]
             ) {
-                Text("Date")
+                Text(task.endDate == nil ? "Due" : "From")
             }
             .onChange(of: dueDraft) { _, newValue in
                 task.dueDate = newValue
                 save()
+                syncReminder()
             }
 
             Toggle(isOn: $task.hasDueTime.animation(.easeInOut(duration: 0.2))) {
                 Label("Include time", systemImage: "clock")
             }
-            .onChange(of: task.hasDueTime) { _, _ in save() }
-        }
-    }
-
-    @ViewBuilder
-    private var deadlineRows: some View {
-        Toggle(isOn: $hasDeadline.animation(.spring(response: 0.3, dampingFraction: 0.8))) {
-            Label("Deadline", systemImage: "hourglass")
-        }
-        .onChange(of: hasDeadline) { _, newValue in
-            withAnimation {
-                task.deadline = newValue ? deadlineDraft : nil
-                if !newValue { task.deadlineReminderEnabled = false }
-            }
-            save()
-            syncReminder()
-        }
-
-        if hasDeadline {
-            DatePicker(selection: $deadlineDraft) {
-                Text("Date")
-            }
-            .onChange(of: deadlineDraft) { _, newValue in
-                task.deadline = newValue
+            .onChange(of: task.hasDueTime) { _, on in
+                if !on { task.endDate = nil }
                 save()
                 syncReminder()
             }
 
-            Toggle(isOn: $task.deadlineReminderEnabled.animation(.easeInOut(duration: 0.2))) {
-                Label("Remind me before this deadline", systemImage: "bell")
+            if task.hasDueTime {
+                Toggle(isOn: Binding(
+                    get: { task.endDate != nil },
+                    set: { on in
+                        task.endDate = on
+                            ? Calendar.current.date(byAdding: .hour, value: 1, to: dueDraft)
+                            : nil
+                        if !on { task.startReminderEnabled = false }
+                        save()
+                        syncReminder()
+                    }
+                )) {
+                    Label("Time range", systemImage: "arrow.right")
+                }
+
+                if task.endDate != nil {
+                    DatePicker(selection: $endDraft, displayedComponents: [.date, .hourAndMinute]) {
+                        Text("Until")
+                    }
+                    .onChange(of: endDraft) { _, newValue in
+                        task.endDate = newValue
+                        save()
+                        syncReminder()
+                    }
+                }
             }
-            .onChange(of: task.deadlineReminderEnabled) { _, _ in
+
+            Toggle(isOn: $task.endReminderEnabled) {
+                Label("Remind me before this is due", systemImage: "bell")
+            }
+            .onChange(of: task.endReminderEnabled) { _, _ in
                 save()
                 syncReminder()
             }
 
-            if task.deadlineReminderEnabled {
-                Picker(selection: $task.deadlineLeadMinutes) {
+            if task.endReminderEnabled {
+                Picker(selection: $task.endReminderLeadMinutes) {
                     ForEach(NotificationService.leadChoices, id: \.self) { minutes in
                         Text(NotificationService.title(forLead: minutes)).tag(minutes)
                     }
                 } label: {
                     Text("Notify")
                 }
-                .onChange(of: task.deadlineLeadMinutes) { _, _ in
+                .onChange(of: task.endReminderLeadMinutes) { _, _ in
                     save()
                     syncReminder()
+                }
+            }
+
+            if task.endDate != nil {
+                Toggle(isOn: $task.startReminderEnabled) {
+                    Label("Remind me when it starts", systemImage: "bell.badge")
+                }
+                .onChange(of: task.startReminderEnabled) { _, _ in
+                    save()
+                    syncReminder()
+                }
+
+                if task.startReminderEnabled {
+                    Picker(selection: $task.startReminderLeadMinutes) {
+                        ForEach(NotificationService.leadChoices, id: \.self) { minutes in
+                            Text(NotificationService.title(forLead: minutes)).tag(minutes)
+                        }
+                    } label: {
+                        Text("Notify")
+                    }
+                    .onChange(of: task.startReminderLeadMinutes) { _, _ in
+                        save()
+                        syncReminder()
+                    }
                 }
             }
         }

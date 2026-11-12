@@ -164,6 +164,7 @@ enum NotificationService {
     ) {
         remove(identifier)
 
+        guard UserDefaults.standard.bool(forKey: PreferenceKey.remindViaNotification) else { return }
         guard let deadline else { return }
         let fireDate = deadline.addingTimeInterval(-Double(leadMinutes) * 60)
         guard fireDate > .now else { return }
@@ -173,6 +174,12 @@ enum NotificationService {
         content.body = String(localized: "The deadline is coming up.")
         content.sound = .default
         content.categoryIdentifier = category
+        if UserDefaults.standard.bool(forKey: PreferenceKey.remindViaTimeSensitive) {
+            content.interruptionLevel = .timeSensitive
+        }
+        #if DEBUG
+        print("reminder interruption level: \(content.interruptionLevel.rawValue)")
+        #endif
 
         let components = Calendar.current.dateComponents(
             [.year, .month, .day, .hour, .minute],

@@ -172,8 +172,17 @@ enum DueDateFormat {
         now: Date = .now,
         calendar: Calendar = .current
     ) -> String? {
-        guard let due = item.dueDate else { return nil }
+        guard let due = item.focusDate else { return nil }
         let startOfToday = calendar.startOfDay(for: now)
+
+        if let end = item.endDate, let start = item.dueDate {
+            let left = timeText(start)
+            let right = calendar.isDate(start, inSameDayAs: end)
+                ? timeText(end)
+                : "\(dayText(end, relativeTo: startOfToday, calendar: calendar)) \(timeText(end))"
+            return "\(left)–\(right)"
+        }
+
         let dueDay = calendar.startOfDay(for: due)
 
         if item.isCompleted && !item.hasDueTime {

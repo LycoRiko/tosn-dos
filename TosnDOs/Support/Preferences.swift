@@ -8,6 +8,11 @@ enum PreferenceKey {
     static let hasOnboarded = "pref.hasOnboarded"
     static let saveShotToEvidence = "pref.saveShotToEvidence"
     static let hasAskedShotPreference = "pref.hasAskedShotPreference"
+    static let defaultReminderEnabled = "pref.defaultReminderEnabled"
+    static let defaultReminderLead = "pref.defaultReminderLead"
+    static let remindViaNotification = "pref.remindViaNotification"
+    static let remindViaTimeSensitive = "pref.remindViaTimeSensitive"
+    static let remindViaLiveActivity = "pref.remindViaLiveActivity"
     static let backupEvidenceScope = "pref.backupEvidenceScope"
     static let optimizeImages = "pref.optimizeImages"
 }

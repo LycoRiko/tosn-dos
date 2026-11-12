@@ -78,6 +78,7 @@ struct QuickAddBar: View {
         guard !trimmed.isEmpty else { return }
 
         let parsed = NaturalDateParser.parse(trimmed)
+        let wantsReminder = UserDefaults.standard.bool(forKey: PreferenceKey.defaultReminderEnabled)
         let task = TodoItem(
             title: parsed.title,
             dueDate: parsed.dueDate ?? defaultDue,
@@ -85,6 +86,10 @@ struct QuickAddBar: View {
             list: targetList,
             sortIndex: WorkspaceService.nextTaskIndex(in: targetList)
         )
+        if wantsReminder, task.dueDate != nil {
+            task.endReminderEnabled = true
+            task.endReminderLeadMinutes = UserDefaults.standard.object(forKey: PreferenceKey.defaultReminderLead) as? Int ?? 1440
+        }
         context.insert(task)
         try? context.save()
 
