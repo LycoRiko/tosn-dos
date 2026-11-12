@@ -140,6 +140,22 @@ enum NaturalDateParser {
         }
 
         if dayOffset == nil, weekdayTarget == nil, fixedDay == nil,
+           let result = firstMatch(#"(\d{4})-(\d{1,2})-(\d{1,2})"#, in: text) {
+            if let year = Int(capture(1, result, text) ?? ""),
+               let month = Int(capture(2, result, text) ?? ""),
+               let day = Int(capture(3, result, text) ?? "") {
+                var comps = DateComponents()
+                comps.year = year
+                comps.month = month
+                comps.day = day
+                comps.hour = 0
+                comps.minute = 0
+                fixedDay = calendar.date(from: comps)
+            }
+            text = removing(result.range, from: text)
+        }
+
+        if dayOffset == nil, weekdayTarget == nil, fixedDay == nil,
            let result = firstMatch(#"(\d{1,2})/(\d{1,2})"#, in: text) {
             if let month = Int(capture(1, result, text) ?? ""), let day = Int(capture(2, result, text) ?? "") {
                 var comps = calendar.dateComponents([.year], from: now)
@@ -197,17 +213,30 @@ enum NaturalDateParser {
         let connectors = ["一直到", "直到", "到", "至", "～", "~", "—", "–", "-",
                           " to ", " until ", " till ", " through "]
         for connector in connectors {
-            guard let range = text.range(of: connector) else { continue }
+            guard var range = text.range(of: connector) else { continue }
             let left = String(text[text.startIndex..<range.lowerBound])
             let right = String(text[range.upperBound...])
             guard looksLikeTime(left), looksLikeTime(right) else { continue }
-            if connector == "-" {
-                let clock = endsWithClockTime(left) && startsWithClockTime(right)
-                let spoken = left.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
-                    && right.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
-                guard clock || spoken else { continue }
+            if connector != "-" {
+                // nothing to validate
+            } else {
+                // 2026-11-13 carries hyphens of its own, so try each one.
+                var candidate = range
+                var accepted = false
+                while true {
+                    let l = String(text[text.startIndex..<candidate.lowerBound])
+                    let r = String(text[candidate.upperBound...])
+                    let clock = endsWithClockTime(l) && startsWithClockTime(r)
+                    let spoken = l.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
+                        && r.range(of: #"\d{1,2}\s*点"#, options: .regularExpression) != nil
+                    if clock || spoken { range = candidate; accepted = true; break }
+                    guard let next = text.range(of: connector, range: candidate.upperBound..<text.endIndex) else { break }
+                    candidate = next
+                }
+                guard accepted else { continue }
             }
-            return (left, right)
+            return (String(text[text.startIndex..<range.lowerBound]),
+                    String(text[range.upperBound...]))
         }
         return nil
     }

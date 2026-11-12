@@ -226,7 +226,7 @@ struct LogicTests {
             ("18:00", 18, 0), ("9:30", 9, 30), ("23:00", 23, 0),
             ("下午3点", 15, 0), ("上午9点", 9, 0), ("晚上8点半", 20, 30)
         ]
-        let titles = ["开会", "值班", "写方案", "复盘", "体检", "接人", "整理", "对账"]
+        let titles = ["开会", "值班", "写方案", "复盘", "体检", "接人", "整理", "对账", "寄件", "还书"]
 
         // 1. 单时间：4 天 × 6 时刻 × 5 标题 = 120
         for (dayWord, day) in days {
@@ -243,7 +243,9 @@ struct LogicTests {
             ("18:00", "19:00", 18, 0, 19, 0),
             ("9:30", "11:30", 9, 30, 11, 30),
             ("下午3点", "下午5点", 15, 0, 17, 0),
-            ("上午9点", "中午11点", 9, 0, 11, 0)
+            ("上午9点", "中午11点", 9, 0, 11, 0),
+            ("上午8点", "上午10点", 8, 0, 10, 0),
+            ("晚上7点", "晚上9点", 19, 0, 21, 0)
         ]
         for (dayWord, day) in days {
             for (left, right, lh, lm, rh, _) in pairs {
@@ -279,6 +281,59 @@ struct LogicTests {
         }
 
         return cases
+    }
+
+
+    /// 特殊写法单独断言：这类靠组合生成覆盖不到。
+    @Test func specialDateParsing() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 8 * 3600)!
+        // 2026-11-12 是星期四
+        let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10, minute: 0))!
+
+        func offset(_ date: Date?) -> Int? {
+            guard let date else { return nil }
+            return calendar.dateComponents([.day], from: calendar.startOfDay(for: now),
+                                           to: calendar.startOfDay(for: date)).day
+        }
+
+        // 周末 = 本周六
+        let weekend = NaturalDateParser.parse("周末 10:00 买菜", now: now, calendar: calendar)
+        #expect(offset(weekend.dueDate) == 2)
+        #expect(calendar.component(.hour, from: weekend.dueDate ?? now) == 10)
+
+        // 周X / 下周X
+        #expect(offset(NaturalDateParser.parse("周五 14:00 复盘", now: now, calendar: calendar).dueDate) == 1)
+        #expect(offset(NaturalDateParser.parse("下周三 9:00 面试", now: now, calendar: calendar).dueDate) == 13)
+
+        // 11/15 与 11月15日 等价
+        let slash = NaturalDateParser.parse("11/15 20:00 直播", now: now, calendar: calendar)
+        #expect(offset(slash.dueDate) == 3)
+        let spoken = NaturalDateParser.parse("11月15日 20:00 直播", now: now, calendar: calendar)
+        #expect(offset(spoken.dueDate) == 3)
+
+        // 跨年的月日：10月20日 已经过去 → 落到明年
+        let past = NaturalDateParser.parse("10月20日 开会", now: now, calendar: calendar)
+        #expect(calendar.component(.year, from: past.dueDate ?? now) == 2027)
+
+        // 没有任何日期词 → 不应解析出时间
+        let plain = NaturalDateParser.parse("买咖啡", now: now, calendar: calendar)
+        #expect(plain.dueDate == nil)
+        #expect(plain.title == "买咖啡")
+
+        // 多个时间：取第一个，其余留在标题里
+        let multi = NaturalDateParser.parse("3点和5点开会", now: now, calendar: calendar)
+        #expect(calendar.component(.hour, from: multi.dueDate ?? now) == 15)
+
+        // 误判防护：日期里的连字符不该被当成区间
+        let dated = NaturalDateParser.parse("2026-11-13 10:00-12:00 培训", now: now, calendar: calendar)
+        #expect(offset(dated.dueDate) == 1)
+        #expect(dated.endDate != nil)
+        #expect(calendar.component(.hour, from: dated.endDate ?? now) == 12)
+
+        // 误判防护：到底 / 迟到 不含时间语义
+        #expect(NaturalDateParser.parse("到底要不要去", now: now, calendar: calendar).dueDate == nil)
+        #expect(NaturalDateParser.parse("迟到了要罚钱", now: now, calendar: calendar).dueDate == nil)
     }
 
     @Test func parserAccuracyOnGeneratedInputs() throws {
