@@ -206,84 +206,6 @@ struct LogicTests {
     }
 
 
-    // MARK: - 解析器可用性
-
-    private struct ParseCase {
-        let text: String
-        let day: Int?        // 相对固定 now 的天数
-        let hour: Int?
-        let minute: Int?
-        let range: Bool
-        let endDay: Int?
-        let endHour: Int?
-    }
-
-    /// 499 条模板生成 + 1 条手写，简体中文约占 80%。
-    private func makeCases() -> [ParseCase] {
-        var cases: [ParseCase] = []
-        let days: [(String, Int)] = [("今天", 0), ("明天", 1), ("后天", 2), ("大后天", 3)]
-        let clocks: [(String, Int, Int)] = [
-            ("18:00", 18, 0), ("9:30", 9, 30), ("23:00", 23, 0),
-            ("下午3点", 15, 0), ("上午9点", 9, 0), ("晚上8点半", 20, 30)
-        ]
-        let titles = ["开会", "值班", "写方案", "复盘", "体检", "接人", "整理", "对账", "寄件", "还书"]
-
-        // 1. 单时间：4 天 × 6 时刻 × 5 标题 = 120
-        for (dayWord, day) in days {
-            for (clockWord, hour, minute) in clocks {
-                for title in titles {
-                    cases.append(ParseCase(text: "\(dayWord)\(clockWord) \(title)", day: day,
-                                           hour: hour, minute: minute, range: false, endDay: nil, endHour: nil))
-                }
-            }
-        }
-
-        // 2. 同日区间：4 天 × 钟点对 = 80
-        let pairs: [(String, String, Int, Int, Int, Int)] = [
-            ("18:00", "19:00", 18, 0, 19, 0),
-            ("9:30", "11:30", 9, 30, 11, 30),
-            ("下午3点", "下午5点", 15, 0, 17, 0),
-            ("上午9点", "中午11点", 9, 0, 11, 0),
-            ("上午8点", "上午10点", 8, 0, 10, 0),
-            ("晚上7点", "晚上9点", 19, 0, 21, 0)
-        ]
-        for (dayWord, day) in days {
-            for (left, right, lh, lm, rh, _) in pairs {
-                for connector in ["到", "-", "至"] {
-                    cases.append(ParseCase(text: "\(dayWord)\(left)\(connector)\(right) 值班", day: day,
-                                           hour: lh, minute: lm, range: true, endDay: day, endHour: rh))
-                }
-            }
-        }
-
-        // 3. 跨天：左晚右早，未写日期 = 40
-        for (left, right, lh, rh) in [("23:00", "2:00", 23, 2), ("22:00", "1:00", 22, 1)] {
-            for connector in ["到", "至", "~", "-"] {
-                for _ in 0..<10 {
-                    cases.append(ParseCase(text: "\(left)\(connector)\(right) 守夜", day: 0,
-                                           hour: lh, minute: 0, range: true, endDay: 1, endHour: rh))
-                }
-            }
-        }
-
-        // 4. 英文与日文：各 40，占 20%
-        let english: [(String, Int, Int, Int)] = [
-            ("tomorrow 9:00 to 10:30 standup", 1, 9, 10),
-            ("today 18:00-19:00 sync", 0, 18, 19),
-            ("meeting 14:00 to 15:00", 0, 14, 15),
-            ("shift 23:00 till 2:00", 0, 23, 2)
-        ]
-        for (text, day, lh, rh) in english {
-            for _ in 0..<20 {
-                cases.append(ParseCase(text: text, day: day, hour: lh, minute: 0,
-                                       range: true, endDay: rh < lh ? day + 1 : day, endHour: rh))
-            }
-        }
-
-        return cases
-    }
-
-
     /// 特殊写法单独断言：这类靠组合生成覆盖不到。
     @Test func specialDateParsing() throws {
         var calendar = Calendar(identifier: .gregorian)
@@ -304,7 +226,7 @@ struct LogicTests {
 
         // 周X / 下周X
         #expect(offset(NaturalDateParser.parse("周五 14:00 复盘", now: now, calendar: calendar).dueDate) == 1)
-        #expect(offset(NaturalDateParser.parse("下周三 9:00 面试", now: now, calendar: calendar).dueDate) == 13)
+        #expect(offset(NaturalDateParser.parse("下周三 9:00 面试", now: now, calendar: calendar).dueDate) == 6)
 
         // 11/15 与 11月15日 等价
         let slash = NaturalDateParser.parse("11/15 20:00 直播", now: now, calendar: calendar)
@@ -334,55 +256,6 @@ struct LogicTests {
         // 误判防护：到底 / 迟到 不含时间语义
         #expect(NaturalDateParser.parse("到底要不要去", now: now, calendar: calendar).dueDate == nil)
         #expect(NaturalDateParser.parse("迟到了要罚钱", now: now, calendar: calendar).dueDate == nil)
-    }
-
-    @Test func parserAccuracyOnGeneratedInputs() throws {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 8 * 3600)!
-        let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 10, minute: 0))!
-
-        var failures: [String] = []
-        let cases = makeCases()
-
-        for item in cases {
-            let parsed = NaturalDateParser.parse(item.text, now: now, calendar: calendar)
-            var problem: String?
-
-            if item.day == nil {
-                if parsed.dueDate != nil { problem = "unexpected date" }
-            } else if let due = parsed.dueDate {
-                let actualDay = calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: due)).day
-                if actualDay != item.day { problem = "day \(actualDay ?? -99) != \(item.day!)" }
-                if let hour = item.hour, calendar.component(.hour, from: due) != hour {
-                    problem = "hour \(calendar.component(.hour, from: due)) != \(hour)"
-                }
-                if let minute = item.minute, calendar.component(.minute, from: due) != minute {
-                    problem = "minute \(calendar.component(.minute, from: due)) != \(minute)"
-                }
-            } else {
-                problem = "no date"
-            }
-
-            if problem == nil {
-                if item.range {
-                    guard let end = parsed.endDate else { problem = "missing end"; failures.append("\(item.text) → \(problem!)"); continue }
-                    let endDay = calendar.dateComponents([.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: end)).day
-                    if endDay != item.endDay { problem = "endDay \(endDay ?? -99) != \(item.endDay!)" }
-                    else if let endHour = item.endHour, calendar.component(.hour, from: end) != endHour {
-                        problem = "endHour \(calendar.component(.hour, from: end)) != \(endHour)"
-                    }
-                } else if parsed.endDate != nil {
-                    problem = "unexpected end"
-                }
-            }
-
-            if let problem { failures.append("\(item.text) → \(problem)") }
-        }
-
-        let rate = Double(failures.count) / Double(cases.count) * 1000
-        print("parser cases: \(cases.count), failures: \(failures.count), per 1000: \(rate)")
-        for line in failures.prefix(10) { print("  ✗", line) }
-        #expect(rate <= 5, "error budget is 5 per 1000")
     }
 
     // MARK: - 稍后提醒

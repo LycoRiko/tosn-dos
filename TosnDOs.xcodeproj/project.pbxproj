@@ -6,6 +6,7 @@
 	objectVersion = 77;
 	objects = {
 
+		AA11BB22CC33DD44EE55FF61 /* ParseTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF60 /* ParseTelemetry.swift */; };
 /* Begin PBXBuildFile section */
 		AA11BB22CC33DD44EE55FF5F /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4F /* Preferences.swift */; };
 		AA11BB22CC33DD44EE55FF5E /* TodayScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF4E /* TodayScope.swift */; };
@@ -70,6 +71,7 @@
 		};
 /* End PBXCopyFilesBuildPhase section */
 
+		AA11BB22CC33DD44EE55FF60 /* ParseTelemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/ParseTelemetry.swift"; sourceTree = "<group>"; };
 /* Begin PBXFileReference section */
 		AA11BB22CC33DD44EE55FF4F /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TosnDOs/Support/Preferences.swift"; sourceTree = "<group>"; };
 		AA11BB22CC33DD44EE55FF4E /* TodayScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shared/TodayScope.swift"; sourceTree = "<group>"; };
@@ -436,6 +438,7 @@
 				AA11BB22CC33DD44EE55FF5D /* TaskQuery.swift in Sources */,
 				AA11BB22CC33DD44EE55FF5E /* TodayScope.swift in Sources */,
 				AA11BB22CC33DD44EE55FF5F /* Preferences.swift in Sources */,
+				AA11BB22CC33DD44EE55FF61 /* ParseTelemetry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
