@@ -28,6 +28,7 @@ struct MacRootView: View {
                         }
                         .keyboardShortcut("n", modifiers: .command)
                         .help(Text(isTemplateScope ? "New template" : "New task"))
+                        .accessibilityLabel(Text(isTemplateScope ? "New template" : "New task"))
                     }
                 }
         } detail: {

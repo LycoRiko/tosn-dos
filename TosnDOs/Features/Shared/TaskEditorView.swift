@@ -370,6 +370,7 @@ struct TaskEditorView: View {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 8, weight: .bold))
                             }
+                            .accessibilityHint(Text("Remove tag"))
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(ListPalette.color(tag.colorHex))
                             .padding(.horizontal, 9)
@@ -503,6 +504,7 @@ struct TaskEditorView: View {
                     Image(systemName: subtask.isDone ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 17))
                         .foregroundStyle(subtask.isDone ? Theme.mint : Color.secondary.opacity(0.5))
+                        .accessibilityLabel(subtask.isDone ? Text("Completed") : Text("Complete task"))
                 }
                 .buttonStyle(.plain)
 

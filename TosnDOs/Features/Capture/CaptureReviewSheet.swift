@@ -133,6 +133,8 @@ struct CaptureReviewSheet: View {
                     Image(systemName: row.isSelected.wrappedValue ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 18))
                         .foregroundStyle(row.isSelected.wrappedValue ? Theme.accent : Color.secondary.opacity(0.5))
+                        .accessibilityLabel(Text("Include"))
+                        .accessibilityAddTraits(row.isSelected.wrappedValue ? [.isSelected] : [])
                 }
                 .buttonStyle(.plain)
 
@@ -161,6 +163,7 @@ struct CaptureReviewSheet: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.tertiary)
+                            .accessibilityLabel(Text("Remove date"))
                     }
                     .buttonStyle(.plain)
                 } else {

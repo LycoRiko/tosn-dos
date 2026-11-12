@@ -72,6 +72,8 @@ struct ListEditorView: View {
                         } label: {
                             Image(systemName: name)
                                 .font(.system(size: 17, weight: .medium))
+                                .accessibilityLabel(Text("Icon"))
+                                .accessibilityAddTraits(symbol == name ? [.isSelected] : [])
                                 .foregroundStyle(symbol == name ? Color.white : Color.primary.opacity(0.75))
                                 .frame(width: 40, height: 40)
                                 .background(

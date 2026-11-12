@@ -17,6 +17,8 @@ struct IconColorPicker: View {
                     } label: {
                         Image(systemName: name)
                             .font(.system(size: 16, weight: .medium))
+                            .accessibilityLabel(Text("Icon"))
+                            .accessibilityAddTraits(symbol == name ? [.isSelected] : [])
                             .foregroundStyle(symbol == name ? Color.white : Color.primary.opacity(0.72))
                             .frame(width: 38, height: 38)
                             .background(
