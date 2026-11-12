@@ -10,9 +10,11 @@ enum LedgerDemo {
 
     @MainActor
     static func seed(_ context: ModelContext) {
-        defer { lastSeededUID = nil }
         let existing = (try? context.fetch(FetchDescriptor<ListTemplate>())) ?? []
-        guard !existing.contains(where: { $0.title == "Weekly review" }) else { return }
+        // Start clean each run: a stale copy would still owe periods and pop the prompt.
+        for stale in existing where stale.title == "Weekly review" {
+            context.delete(stale)
+        }
 
         let calendar = Calendar.current
         let anchor = calendar.date(byAdding: .weekOfYear, value: -3, to: calendar.startOfDay(for: .now)) ?? .now
@@ -31,6 +33,7 @@ enum LedgerDemo {
         item.template = template
         context.insert(item)
 
+        template.lastGeneratedAt = .now          // no prompt for the demo
         try? context.save()
         lastSeededUID = template.uid
     }
