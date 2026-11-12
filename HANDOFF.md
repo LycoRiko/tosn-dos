@@ -12,7 +12,7 @@
 | 仓库 | <https://github.com/LycoRiko/tosn-dos>（public，`main`）         |
 | 平台 | iOS 18+ / iPadOS 18+ / macOS 15+ / watchOS 10+，Xcode 26.1.1   |
 | 构建 | 四端全部 `BUILD SUCCEEDED`（iOS / iPad / macOS / watchOS）          |
-| 真机 | iPhone 16 Pro Max（iOS 27.0.1）已装 `1.0-50d8c48`（1.1M，含 5.39），免费账号 7 天有效期   |
+| 真机 | iPhone 16 Pro Max（iOS 27.0.1）已装 `1.0-186cdef`（1.1M，含 5.39），免费账号 7 天有效期   |
 | 签名 | Team `S465RV3CLC`（REGer Bili / Personal Team，免费）              |
 | 版本 | Bundle `com.rikomiyazaki.TosnDOs`（`.widget` / `.watchkitapp`） |
 
@@ -125,7 +125,7 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 于是 `BrowseView.templatesSection` 的 `footer:` 整块删除，只剩 header；
 `Localizable.xcstrings` 里对应键同时移除（325 → 324 条）。
 
-真机包 `1.0-50d8c48` 已装到 iPhone。模拟器实拍确认模板区下方不再有灰字、也没有残留空白。
+真机包已装到 iPhone（代码提交 `50d8c48`，装机时打的是含该提交的 `1.0-186cdef`）。模拟器实拍确认模板区下方不再有灰字、也没有残留空白。
 
 ### 5.1 分享码（已完成，2026-10-22）
 
@@ -1234,9 +1234,9 @@ TodoList
 - 统计页做不做（会不会只是看一眼就再不打开）。
 - 批量操作的手势：右上角「选择」进入多选，还是长按拖选。
 
-**C. 真机验证清单（1.0-50d8c48 已装，按这个顺序点）**
+**C. 真机验证清单（`1.0-186cdef` 已装，按这个顺序点）**
 
-1. 设置页底部版本号 = `1.0-50d8c48`
+1. 设置页底部版本号 = `1.0-<7 位短提交号>`，形如 `1.0-186cdef`
 2. 浏览页模板区：`新建模板` 下面不再有灰字
 3. Live Activity 在锁屏 / 灵动岛的样子；时效性通知（DEBUG 日志里打印的实际级别）
 4. 撤销条位置与文案；删模板 / 删带材料的任务是否弹二次确认
