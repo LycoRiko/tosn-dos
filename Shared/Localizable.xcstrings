@@ -298,28 +298,6 @@
         }
       }
     },
-    "A template is a list you can pull into your workspace again and again — with its checklist already written.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "テンプレートは、チェック項目まで書き終えたリストを何度でも呼び出せるようにしたものです。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "模板就是一张可以反复拉进清单的清单，检查项已经写好了。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "範本就是一張可以反覆拉進清單的清單，檢查項已經寫好了。"
-          }
-        }
-      }
-    },
     "About": {
       "localizations": {
         "ja": {

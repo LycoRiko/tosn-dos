@@ -234,10 +234,6 @@ struct BrowseView: View {
             }
         } header: {
             SectionHeader(title: String(localized: "Templates"), count: templates.count)
-        } footer: {
-            Text("A template is a list you can pull into your workspace again and again — with its checklist already written.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
         }
     }
 
