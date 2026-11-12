@@ -129,9 +129,6 @@ struct SettingsView: View {
                 }
             } header: {
                 Text("New tasks")
-            } footer: {
-                Text("Tasks created from the quick-add bar start with this reminder.")
-                    .font(.footnote)
             }
 
             Section {
@@ -148,34 +145,21 @@ struct SettingsView: View {
                 Toggle("Keep screenshots in materials", isOn: $saveShotToEvidence)
             } header: {
                 Text("Tasks")
-            } footer: {
-                #if os(iOS)
-                Text("These switches are also available in Settings › Tos'n DOs.")
-                #else
-                Text("These switches apply to every window and are shared with iCloud.")
-                #endif
             }
 
+            // Two single-row sections used to repeat their own title as a header and
+            // then float as two bare cards. One card, two rows, no repeated words.
             Section {
                 LabeledContent("Language") {
                     Text(languageName)
                         .foregroundStyle(.secondary)
                 }
-            } header: {
-                Text("Language")
-            } footer: {
-                Text("To change the language, open the Settings app and choose Tos'n DOs.")
-            }
-
-            Section {
                 LabeledContent("Sync") {
                     Text(syncStatus.title)
                         .foregroundStyle(syncStatus.isCloud ? Theme.mint : .secondary)
                 }
-            } header: {
-                Text("Sync")
             } footer: {
-                Text(syncStatus.detail)
+                Text("To change the language, open the Settings app and choose Tos'n DOs.")
             }
 
             Section {
@@ -197,8 +181,6 @@ struct SettingsView: View {
                 }
             } header: {
                 Text("Backup")
-            } footer: {
-                Text("One file with every list and template. Screenshots make it much larger, so they are optional. Restoring asks whether to merge or replace.")
             }
 
             Section {

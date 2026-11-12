@@ -11,6 +11,7 @@ struct TemplateLibraryView: View {
 
     @State private var editorTemplate: ListTemplate?
     @State private var showsNewEditor = false
+    @State private var pendingDelete: ListTemplate?
 
     private let columns = [GridItem(.adaptive(minimum: 148), spacing: 12)]
 
@@ -44,7 +45,7 @@ struct TemplateLibraryView: View {
                                 }
 
                                 Button(role: .destructive) {
-                                    WorkspaceService.delete(template, in: context)
+                                    requestDelete(template)
                                 } label: {
                                     Label("Delete template", systemImage: "trash")
                                 }
@@ -52,7 +53,7 @@ struct TemplateLibraryView: View {
                     }
                     .onDelete { offsets in
                         for index in offsets where index < templates.count {
-                            WorkspaceService.delete(templates[index], in: context)
+                            requestDelete(templates[index])
                         }
                     }
 
@@ -69,6 +70,19 @@ struct TemplateLibraryView: View {
             }
         }
         .listStyle(.plain)
+        .confirmationDialog(
+            pendingDelete.map { String(localized: "\($0.items?.count ?? 0) tasks will be deleted with this template.") } ?? "",
+            isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Delete template and tasks", role: .destructive) {
+                if let template = pendingDelete {
+                    WorkspaceService.delete(template, in: context)
+                }
+                pendingDelete = nil
+            }
+            Button("Keep", role: .cancel) { pendingDelete = nil }
+        }
         .scrollContentBackground(.hidden)
         .background(AppBackground())
         .navigationTitle("Templates")
@@ -100,6 +114,15 @@ struct TemplateLibraryView: View {
     }
 
     // MARK: - Cards
+
+    /// An empty template goes at once; one with tasks asks first, like deleting a list.
+    private func requestDelete(_ template: ListTemplate) {
+        if (template.items ?? []).isEmpty {
+            WorkspaceService.delete(template, in: context)
+        } else {
+            pendingDelete = template
+        }
+    }
 
     @ViewBuilder
     private func card(_ template: ListTemplate) -> some View {

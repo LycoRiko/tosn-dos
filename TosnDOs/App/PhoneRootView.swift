@@ -10,7 +10,13 @@ struct PhoneRootView: View {
     }
 
     @Environment(\.modelContext) private var context
-    @State private var tab: AppTab = .today
+    @State private var tab: AppTab = {
+        // Screenshot aid: launch with -openSettings to land on Settings directly.
+        #if DEBUG
+        if CommandLine.arguments.contains("-openSettings") { return .settings }
+        #endif
+        return .today
+    }()
     @State private var pendingList: UUID?
 
     var body: some View {

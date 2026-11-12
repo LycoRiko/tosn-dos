@@ -6708,6 +6708,50 @@
           }
         }
       }
+    },
+    "%lld tasks will be deleted with this template.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个模板里的 %lld 条任务会一起删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這個模板裡的 %lld 條任務會一起刪除。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このテンプレートの %lld 件のタスクも削除されます。"
+          }
+        }
+      }
+    },
+    "Delete template and tasks": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除模板和任务"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刪除模板和任務"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テンプレートとタスクを削除"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
