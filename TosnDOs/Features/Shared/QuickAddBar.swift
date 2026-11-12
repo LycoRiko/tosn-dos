@@ -86,6 +86,8 @@ struct QuickAddBar: View {
             list: targetList,
             sortIndex: WorkspaceService.nextTaskIndex(in: targetList)
         )
+        task.endDate = parsed.endDate
+
         if wantsReminder, task.dueDate != nil {
             task.endReminderEnabled = true
             task.endReminderLeadMinutes = UserDefaults.standard.object(forKey: PreferenceKey.defaultReminderLead) as? Int ?? 1440

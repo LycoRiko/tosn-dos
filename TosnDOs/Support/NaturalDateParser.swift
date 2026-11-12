@@ -3,7 +3,15 @@ import Foundation
 struct ParsedTaskInput {
     var title: String
     var dueDate: Date?
+    var endDate: Date?
     var hasTime: Bool
+
+    init(title: String, dueDate: Date?, endDate: Date? = nil, hasTime: Bool) {
+        self.title = title
+        self.dueDate = dueDate
+        self.endDate = endDate
+        self.hasTime = hasTime
+    }
 }
 
 /// Small and deliberate: it understands 今天 / 明天 / 周三 / 下午3点 / 15:30 and
@@ -11,6 +19,42 @@ struct ParsedTaskInput {
 enum NaturalDateParser {
 
     static func parse(_ raw: String, now: Date = .now, calendar: Calendar = .current) -> ParsedTaskInput {
+        var text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            return ParsedTaskInput(title: raw, dueDate: nil, hasTime: false)
+        }
+
+        // A range is two expressions joined by a connector; parse each half with the
+        // rules below, then let the end inherit the start's day when it names none.
+        if let parts = splitRange(text) {
+            let left = parseSingle(parts.0, now: now, calendar: calendar)
+            let right = parseSingle(parts.1, now: now, calendar: calendar)
+            if let start = left.dueDate {
+                var end = right.dueDate ?? start
+                if !daysNamed(parts.1) {
+                    end = calendar.date(
+                        bySettingHour: calendar.component(.hour, from: end),
+                        minute: calendar.component(.minute, from: end),
+                        second: 0,
+                        of: start
+                    ) ?? end
+                }
+                if end <= start {
+                    end = calendar.date(byAdding: .day, value: 1, to: end) ?? end
+                }
+                return ParsedTaskInput(
+                    title: left.title.isEmpty ? right.title : left.title,
+                    dueDate: start,
+                    endDate: end,
+                    hasTime: left.hasTime || right.hasTime
+                )
+            }
+        }
+
+        return parseSingle(text, now: now, calendar: calendar)
+    }
+
+    private static func parseSingle(_ raw: String, now: Date, calendar: Calendar) -> ParsedTaskInput {
         var text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else {
             return ParsedTaskInput(title: raw, dueDate: nil, hasTime: false)
@@ -62,7 +106,12 @@ enum NaturalDateParser {
             }
         }
 
-        if dayOffset == nil, let result = firstMatch(#"(下下|下)?\s*(?:周|星期|礼拜)\s*([一二三四五六日天])"#, in: text) {
+        if dayOffset == nil, text.contains("周末") {
+            weekdayTarget = 7
+            text = text.replacingOccurrences(of: "周末", with: "")
+        }
+
+        if dayOffset == nil, weekdayTarget == nil, let result = firstMatch(#"(下下|下)?\s*(?:周|星期|礼拜)\s*([一二三四五六日天])"#, in: text) {
             let prefix = capture(1, result, text) ?? ""
             let dayChar = capture(2, result, text) ?? ""
             weekdayTarget = weekdayNumber(dayChar)
@@ -74,6 +123,25 @@ enum NaturalDateParser {
            let result = firstMatch(#"(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]?"#, in: text) {
             if let month = Int(capture(1, result, text) ?? ""),
                let day = Int(capture(2, result, text) ?? "") {
+                var comps = calendar.dateComponents([.year], from: now)
+                comps.month = month
+                comps.day = day
+                comps.hour = 0
+                comps.minute = 0
+                if var candidate = calendar.date(from: comps) {
+                    if candidate < calendar.startOfDay(for: now) {
+                        comps.year = (comps.year ?? 0) + 1
+                        candidate = calendar.date(from: comps) ?? candidate
+                    }
+                    fixedDay = candidate
+                }
+            }
+            text = removing(result.range, from: text)
+        }
+
+        if dayOffset == nil, weekdayTarget == nil, fixedDay == nil,
+           let result = firstMatch(#"(\d{1,2})/(\d{1,2})"#, in: text) {
+            if let month = Int(capture(1, result, text) ?? ""), let day = Int(capture(2, result, text) ?? "") {
                 var comps = calendar.dateComponents([.year], from: now)
                 comps.month = month
                 comps.day = day
@@ -121,6 +189,47 @@ enum NaturalDateParser {
         return ParsedTaskInput(title: title, dueDate: dueDate, hasTime: hasTime)
     }
 
+    // MARK: - Ranges
+
+    /// Dates are never split: a hyphen only counts when both sides end and start
+    /// with a clock time, so `2026-11-13` stays whole.
+    private static func splitRange(_ text: String) -> (String, String)? {
+        let connectors = ["一直到", "直到", "到", "至", "～", "~", "—", "–", "-",
+                          " to ", " until ", " till ", " through "]
+        for connector in connectors {
+            guard let range = text.range(of: connector) else { continue }
+            let left = String(text[text.startIndex..<range.lowerBound])
+            let right = String(text[range.upperBound...])
+            guard looksLikeTime(left), looksLikeTime(right) else { continue }
+            if connector == "-" {
+                guard endsWithClockTime(left), startsWithClockTime(right) else { continue }
+            }
+            return (left, right)
+        }
+        return nil
+    }
+
+    /// Guards against `到底`, `迟到` and `todo`: the side has to name a time or a day.
+    private static func looksLikeTime(_ fragment: String) -> Bool {
+        if fragment.range(of: #"\d"#, options: .regularExpression) != nil { return true }
+        let days = ["今天", "明天", "后天", "明早", "明晚", "今晚", "次日", "第二天", "周末", "tomorrow", "tonight"]
+        return days.contains { fragment.localizedCaseInsensitiveContains($0) }
+    }
+
+    private static func endsWithClockTime(_ text: String) -> Bool {
+        text.range(of: #"\d{1,2}[:：]\d{2}\s*$"#, options: .regularExpression) != nil
+    }
+
+    private static func startsWithClockTime(_ text: String) -> Bool {
+        text.range(of: #"^\s*\d{1,2}[:：]\d{2}"#, options: .regularExpression) != nil
+    }
+
+    private static func daysNamed(_ text: String) -> Bool {
+        let markers = ["今天", "明天", "后天", "大后天", "明早", "明晚", "今晚", "次日", "第二天",
+                       "周", "星期", "礼拜", "周末", "月", "/", "tomorrow", "tonight", "next"]
+        return markers.contains { text.localizedCaseInsensitiveContains($0) }
+    }
+
     // MARK: - Helpers
 
     private static func adjustedHour(_ hour: Int?, period: String?) -> Int? {
@@ -133,7 +242,8 @@ enum NaturalDateParser {
         case "凌晨":
             if hour == 12 { hour = 0 }
         default:
-            break
+            // A bare 1–6 is read as afternoon; 7–11 stays morning.
+            if hour < 7 { hour += 12 }
         }
         return min(max(hour, 0), 23)
     }
