@@ -293,6 +293,28 @@ struct LogicTests {
 
 
 
+
+    // MARK: - 备份的坏文件
+
+    @Test func aTruncatedBackupIsRejected() {
+        let data = Data(#"{"lists": [{"title": "Work""#.utf8)
+        #expect(throws: (any Error).self) { try BackupFile.decode(data) }
+    }
+
+    @Test func aBackupOfTheWrongShapeIsRejected() {
+        let data = Data(#"{"lists": "nope"}"#.utf8)
+        #expect(throws: (any Error).self) { try BackupFile.decode(data) }
+    }
+
+    @Test func anEmptyFileIsRejected() {
+        #expect(throws: (any Error).self) { try BackupFile.decode(Data()) }
+    }
+
+    @Test func anUnrelatedJSONFileIsRejected() {
+        let data = Data(#"{"hello": "world"}"#.utf8)
+        #expect(throws: (any Error).self) { try BackupFile.decode(data) }
+    }
+
     // MARK: - 大清单
 
     /// Nothing here was ever measured. A loose bound only: it catches a change that
@@ -331,6 +353,35 @@ struct LogicTests {
         #expect(snapshot.total > 0)
         #expect(snapshotCost < 0.5, "snapshot must not crawl on a big list")
         #expect(queryCost < 0.5, "filtering must not crawl on a big list")
+    }
+
+
+    @Test func aVeryLargeListStillLoads() throws {
+        let container = try memoryContainer()
+        let context = ModelContext(container)
+        let list = TodoList(title: "Huge")
+        context.insert(list)
+
+        let now = Date()
+        for index in 0..<2000 {
+            let task = TodoItem(
+                title: "task \(index)",
+                dueDate: now.addingTimeInterval(Double(index) * 60),
+                hasDueTime: true,
+                list: list,
+                sortIndex: Double(index)
+            )
+            context.insert(task)
+        }
+        try context.save()
+        let all = try context.fetch(FetchDescriptor<TodoItem>())
+
+        let start = Date()
+        let snapshot = TodayScope.snapshot(from: all, now: now)
+        let cost = Date().timeIntervalSince(start)
+        print(String(format: "perf · 2000 tasks · snapshot %.1f ms · %d open", cost * 1000, snapshot.open.count))
+        #expect(snapshot.total > 0)
+        #expect(cost < 1.0, "2000 tasks must still be instant")
     }
 
     // MARK: - 重复模板账本

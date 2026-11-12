@@ -9,6 +9,12 @@ struct TosnDOsApp: App {
         NotificationService.registerCategories()
         // Must be set before launch finishes, or cold-start actions are dropped.
         UNUserNotificationCenter.current().delegate = NotificationRouter.shared
+
+        #if DEBUG
+        if CommandLine.arguments.contains("-seedLedgerDemo") {
+            LedgerDemo.seed(AppContainer.boot.container.mainContext)
+        }
+        #endif
     }
 
     #if os(macOS)
@@ -81,6 +87,11 @@ struct RootView: View {
             #if DEBUG && os(iOS)
             if CommandLine.arguments.contains("-activityDemo") {
                 ActivityDemo.seed(context)
+            }
+            #endif
+            #if DEBUG
+            if CommandLine.arguments.contains("-seedLedgerDemo") {
+                LedgerDemo.seed(context)
             }
             #endif
             checkRepeat()

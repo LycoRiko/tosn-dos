@@ -104,6 +104,11 @@ struct TemplateDetailView: View {
                 }
             }
 
+            if template.repeatRule != .off, let log = template.periodLog, !log.isEmpty {
+                periodHistory(log)
+                    .rowChrome()
+            }
+
             addTaskButton(template)
                 .rowChrome()
         }
@@ -161,6 +166,45 @@ struct TemplateDetailView: View {
             Text(label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    /// The ledger, newest first. Only shown for repeating templates that have one.
+    @ViewBuilder
+    private func periodHistory(_ log: [PeriodRecord]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("History")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            ForEach(Array(log.suffix(8).reversed().enumerated()), id: \.offset) { _, record in
+                HStack(spacing: 8) {
+                    Text(record.start.formatted(.dateTime.month(.abbreviated).day()))
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                    Spacer(minLength: 0)
+                    Text(title(for: record.outcome))
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(tint(for: record.outcome))
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func title(for outcome: PeriodRecord.Outcome) -> String {
+        switch outcome {
+        case .generated: return String(localized: "Caught up")
+        case .skipped: return String(localized: "Skipped")
+        case .manual: return String(localized: "Pulled by hand")
+        }
+    }
+
+    private func tint(for outcome: PeriodRecord.Outcome) -> Color {
+        switch outcome {
+        case .generated: return Theme.mint
+        case .skipped: return .secondary
+        case .manual: return Theme.accent
         }
     }
 

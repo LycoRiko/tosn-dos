@@ -11,9 +11,10 @@ struct PhoneRootView: View {
 
     @Environment(\.modelContext) private var context
     @State private var tab: AppTab = {
-        // Screenshot aid: launch with -openSettings to land on Settings directly.
+        // Screenshot aid: launch with -openSettings / -openBrowse to land on that tab.
         #if DEBUG
         if CommandLine.arguments.contains("-openSettings") { return .settings }
+        if CommandLine.arguments.contains("-openBrowse") { return .browse }
         #endif
         return .today
     }()
