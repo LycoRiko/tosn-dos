@@ -54,7 +54,14 @@ enum NaturalDateParser {
         return parseSingle(text, now: now, calendar: calendar)
     }
 
-    private static func parseSingle(_ raw: String, now: Date, calendar: Calendar) -> ParsedTaskInput {
+    /// `useSystemFallback` stays off by default: it exists so the measurement can
+    /// tell us whether a fallback would even help.
+    private static func parseSingle(
+        _ raw: String,
+        now: Date,
+        calendar: Calendar,
+        useSystemFallback: Bool = false
+    ) -> ParsedTaskInput {
         var text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else {
             return ParsedTaskInput(title: raw, dueDate: nil, hasTime: false)
@@ -202,6 +209,15 @@ enum NaturalDateParser {
         }
 
         let title = cleaned(text, fallback: raw)
+        if dueDate != nil {
+            ParseTelemetry.recordRules()
+        } else if useSystemFallback, let found = SystemDateFallback.date(in: raw, now: now, calendar: calendar) {
+            ParseTelemetry.recordFallback()
+            return ParsedTaskInput(title: title, dueDate: found, hasTime: true)
+        } else {
+            if useSystemFallback { ParseTelemetry.recordRejected() }
+            ParseTelemetry.recordUnresolved()
+        }
         return ParsedTaskInput(title: title, dueDate: dueDate, hasTime: hasTime)
     }
 
