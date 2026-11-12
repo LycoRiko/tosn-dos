@@ -61,6 +61,13 @@ struct TaskRow: View {
             || !task.orderedTags.isEmpty || task.isWaiting
     }
 
+    /// A clock time earns the theme colour; dates stay quiet and overdue stays red.
+    private var dueTint: Color {
+        if isLate { return Color(hex: 0xFF453A) }
+        if task.hasDueTime && !task.isCompleted { return Theme.accent }
+        return .secondary
+    }
+
     private var metaLine: some View {
         HStack(spacing: 6) {
             if task.isWaiting, let waiting = task.waitingFor {
@@ -71,7 +78,7 @@ struct TaskRow: View {
                 MetaChip(
                     icon: task.hasDueTime ? "clock" : "calendar",
                     text: dueLabel,
-                    tint: isLate ? Color(hex: 0xFF453A) : .secondary
+                    tint: dueTint
                 )
             }
 
