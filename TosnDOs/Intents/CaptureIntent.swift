@@ -15,7 +15,11 @@ struct AddTasksFromScreenshotIntent: AppIntent {
         let data = screenshot.data
         let lines = await TextRecognizer.lines(from: data)
         let tasks = CaptureParser.parse(lines: lines)
-        CaptureSession.shared.draft = CaptureSession.Draft(tasks: tasks, imageData: data)
+        CaptureSession.shared.draft = CaptureSession.Draft(
+            tasks: tasks,
+            imageData: data,
+            ocrText: lines.map(\.text).joined(separator: "\n")
+        )
 
         if tasks.isEmpty {
             return .result(dialog: "没有识别到待办事项。")

@@ -84,6 +84,8 @@ struct RootView: View {
             PhoneWatchSync.shared.start(context: context)
             #endif
             TimeMerge.runIfNeeded(context)
+            OCRBackfill.runIfNeeded(context: context)
+            SpotlightIndexer.indexAll(in: context)
             #if DEBUG && os(iOS)
             if CommandLine.arguments.contains("-activityDemo") {
                 ActivityDemo.seed(context)
@@ -102,6 +104,8 @@ struct RootView: View {
             // Flush staged deletions on the way out.
             if phase != .active {
                 UndoCenter.shared.flush()
+                // Cheaper than hooking every edit path, and the index cannot drift.
+                SpotlightIndexer.indexAll(in: context)
             }
             if phase == .active {
                 LiveActivityService.reconcile(

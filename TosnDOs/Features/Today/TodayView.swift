@@ -41,6 +41,15 @@ struct TodayHero: View {
             }
         }
         .glassCard(radius: Theme.radius, padding: 20)
+        .overlay(alignment: .bottomTrailing) {
+            // Quiet affordance: the card opens the statistics page.
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 16)
+                .padding(.bottom, 14)
+                .accessibilityHidden(true)
+        }
         .animation(.spring(response: 0.5, dampingFraction: 0.85), value: remaining)
         .accessibilityElement(children: .combine)
     }

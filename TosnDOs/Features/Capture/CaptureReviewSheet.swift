@@ -226,12 +226,14 @@ struct CaptureReviewSheet: View {
             }
             if keepScreenshot, let image = draft.imageData {
                 // Shrink before storing; backups compress again.
-                context.insert(Evidence(
+                let evidence = Evidence(
                     kind: .image,
                     text: String(localized: "Screenshot"),
                     imageData: ImageShrink.jpeg(image) ?? image,
                     task: task
-                ))
+                )
+                evidence.ocrText = draft.ocrText
+                context.insert(evidence)
             }
         }
 

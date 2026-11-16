@@ -25,6 +25,15 @@ struct TaskListView: View {
     @State private var showsTemplates = false
     @State private var showsQR = false
     @State private var pendingDelete: TodoItem?
+    /// Batch mode: `picked` survives scrolling, `dragAnchor` only lives for one drag.
+    @State private var isSelecting = false
+    @State private var picked: Set<UUID> = []
+    @State private var dragAnchorY: CGFloat?
+    @State private var rowFrames: [UUID: CGRect] = [:]
+    @State private var showsBatchDate = false
+    @State private var showsBatchMove = false
+    @State private var pendingBatchDelete: [TodoItem]?
+    @State private var showsStats = false
     /// Ignore taps for 350 ms: the previous screen's touch-up lands here.
     @State private var appearedAt = Date()
     @State private var canTap = true
@@ -88,11 +97,17 @@ struct TaskListView: View {
         List {
             if scope.smartList == .today, !isSearching {
                 Section {
-                    TodayHero(
-                        remaining: todaySnapshot.remaining,
-                        done: todaySnapshot.done,
-                        progress: todaySnapshot.progress
-                    )
+                    Button {
+                        showsStats = true
+                    } label: {
+                        TodayHero(
+                            remaining: todaySnapshot.remaining,
+                            done: todaySnapshot.done,
+                            progress: todaySnapshot.progress
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Shows statistics"))
                 }
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
@@ -149,6 +164,8 @@ struct TaskListView: View {
                 .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+        .coordinateSpace(name: Self.rowSpace)
+        .onPreferenceChange(RowFrameKey.self) { rowFrames = $0 }
         .scrollContentBackground(.hidden)
         // On iPad the rows stretched edge to edge, which left a lot of dead space
         // and very long lines. Cap the column, then let it centre.
@@ -158,23 +175,40 @@ struct TaskListView: View {
         .environment(\.photoBackground, photoBackground)
         .navigationTitle(title)
         .toolbar {
-            if let list = currentList {
+            if isSelecting {
                 ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        ShareLink(item: ListShareText.make(for: list)) {
-                            Label("Share as text", systemImage: "square.and.arrow.up")
-                        }
-                        // QR only: the bare base64 string was too long to paste
-                        // anywhere, and the camera path needs no paste at all.
-                        Button {
-                            showsQR = true
-                        } label: {
-                            Label("Show QR code", systemImage: "qrcode")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
+                    Button(allPicked ? String(localized: "Deselect all") : String(localized: "Select all")) {
+                        toggleAll()
                     }
-                    .accessibilityLabel(Text("More"))
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Done") { endSelecting() }
+                        .fontWeight(.semibold)
+                }
+            } else {
+                if let list = currentList {
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            ShareLink(item: ListShareText.make(for: list)) {
+                                Label("Share as text", systemImage: "square.and.arrow.up")
+                            }
+                            // QR only: the bare base64 string was too long to paste
+                            // anywhere, and the camera path needs no paste at all.
+                            Button {
+                                showsQR = true
+                            } label: {
+                                Label("Show QR code", systemImage: "qrcode")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        .accessibilityLabel(Text("More"))
+                    }
+                }
+                if !visibleTasks.isEmpty {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Select") { startSelecting() }
+                    }
                 }
             }
         }
@@ -224,7 +258,17 @@ struct TaskListView: View {
         .dismissKeyboardOnTap()
         #endif
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            QuickAddBar(targetList: targetList, defaultDue: defaultDue)
+            if isSelecting {
+                BatchActionBar(
+                    count: picked.count,
+                    onDate: { showsBatchDate = true },
+                    onMove: { showsBatchMove = true },
+                    onComplete: { completePicked() },
+                    onDelete: { deletePicked() }
+                )
+            } else {
+                QuickAddBar(targetList: targetList, defaultDue: defaultDue)
+            }
         }
         .sheet(item: $editingTask) { task in
             NavigationStack {
@@ -238,6 +282,43 @@ struct TaskListView: View {
         }
         .sheet(isPresented: $showsTemplates) {
             TemplateLibrarySheet()
+        }
+        .sheet(isPresented: $showsStats) {
+            StatisticsView()
+        }
+        .sheet(isPresented: $showsBatchDate) {            BatchDateSheet(count: picked.count) { day, withTime in
+                applyDate(day, withTime: withTime)
+            }
+        }
+        .sheet(isPresented: $showsBatchMove) {
+            BatchMoveSheet(
+                count: picked.count,
+                lists: lists,
+                currentListUID: currentList?.uid
+            ) { list in
+                movePicked(to: list)
+            }
+        }
+        .confirmationDialog(
+            pendingBatchDelete.map { tasks in
+                let total = tasks.reduce(0) { $0 + $1.evidenceCount }
+                return String(localized: "\(total) materials will be deleted with these tasks.")
+            } ?? "",
+            isPresented: Binding(
+                get: { pendingBatchDelete != nil },
+                set: { if !$0 { pendingBatchDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete tasks and materials", role: .destructive) {
+                if let chosen = pendingBatchDelete {
+                    WorkspaceService.delete(chosen, in: context)
+                    SpotlightIndexer.indexAll(in: context)
+                }
+                pendingBatchDelete = nil
+                endSelecting()
+            }
+            Button("Keep", role: .cancel) { pendingBatchDelete = nil }
         }
     }
 
@@ -301,6 +382,16 @@ struct TaskListView: View {
     }
 
     private func row(_ task: TodoItem) -> some View {
+        Group {
+            if isSelecting {
+                selectionRow(task)
+            } else {
+                normalRow(task)
+            }
+        }
+    }
+
+    private func normalRow(_ task: TodoItem) -> some View {
         TaskRow(task: task, showsListName: showsListName)
             .listRowInsets(EdgeInsets(top: 0, leading: Theme.pagePadding, bottom: 0, trailing: Theme.pagePadding))
             .listRowSeparator(.hidden)
@@ -308,6 +399,7 @@ struct TaskListView: View {
             .tag(task)
             .contentShape(Rectangle())
             .onTapGesture { open(task) }
+            .onLongPressGesture(minimumDuration: 0.35) { startSelecting(with: task) }
             .swipeActions(edge: .leading, allowsFullSwipe: false) {
                 Button {
                     open(task)
@@ -441,5 +533,175 @@ struct TaskListView: View {
             task.hasDueTime = false
         }
         try? context.save()
+    }
+
+    // MARK: - Batch selection
+
+    static let rowSpace = "task-rows"
+
+    private var visibleTasks: [TodoItem] { sections.flatMap(\.items) }
+
+    private var allPicked: Bool {
+        !visibleTasks.isEmpty && picked.count == visibleTasks.count
+    }
+
+    private func selectionRow(_ task: TodoItem) -> some View {
+        let isPicked = picked.contains(task.uid)
+
+        return HStack(spacing: 10) {
+            Image(systemName: isPicked ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 20, weight: .regular))
+                .foregroundStyle(isPicked ? Theme.accent : Color.secondary)
+
+            Text(task.title.isEmpty ? String(localized: "Untitled") : task.title)
+                .font(.subheadline)
+                .foregroundStyle(task.isCompleted ? .secondary : .primary)
+                .strikethrough(task.isCompleted, color: .secondary)
+                .lineLimit(1)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+        .listRowInsets(EdgeInsets(top: 0, leading: Theme.pagePadding, bottom: 0, trailing: Theme.pagePadding))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+        .background(
+            GeometryReader { proxy in
+                Color.clear.preference(
+                    key: RowFrameKey.self,
+                    value: [task.uid: proxy.frame(in: .named(Self.rowSpace))]
+                )
+            }
+        )
+        .onTapGesture { togglePick(task) }
+        .gesture(dragSelection(task))
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isPicked ? [.isButton, .isSelected] : [.isButton])
+    }
+
+    /// Hold, then move: every row the finger passes joins the selection.
+    private func dragSelection(_ task: TodoItem) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.28)
+            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named(Self.rowSpace)))
+            .onChanged { value in
+                switch value {
+                case .first(true):
+                    if dragAnchorY == nil { dragAnchorY = rowFrames[task.uid]?.midY }
+                    picked.insert(task.uid)
+                case .second(true, let drag?):
+                    if dragAnchorY == nil { dragAnchorY = rowFrames[task.uid]?.midY }
+                    extendSelection(to: drag.location.y)
+                default:
+                    break
+                }
+            }
+            .onEnded { _ in dragAnchorY = nil }
+    }
+
+    private func extendSelection(to y: CGFloat) {
+        guard let anchor = dragAnchorY else { return }
+        let low = min(anchor, y)
+        let high = max(anchor, y)
+        for (uid, frame) in rowFrames where frame.midY >= low && frame.midY <= high {
+            picked.insert(uid)
+        }
+    }
+
+    private func startSelecting(with task: TodoItem) {
+        isSelecting = true
+        picked = [task.uid]
+        dragAnchorY = rowFrames[task.uid]?.midY
+    }
+
+    private func startSelecting() {
+        isSelecting = true
+        picked = []
+        dragAnchorY = nil
+    }
+
+    private func endSelecting() {
+        isSelecting = false
+        picked = []
+        dragAnchorY = nil
+    }
+
+    private func togglePick(_ task: TodoItem) {
+        if picked.contains(task.uid) {
+            picked.remove(task.uid)
+        } else {
+            picked.insert(task.uid)
+        }
+    }
+
+    private func toggleAll() {
+        picked = allPicked ? [] : Set(visibleTasks.map(\.uid))
+    }
+
+    private func selectedTasks() -> [TodoItem] {
+        visibleTasks.filter { picked.contains($0.uid) }
+    }
+
+    private func applyDate(_ day: Date, withTime: Bool) {
+        let target = withTime ? day : Calendar.current.startOfDay(for: day)
+        for task in selectedTasks() {
+            task.dueDate = target
+            task.hasDueTime = withTime
+            // A range cannot end before it starts, so collapse it instead.
+            if let end = task.endDate, end < target {
+                task.endDate = nil
+                task.startReminderEnabled = false
+                task.endReminderEnabled = false
+            }
+            NotificationService.sync(task)
+            LiveActivityService.refresh(for: task)
+        }
+        WorkspaceService.save(context)
+        SpotlightIndexer.indexAll(in: context)
+        endSelecting()
+    }
+
+    private func movePicked(to list: TodoList) {
+        var next = (list.tasks ?? []).map(\.sortIndex).max().map { $0 + 1 } ?? 0
+        for task in selectedTasks() {
+            task.list = list
+            task.sortIndex = next
+            next += 1
+        }
+        list.reconcileCompletion()
+        currentList?.reconcileCompletion()
+        WorkspaceService.save(context)
+        SpotlightIndexer.indexAll(in: context)
+        endSelecting()
+    }
+
+    private func completePicked() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+            for task in selectedTasks() where !task.isCompleted {
+                task.setCompleted(true)
+            }
+        }
+        try? context.save()
+        endSelecting()
+    }
+
+    private func deletePicked() {
+        let chosen = selectedTasks()
+        guard !chosen.isEmpty else { return }
+        let materials = chosen.reduce(0) { $0 + $1.evidenceCount }
+        if materials > 0 {
+            pendingBatchDelete = chosen
+        } else {
+            WorkspaceService.delete(chosen, in: context)
+            SpotlightIndexer.indexAll(in: context)
+            endSelecting()
+        }
+    }
+}
+
+private struct RowFrameKey: PreferenceKey {
+    static let defaultValue: [UUID: CGRect] = [:]
+    static func reduce(value: inout [UUID: CGRect], nextValue: () -> [UUID: CGRect]) {
+        value.merge(nextValue()) { _, new in new }
     }
 }

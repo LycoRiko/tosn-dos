@@ -14,7 +14,7 @@ struct BrowseView: View {
     @State private var path = NavigationPath()
     @State private var newListSheet = false
     @State private var pendingDeleteList: TodoList?
-
+    @State private var showsSearch = false
     init(pendingList: Binding<UUID?> = .constant(nil)) {
         _pendingList = pendingList
     }
@@ -23,6 +23,7 @@ struct BrowseView: View {
     var body: some View {
         NavigationStack(path: $path) {
             List {
+                SearchEntryRow { showsSearch = true }
                 listsSection
                 previousSection
                 templatesSection
@@ -101,6 +102,9 @@ struct BrowseView: View {
                 NavigationStack {
                     TemplateEditorView(template: nil)
                 }
+            }
+            .sheet(isPresented: $showsSearch) {
+                SearchView()
             }
         }
     }

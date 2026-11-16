@@ -35,6 +35,9 @@ final class Evidence {
     var uid: UUID = UUID()
     var kindRaw: Int = EvidenceKind.text.rawValue
     var text: String = ""
+    /// Words lifted from a screenshot. Kept only so search can find them; the
+    /// image itself is what the row shows.
+    var ocrText: String = ""
     /// Screenshots live outside the row: they are megabytes, not bytes.
     @Attribute(.externalStorage) var imageData: Data?
     var createdAt: Date = Date()

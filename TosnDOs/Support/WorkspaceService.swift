@@ -166,6 +166,30 @@ enum WorkspaceService {
         }
     }
 
+    /// One undo entry for a whole selection: rollback restores every task at once.
+    static func delete(_ tasks: [TodoItem], in context: ModelContext) {
+        guard !tasks.isEmpty else { return }
+        let uids = tasks.map(\.uid)
+        let owners = tasks.compactMap(\.list)
+
+        for task in tasks {
+            NotificationService.cancel(task)
+            LiveActivityService.end(for: task, done: false)
+            context.delete(task)
+        }
+        for owner in owners { owner.reconcileCompletion() }
+
+        UndoCenter.shared.stage(
+            message: String(localized: "Deleted \(tasks.count) tasks"),
+            commit: { save(context) },
+            undo: {
+                context.rollback()
+                let alive = Set(((try? context.fetch(FetchDescriptor<TodoItem>())) ?? []).map(\.uid))
+                return uids.allSatisfy { alive.contains($0) }
+            }
+        )
+    }
+
     static func delete(_ list: TodoList, in context: ModelContext) {
         let uid = list.uid
         let name = list.title

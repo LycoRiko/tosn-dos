@@ -19,6 +19,7 @@ struct PhoneRootView: View {
         return .today
     }()
     @State private var pendingList: UUID?
+    @State private var linkedTask: TodoItem?
 
     var body: some View {
         TabView(selection: $tab) {
@@ -29,7 +30,7 @@ struct PhoneRootView: View {
             }
 
             Tab("Browse", systemImage: "square.grid.2x2", value: AppTab.browse) {
-                BrowseView(pendingList: $pendingList)
+                LibrarySplitView(pendingList: $pendingList)
             }
 
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
@@ -44,7 +45,22 @@ struct PhoneRootView: View {
             if url.host == "today" { tab = .today }
             if url.host == "browse" { tab = .browse }
             if url.host == "import" { importSharedList(from: url) }
+            if url.host == "task" { openLinkedTask(url) }
         }
+        .sheet(item: $linkedTask) { task in
+            TaskEditorView(task: task)
+        }
+    }
+
+    /// Spotlight hands back `tosndos://task/<uid>`; the row may live anywhere,
+    /// so the editor opens over the current tab instead of jumping lists.
+    private func openLinkedTask(_ url: URL) {
+        guard
+            let uid = UUID(uuidString: url.lastPathComponent),
+            let task = try? context.fetch(FetchDescriptor<TodoItem>())
+                .first(where: { $0.uid == uid })
+        else { return }
+        linkedTask = task
     }
 
     /// `tosndos://import?c=<code>` — always lands as a new list, never merges

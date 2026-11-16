@@ -6,11 +6,21 @@ struct HomeView: View {
     @Binding var selection: TodoItem?
 
     @State private var scope: SidebarItem = .smart(.today)
+    @State private var showsSearch = false
 
     var body: some View {
         TaskListView(scope: scope, selection: $selection)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                // One group so iOS 26 draws a single glass capsule around both.
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button {
+                        showsSearch = true
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .accessibilityLabel(Text("Search"))
+                    .help(Text("Search"))
+
                     Menu {
                         Picker("Show", selection: $scope) {
                             ForEach(SmartList.allCases) { smart in
@@ -24,6 +34,9 @@ struct HomeView: View {
                     .accessibilityLabel(Text("Filter"))
                     .help(Text("Filter"))
                 }
+            }
+            .sheet(isPresented: $showsSearch) {
+                SearchView()
             }
     }
 }

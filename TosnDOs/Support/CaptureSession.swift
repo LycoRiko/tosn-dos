@@ -10,6 +10,8 @@ final class CaptureSession {
         let id = UUID()
         var tasks: [CapturedTask]
         var imageData: Data?
+        /// Joined OCR lines, stored with the screenshot so search can find it.
+        var ocrText: String = ""
     }
 
     var draft: Draft?
