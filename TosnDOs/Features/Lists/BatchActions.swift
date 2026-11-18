@@ -81,7 +81,7 @@ struct BatchDateSheet: View {
                 }
             }
             .navigationTitle("Move \(count) to a date")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -131,7 +131,7 @@ struct BatchMoveSheet: View {
                 }
             }
             .navigationTitle("Move \(count) to a list")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

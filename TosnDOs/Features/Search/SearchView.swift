@@ -118,7 +118,7 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Search")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .searchable(
                 text: $query,
                 prompt: Text("Search tasks, lists and screenshots")

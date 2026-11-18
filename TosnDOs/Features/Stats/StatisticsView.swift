@@ -6,9 +6,10 @@ import SwiftData
 struct StatisticsView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \TodoItem.sortIndex) private var allTasks: [TodoItem]
+    @Query(sort: \TodoList.sortIndex) private var lists: [TodoList]
 
     private var stats: StatsSnapshot {
-        StatsService.snapshot(from: allTasks)
+        StatsService.snapshot(from: allTasks, lists: lists)
     }
 
     var body: some View {
@@ -19,6 +20,10 @@ struct StatisticsView: View {
                     streakCard
                     heatmapCard
                     onTimeCard
+                    byListCard
+                    byHourCard
+                    templateCard
+                    medianCard
                 }
                 .padding(.horizontal, Theme.pagePadding)
                 .padding(.top, 8)
@@ -27,7 +32,7 @@ struct StatisticsView: View {
             .scrollContentBackground(.hidden)
             .background(AppBackground())
             .navigationTitle("Statistics")
-            .navigationBarTitleDisplayMode(.inline)
+            .inlineNavigationTitle()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
@@ -159,6 +164,134 @@ struct StatisticsView: View {
                     .foregroundStyle(.secondary)
             } else {
                 Text("No deadlines to measure yet.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard()
+    }
+
+    private var byListCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("This month by list")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            if stats.byList.isEmpty {
+                Text("Nothing finished yet.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } else {
+                let top = stats.byList.first?.count ?? 1
+                ForEach(stats.byList, id: \.name) { entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 8) {
+                            Text(entry.name)
+                                .font(.footnote)
+                                .lineLimit(1)
+                            Spacer(minLength: 6)
+                            Text("\(entry.count)")
+                                .font(.footnote.weight(.medium))
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        GeometryReader { proxy in
+                            Capsule()
+                                .fill(Theme.accent.opacity(0.55))
+                                .frame(
+                                    width: max(4, proxy.size.width * CGFloat(entry.count) / CGFloat(max(top, 1))),
+                                    height: 6
+                                )
+                        }
+                        .frame(height: 6)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard()
+    }
+
+    private var byHourCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("When you finish")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            let top = stats.byHour.max() ?? 0
+            HStack(alignment: .bottom, spacing: 3) {
+                ForEach(0..<24, id: \.self) { hour in
+                    let count = stats.byHour[hour]
+                    Capsule()
+                        .fill(count == 0 ? Color.primary.opacity(0.08) : Theme.accent.opacity(0.75))
+                        .frame(height: max(3, 34 * CGFloat(count) / CGFloat(max(top, 1))))
+                        // Bars are decoration; the caption below carries the meaning.
+                        .frame(maxWidth: .infinity, alignment: .bottom)
+                        .accessibilityHidden(true)
+                }
+            }
+            .frame(height: 40, alignment: .bottom)
+
+            if let peak = peakHour {
+                Text("Most often around \(peak)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard()
+    }
+
+    private var peakHour: String? {
+        guard let top = stats.byHour.max(), top > 0,
+              let hour = stats.byHour.firstIndex(of: top) else { return nil }
+        let date = Calendar.current.date(
+            bySettingHour: hour, minute: 0, second: 0, of: Date()
+        ) ?? Date()
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+
+    private var templateCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("From templates")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            if let rate = stats.templateRate {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(rate.formatted(.percent.precision(.fractionLength(0))))
+                        .font(.system(.title, design: .rounded).weight(.bold))
+                        .monospacedDigit()
+                    Text("\(stats.templateFinished) of \(stats.templateTotal) finished")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Text("No list has come from a template yet.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard()
+    }
+
+    private var medianCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Typical time to finish")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            if let hours = stats.medianHours {
+                Text(DurationFormat.short(hours * 3600))
+                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .monospacedDigit()
+                Text("From writing it down to ticking it off.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Not enough finished tasks yet.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }

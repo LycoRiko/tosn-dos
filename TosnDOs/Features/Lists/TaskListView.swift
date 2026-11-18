@@ -699,7 +699,9 @@ struct TaskListView: View {
     }
 }
 
-private struct RowFrameKey: PreferenceKey {
+/// `SwiftUI.PreferenceKey` is spelled out because `Preferences.swift` owns a type
+/// called `PreferenceKey` for `@AppStorage` keys.
+private struct RowFrameKey: SwiftUI.PreferenceKey {
     static let defaultValue: [UUID: CGRect] = [:]
     static func reduce(value: inout [UUID: CGRect], nextValue: () -> [UUID: CGRect]) {
         value.merge(nextValue()) { _, new in new }

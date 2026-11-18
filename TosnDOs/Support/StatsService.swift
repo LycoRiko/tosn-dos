@@ -11,10 +11,22 @@ struct StatsSnapshot {
     var longestStreak = 0
     var onTime = 0
     var late = 0
+    /// Finished work this month, biggest list first.
+    var byList: [(name: String, count: Int)] = []
+    /// 24 slots, one per hour of the day.
+    var byHour: [Int] = Array(repeating: 0, count: 24)
+    /// Hours between creating and finishing; median is less distorted than average.
+    var medianHours: Double?
+    var templateFinished = 0
+    var templateTotal = 0
 
     var onTimeRate: Double? {
         let total = onTime + late
         return total == 0 ? nil : Double(onTime) / Double(total)
+    }
+
+    var templateRate: Double? {
+        templateTotal == 0 ? nil : Double(templateFinished) / Double(templateTotal)
     }
 }
 
@@ -23,6 +35,7 @@ enum StatsService {
 
     static func snapshot(
         from tasks: [TodoItem],
+        lists: [TodoList] = [],
         now: Date = .now,
         calendar: Calendar = .current
     ) -> StatsSnapshot {
@@ -66,7 +79,59 @@ enum StatsService {
             }
         }
 
+        stats.byList = listBreakdown(tasks: tasks, month: thisMonth, calendar: calendar)
+        stats.byHour = hourHistogram(tasks: tasks, since: horizon, calendar: calendar)
+        stats.medianHours = medianFinishHours(tasks: tasks, since: horizon, calendar: calendar)
+
+        let fromTemplates = lists.filter { $0.periodDate != nil }
+        stats.templateTotal = fromTemplates.count
+        stats.templateFinished = fromTemplates.filter(\.isFinished).count
+
         return stats
+    }
+
+    /// Only the head of the list is worth showing; the tail is noise.
+    private static func listBreakdown(
+        tasks: [TodoItem],
+        month: DateInterval?,
+        calendar: Calendar
+    ) -> [(name: String, count: Int)] {
+        guard let month else { return [] }
+        var counts: [String: Int] = [:]
+        for task in tasks {
+            guard task.isCompleted, let finished = task.completedAt, month.contains(finished) else { continue }
+            counts[task.list?.title ?? String(localized: "No list"), default: 0] += 1
+        }
+        return counts
+            .sorted { $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value }
+            .prefix(5)
+            .map { (name: $0.key, count: $0.value) }
+    }
+
+    private static func hourHistogram(tasks: [TodoItem], since: Date, calendar: Calendar) -> [Int] {
+        var buckets = Array(repeating: 0, count: 24)
+        for task in tasks {
+            guard task.isCompleted, let finished = task.completedAt, finished >= since else { continue }
+            let hour = calendar.component(.hour, from: finished)
+            buckets[hour] += 1
+        }
+        return buckets
+    }
+
+    private static func medianFinishHours(tasks: [TodoItem], since: Date, calendar: Calendar) -> Double? {
+        var hours: [Double] = []
+        for task in tasks {
+            guard task.isCompleted, let finished = task.completedAt, finished >= since else { continue }
+            let span = finished.timeIntervalSince(task.createdAt)
+            guard span > 0 else { continue }
+            hours.append(span / 3600)
+        }
+        guard !hours.isEmpty else { return nil }
+        hours.sort()
+        let middle = hours.count / 2
+        return hours.count.isMultiple(of: 2)
+            ? (hours[middle - 1] + hours[middle]) / 2
+            : hours[middle]
     }
 
     /// Today does not break a streak until it is over — an empty morning is not

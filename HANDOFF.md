@@ -11,7 +11,7 @@
 | -- | ------------------------------------------------------------- |
 | 仓库 | <https://github.com/LycoRiko/tosn-dos>（public，`main`）         |
 | 平台 | iOS 18+ / iPadOS 18+ / macOS 15+ / watchOS 10+，Xcode 26.1.1   |
-| 构建 | **5.41 的改动还没编译过**（用户没插电）；上一次四端通过是 `8de102c`      |
+| 构建 | 四端 `BUILD SUCCEEDED`（2026-11-18）；逻辑测试 49 条 + UI 冒烟 2 条全过        |
 | 真机 | iPhone 16 Pro Max（iOS 27.0.1）已装 `1.0-186cdef`（1.1M，含 5.39），免费账号 7 天有效期   |
 | 签名 | Team `S465RV3CLC`（REGer Bili / Personal Team，免费）              |
 | 版本 | Bundle `com.rikomiyazaki.TosnDOs`（`.widget` / `.watchkitapp`） |
@@ -117,6 +117,60 @@ xcodebuild -project TosnDOs.xcodeproj -scheme TosnDOsWatch \
 ---
 
 ## 5. 待办
+
+### 5.42 编译收尾 · 统计第二批 · UI 测试骨架（2026-11-18）
+
+5.41 那一批改动全部编译通过，并把欠的两件事补上了。
+
+**编译时才暴露的三个问题**（都是 5.41 只跑语法校验没发现的）
+
+1. `RowFrameKey: PreferenceKey` 编译失败——`Preferences.swift` 里已经有一个叫 `PreferenceKey` 的
+   `@AppStorage` 键名枚举，把 SwiftUI 的协议遮住了。改成 `SwiftUI.PreferenceKey` 显式限定。
+2. `.navigationBarTitleDisplayMode(.inline)` 在 macOS 不存在（三处：搜索页、统计页、两个批量弹窗）。
+   全部换成 `Compat.swift` 已有的 `.inlineNavigationTitle()` 垫片。
+3. `WorkspaceService` 里一次编辑把两行粘成一行（`let uid = list.uid        let name = list.title`），
+   `swiftc -parse` 抓到了，已修。**教训：连续做"只改空白"的编辑很容易粘连，改完必须 parse 一遍。**
+
+**统计第二批**（`StatsService` + `StatisticsView`）
+
+- 本月按清单分布（前 5 名横条）、完成时段（24 格柱状 + "最常在 X 点"）、模板清单完成率
+  （`periodDate != nil` 的清单里已完成的占比）、典型完成耗时（createdAt → completedAt 中位数，
+  复用 `DurationFormat.short`）。
+- 口径仍全部现算，不加字段、不存计数器。
+
+**UI 测试骨架（新 target `TosnDOsUITests`）**
+
+- 手写进 pbxproj：`PBXFileSystemSynchronizedRootGroup`（目录 `TosnDOsUITests`）+ ui-testing 类型的
+  target + 对主 App 的 `PBXTargetDependency`。ID 段用 `…EE55FFA0–AA`，避开已有 00–5F。
+- **单独一个 scheme `TosnDOsUITests.xcscheme`**，没并进 `TosnDOs` 的 TestAction——主 scheme 的测试
+  跑在 macOS 目的地，混进 iOS-only 的 UI 测试会直接报"不支持该平台"（5.37 踩过）。
+- 两条冒烟用例：快速输入加一条任务；浏览页能进搜索并聚焦。
+- 为了能测：`-uiTesting` 启动参数跳过引导页（DEBUG）；`today.quickAdd` / `browse.search` 两个
+  accessibilityIdentifier 当锚点。
+- **前置条件**：模拟器要关掉硬件键盘，否则 `typeText` 报 "Neither element nor any descendant has
+  keyboard focus"。本机已执行 `defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false`。
+
+**无障碍**：任务行的 meta chips（日期/子任务/清单/标签）合并成一个朗读单元，不再碎成四段。
+
+**发现一处该问用户的重复入口**：iOS 26 下 `TaskListView` 的 `.searchable` 会常驻在导航栏
+（"Search tasks"），和今天页右上角新加的放大镜（全局搜索）同时出现——两个搜索、两种范围。
+要么把列表内那个改回 `.automatic`（下拉才出现），要么干脆去掉。**等用户拍板，本轮没动。**
+
+**验证结果**（2026-11-18 全部跑通）
+
+| 项 | 结果 |
+|---|---|
+| iOS（含 watch 嵌入） | `BUILD SUCCEEDED` |
+| macOS | `BUILD SUCCEEDED` + 逻辑测试 **49/49** |
+| watchOS | `BUILD SUCCEEDED` |
+| UI 冒烟（iOS 模拟器） | **2/2**：快速输入加任务、浏览页进搜索并聚焦 |
+
+跑 UI 测试的命令：
+```bash
+xcodebuild test -project TosnDOs.xcodeproj -scheme TosnDOsUITests \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  SWIFT_ENABLE_EXPLICIT_MODULES=NO OTHER_SWIFT_FLAGS='$(inherited) -disable-sandbox'
+```
 
 ### 5.41 全局搜索 · 批量操作 · 统计页 · iPad 分栏（2026-11-16，本轮未编译）
 
@@ -1235,7 +1289,7 @@ TodoList
 
 **质量保证**
 
-- **只有逻辑层测试**：`TosnDOsTests` 8 个用例；**没有 UI 测试**，界面回归仍靠四端编过 + 手点
+- **UI 测试只有两条冒烟**（加任务、进搜索）：界面回归仍主要靠四端编过 + 手点
 - 只在 iPhone 16 Pro Max（iOS 27）+ 模拟器上跑过；旧机型、iPad 真机都未实测
 - VoiceOver 只做了标签和 Dynamic Type，**没跑过完整朗读流程**
 - 本地化审计是脚本一次性跑的，没有 CI 守着
@@ -1322,18 +1376,13 @@ TodoList
 > 2026-11-16 更新。5.41 这一轮把搜索、批量、统计第一批、iPad 分栏都写完了，
 > **但一行都没编译过**（用户电脑没插电）。所以下轮第 0 步是编译，不是新功能。
 
-**第 0 步（必须先做）**
-
-1. 四端编译 + `xcodebuild test -destination 'platform=macOS'`；按 5.41 末尾的风险清单逐条看。
-2. 编译不过的地方大概率是：`ToolbarItemGroup` 的可用性、`compactSheetDetents` 与 Form 的组合、
-   `StatisticsView` 里 `Text(value == 1 ? … : …)` 的类型推断。
-
 **A. 能独立做，按价值排**
 
-1. **统计第二批**：各清单完成分布、完成时段热力、平均耗时、模板按期率。
-2. **UI 测试骨架**：新 target 手写进 pbxproj，跑「建清单 → 加任务 → 勾完 → 往期出现」。
-3. **无障碍第二轮**：编辑页 / 模板页大字号实测，VoiceOver 朗读顺序（hero、任务行、撤销条、批量条）。
-4. **搜索结果高亮**：目前命中片段给的是上下文，没有把关键词标色。
+1. **搜索结果关键词标色**：现在只给上下文片段，命中词没有高亮。
+2. **无障碍第二轮（剩下的一半）**：编辑页/模板页在最大字号下逐屏看；VoiceOver 朗读顺序
+   （hero → 任务行 → 批量条 → 撤销条）。任务行的 meta 已合并，编辑页还没看。
+3. **UI 测试补第二条链路**：建清单 → 加任务 → 勾完 → 往期清单里出现（现有两条只覆盖加任务与搜索）。
+4. **搜索/统计的入口去重**：见 5.42 结尾那个"两个搜索"的问题，等用户拍板后动手。
 
 **B. 需要用户拍板**
 

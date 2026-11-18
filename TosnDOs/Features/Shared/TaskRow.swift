@@ -42,7 +42,9 @@ struct TaskRow: View {
                 }
 
                 if hasMeta {
+                    // Chips are one sentence to a listener, not four fragments.
                     metaLine
+                        .accessibilityElement(children: .combine)
                 }
             }
 

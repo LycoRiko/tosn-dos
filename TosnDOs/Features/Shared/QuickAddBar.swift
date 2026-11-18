@@ -55,6 +55,7 @@ struct QuickAddBar: View {
                 .focused($focused)
                 .submitLabel(.done)
                 .onSubmit(add)
+                .accessibilityIdentifier("today.quickAdd")
 
             if let previewLabel {
                 Button {

@@ -14,6 +14,10 @@ struct TosnDOsApp: App {
         if CommandLine.arguments.contains("-seedLedgerDemo") {
             LedgerDemo.seed(AppContainer.boot.container.mainContext)
         }
+        // UI tests must start on the real screen, not the onboarding page.
+        if CommandLine.arguments.contains("-uiTesting") {
+            UserDefaults.standard.set(true, forKey: PreferenceKey.hasOnboarded)
+        }
         #endif
     }
 

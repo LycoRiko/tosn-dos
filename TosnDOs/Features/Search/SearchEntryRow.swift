@@ -24,6 +24,7 @@ struct SearchEntryRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("Search"))
+        .accessibilityIdentifier("browse.search")
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .listRowInsets(EdgeInsets(top: 6, leading: Theme.pagePadding, bottom: 10, trailing: Theme.pagePadding))
